@@ -1,16 +1,43 @@
 @import "tailwindcss";
 
 @theme {
-  /* TODO: Valores exactos por definir para estas variables:
-  --color-ink: ...;
-  --color-ink-soft: ...;
-  --color-accent: ...;
-  --color-accent-dim: ...;
-  --color-plum: ...;
-  --color-plum-deep: ...;
-  --color-paper: ...;
-  --color-muted: ...;
-  --font-display: ...;
-  --font-body: ...;
-  */
+  --color-bg: #0a0d12;
+  --color-bg-2: #0d1119;
+  --color-panel: #0f1520;
+  --color-panel-2: #121a27;
+  --color-line: #1d2634;
+  --color-ink: #e9edf3;
+  --color-ink-inverse: #06130c;
+  --color-muted: #96a1b3;
+  --color-accent: #25e98a;
+  --color-gold: #f2b636;
+
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-bg text-ink font-body antialiased;
+  }
+
+  ::selection {
+    background: rgb(37 233 138 / 0.3);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }

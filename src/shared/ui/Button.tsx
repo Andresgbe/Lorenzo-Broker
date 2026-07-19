@@ -36,10 +36,12 @@ export function Button({
   ...props
 }: ButtonProps) {
   const baseClasses = cn(
-    'inline-flex items-center justify-center font-medium transition-colors cursor-pointer',
-    'px-4 py-2 rounded-md',
-    variant === 'primary' && 'bg-white text-black hover:opacity-90',
-    variant === 'ghost' && 'bg-transparent text-black hover:bg-gray-100',
+    'inline-flex items-center justify-center whitespace-nowrap cursor-pointer',
+    'font-bold text-[13px] uppercase tracking-[1.2px] px-7 py-3.5 rounded-xl transition-all duration-150',
+    variant === 'primary' &&
+      'bg-accent text-ink-inverse shadow-[0_0_24px_rgba(37,233,138,0.35)] hover:shadow-[0_0_34px_rgba(37,233,138,0.5)]',
+    variant === 'ghost' &&
+      'bg-transparent text-ink border border-line shadow-none hover:border-accent hover:text-accent',
     className
   );
 
@@ -64,11 +66,11 @@ export function Button({
 
   if ('href' in props && props.href) {
     const { href, ...rest } = props;
+    const isInPageAnchor = href.startsWith('#');
     return (
       <motion.a
         href={href}
-        target="_blank"
-        rel="noopener noreferrer"
+        {...(!isInPageAnchor && { target: '_blank', rel: 'noopener noreferrer' })}
         className={baseClasses}
         {...animationProps}
         {...(rest as any)}

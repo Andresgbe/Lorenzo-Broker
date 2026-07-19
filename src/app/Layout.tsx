@@ -4,7 +4,7 @@ import { Footer } from '../widgets/footer';
 
 export function Layout() {
   return (
-    <div className="flex flex-col min-h-screen bg-neutral-950 text-white selection:bg-blue-500/30">
+    <div className="flex flex-col min-h-screen bg-bg text-ink">
       <Navbar />
       <main className="flex-1">
         <Outlet />
