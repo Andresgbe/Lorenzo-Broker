@@ -6,10 +6,12 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:gh-pages": "tsc -b && vite build --mode gh-pages && cp dist/index.html dist/404.html",
     "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.110.8",
     "clsx": "^2.1.1",
     "framer-motion": "^12.42.2",
     "react": "^19.2.7",

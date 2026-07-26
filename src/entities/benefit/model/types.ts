@@ -3,4 +3,5 @@ export interface Benefit {
   title: string;
   description: string;
   bonus?: boolean;
+  logo?: 'binance';
 }
