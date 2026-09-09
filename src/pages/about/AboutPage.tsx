@@ -23,7 +23,6 @@ export function AboutPage() {
             align="left"
             eyebrow="Sobre mí"
             title={<>Lorenzo <span className="text-accent">Pérez</span></>}
-            className="text-center lg:text-left"
           />
         </div>
 
@@ -32,7 +31,7 @@ export function AboutPage() {
             Soy Lorenzo Pérez y llevo más de 15 años dentro de los mercados.
           </p>
 
-          <div className="grid gap-5 md:columns-1">
+          <div className="grid gap-5">
             {BIO_PARAGRAPHS.map((paragraph) => (
               <p key={paragraph} className="text-muted text-[17px] md:text-lg leading-relaxed">
                 {paragraph}

@@ -12,10 +12,10 @@ export function ClosingCta() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.5 }}
-          className="font-display font-bold text-[clamp(32px,4.6vw,46px)] leading-[1.15] text-ink"
+          className="font-display font-bold text-[clamp(30px,4.6vw,50px)] leading-[1.15] text-ink text-balance max-w-4xl mx-auto"
         >
           Opera con un plan.
-          <br />
+          <br className="hidden sm:inline" />{' '}
           Aprende con <span className="text-accent">alguien que opera</span>.
         </motion.h2>
 
@@ -28,7 +28,7 @@ export function ClosingCta() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.5, delay: 0.1 }}
-          className="max-w-[820px] mx-auto mt-14 px-6 py-5 border border-line rounded-2xl bg-panel text-muted text-[12.5px] text-left"
+          className="max-w-[900px] mx-auto mt-14 px-5 sm:px-6 py-5 border border-line rounded-2xl bg-panel text-muted text-[12.5px] text-left"
         >
           <b className="text-[#c6cedb]">Aviso de riesgo.</b> El contenido de esta comunidad es exclusivamente educativo y
           no constituye asesoría financiera ni recomendación de inversión. Operar en los mercados financieros,
