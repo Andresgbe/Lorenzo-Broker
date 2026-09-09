@@ -11,25 +11,34 @@ const BIO_PARAGRAPHS = [
 
 export function AboutPage() {
   return (
-    <Container className="py-24">
+    <Container className="py-20 md:py-24">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="max-w-2xl mx-auto"
+        className="grid gap-12 lg:grid-cols-[minmax(260px,1fr)_minmax(0,1.9fr)] lg:gap-16 xl:gap-24"
       >
-        <SectionHeading eyebrow="Sobre mí" title={<>Lorenzo <span className="text-accent">Pérez</span></>} />
+        <div className="lg:sticky lg:top-28 lg:self-start">
+          <SectionHeading
+            align="left"
+            eyebrow="Sobre mí"
+            title={<>Lorenzo <span className="text-accent">Pérez</span></>}
+            className="text-center lg:text-left"
+          />
+        </div>
 
-        <p className="text-ink text-xl font-semibold leading-relaxed mt-10 mb-6">
-          Soy Lorenzo Pérez y llevo más de 15 años dentro de los mercados.
-        </p>
+        <div>
+          <p className="text-ink text-xl md:text-[22px] font-semibold leading-relaxed mb-7">
+            Soy Lorenzo Pérez y llevo más de 15 años dentro de los mercados.
+          </p>
 
-        <div className="grid gap-5">
-          {BIO_PARAGRAPHS.map((paragraph) => (
-            <p key={paragraph} className="text-muted text-lg leading-relaxed">
-              {paragraph}
-            </p>
-          ))}
+          <div className="grid gap-5 md:columns-1">
+            {BIO_PARAGRAPHS.map((paragraph) => (
+              <p key={paragraph} className="text-muted text-[17px] md:text-lg leading-relaxed">
+                {paragraph}
+              </p>
+            ))}
+          </div>
         </div>
       </motion.div>
     </Container>
