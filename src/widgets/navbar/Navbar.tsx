@@ -28,7 +28,7 @@ export function Navbar() {
       <Container className="flex items-center justify-between h-[76px]">
         <Logo />
 
-        <nav className="hidden md:flex items-center gap-9">
+        <nav className="hidden lg:flex items-center gap-7 xl:gap-9">
           {navLinks.map((link) => (
             <Link key={link.label} to={link.to} className={navLinkClasses}>
               {link.label}
@@ -36,14 +36,14 @@ export function Navbar() {
           ))}
         </nav>
 
-        <div className="flex items-center gap-5">
-          <Link to={mentorshipLink.to} className={`hidden md:inline ${navLinkClasses}`}>
+        <div className="flex items-center gap-3 sm:gap-5">
+          <Link to={mentorshipLink.to} className={`hidden lg:inline ${navLinkClasses}`}>
             {mentorshipLink.label}
           </Link>
           <SubscribeButton />
           <button
             type="button"
-            className="md:hidden text-ink text-2xl leading-none cursor-pointer"
+            className="lg:hidden text-ink text-2xl leading-none cursor-pointer"
             aria-label={open ? 'Cerrar menú' : 'Abrir menú'}
             aria-expanded={open}
             onClick={() => setOpen((v) => !v)}
@@ -54,7 +54,7 @@ export function Navbar() {
       </Container>
 
       {open && (
-        <nav className="md:hidden absolute top-[76px] left-0 right-0 bg-bg-2 border-b border-line flex flex-col gap-5 p-6 text-sm font-semibold tracking-[1.4px] uppercase text-[#c6cedb]">
+        <nav className="lg:hidden absolute top-[76px] left-0 right-0 bg-bg-2 border-b border-line flex flex-col gap-5 p-6 text-sm font-semibold tracking-[1.4px] uppercase text-[#c6cedb]">
           {[...navLinks, mentorshipLink].map((link) => (
             <Link key={link.label} to={link.to} onClick={() => setOpen(false)} className="hover:text-accent transition-colors">
               {link.label}

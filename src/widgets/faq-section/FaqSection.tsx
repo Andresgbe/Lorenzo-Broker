@@ -205,7 +205,12 @@ export function FaqSection({ variant = 'full' }: FaqSectionProps) {
           </div>
         )}
 
-        <div className={cn('max-w-[760px] mx-auto grid gap-3.5', canCurateHome ? 'mt-6' : 'mt-14')}>
+        <div
+          className={cn(
+            'max-w-[760px] lg:max-w-none mx-auto grid gap-3.5 lg:grid-cols-2 lg:gap-x-6 lg:items-start',
+            canCurateHome ? 'mt-6' : 'mt-14'
+          )}
+        >
           {visibleItems.map((item) =>
             isAdminEditing ? (
               <div key={item.id} className="bg-panel border border-line rounded-2xl p-5">

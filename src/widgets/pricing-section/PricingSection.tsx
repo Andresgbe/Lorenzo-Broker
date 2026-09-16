@@ -126,7 +126,7 @@ export function PricingSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-80px' }}
             transition={{ duration: 0.5 }}
-            className="w-full max-w-[460px] bg-panel border border-accent/40 rounded-[22px] px-10 py-11 text-center shadow-[0_0_60px_rgba(37,233,138,0.08)]"
+            className="w-full max-w-[460px] bg-panel border border-accent/40 rounded-[22px] px-6 sm:px-10 py-11 text-center shadow-[0_0_60px_rgba(37,233,138,0.08)]"
           >
             {isAuthenticated ? (
               <input
