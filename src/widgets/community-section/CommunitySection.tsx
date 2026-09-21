@@ -14,6 +14,7 @@ interface Channel {
   label: string;
   locked: boolean;
   description: string;
+  voice?: boolean;
 }
 
 interface ChannelGroup {
@@ -25,48 +26,41 @@ const DEFAULT_SERVER_NAME = 'LORENZO BROKER';
 
 const DEFAULT_CHANNEL_GROUPS: ChannelGroup[] = [
   {
-    category: 'Lorenzo escribe aquí',
+    category: 'Canales de texto',
     channels: [
       {
-        id: 'senales-swing',
-        label: 'señales-swing',
+        id: 'bienvenida',
+        label: 'bienvenida',
         locked: false,
-        description: 'Señales de compra y venta swing con entrada, salida y tesis, y registro público de resultados.',
+        description: 'Empieza aquí: cómo funciona la comunidad, las reglas y por dónde arrancar.',
       },
       {
-        id: 'pre-market',
-        label: 'pre-market',
+        id: 'general',
+        label: 'general',
         locked: false,
-        description: 'Todos los días antes de la campana: los tickers en mi radar, niveles clave y escenarios.',
+        description: 'Conversación abierta de la comunidad: dudas, ideas y lo que esté pasando en el mercado.',
+      },
+      { id: 'futuros', label: 'futuros', locked: true, description: '' },
+      {
+        id: 'watchlist',
+        label: 'watchlist',
+        locked: false,
+        description: 'Los tickers en el radar y los niveles que estoy vigilando para las próximas sesiones.',
       },
       {
-        id: 'noticias-del-dia',
-        label: 'noticias-del-dia',
+        id: 'noticias',
+        label: 'noticias',
         locked: false,
-        description: 'Las noticias y catalizadores que mueven el mercado hoy, resumidos y explicados en simple.',
+        description: 'Las noticias y catalizadores que mueven el mercado, resumidos y explicados en simple.',
       },
-      { id: 'trade-recaps', label: 'trade-recaps', locked: true, description: '' },
-      { id: 'links-zoom-en-vivo', label: 'links-zoom-en-vivo', locked: true, description: '' },
+      { id: 'trades-intraday', label: 'trades-intraday', locked: true, description: '' },
     ],
   },
   {
-    category: 'Eventos',
+    category: 'Canales de voz',
     channels: [
-      { id: 'webinar-mensual', label: 'webinar-mensual', locked: true, description: '' },
-      { id: 'preguntas-qa', label: 'preguntas-qa', locked: true, description: '' },
+      { id: 'live-trading', label: 'LIVE TRADING 🏆', locked: true, description: '', voice: true },
     ],
-  },
-  {
-    category: 'Educación',
-    channels: [
-      { id: 'libreria-cursos', label: 'libreria-cursos', locked: true, description: '' },
-      { id: 'libros-pdf', label: 'libros-pdf', locked: true, description: '' },
-      { id: 'repeticiones', label: 'repeticiones', locked: true, description: '' },
-    ],
-  },
-  {
-    category: 'Bonus',
-    channels: [{ id: 'copytrading-binance', label: 'copytrading-binance', locked: true, description: '' }],
   },
 ];
 
@@ -93,6 +87,29 @@ function ImageIcon({ className }: { className?: string }) {
       <rect x="3" y="4" width="18" height="16" rx="2" />
       <circle cx="8.5" cy="9.5" r="1.5" />
       <path d="M21 15l-5-5-9 9" />
+    </svg>
+  );
+}
+
+function ChannelGlyph({ voice, className }: { voice?: boolean; className?: string }) {
+  if (!voice) {
+    return <span className={cn('font-semibold', className)}>#</span>;
+  }
+
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={cn('w-[1.1em] h-[1.1em]', className)}
+    >
+      <path d="M11 5 6.5 9H3.5v6h3L11 19V5Z" fill="currentColor" stroke="none" />
+      <path d="M15.5 9.2a4 4 0 0 1 0 5.6" />
+      <path d="M18.2 6.6a7.7 7.7 0 0 1 0 10.8" />
     </svg>
   );
 }
@@ -200,7 +217,7 @@ export function CommunitySection() {
                           isSelected ? 'text-accent bg-accent/10' : 'text-[#aab4c5]'
                         )}
                       >
-                        <span className="text-[#5b6577] font-semibold shrink-0">#</span>
+                        <ChannelGlyph voice={ch.voice} className="text-[#5b6577] shrink-0" />
                         <input
                           value={ch.label}
                           onChange={(e: ChangeEvent<HTMLInputElement>) => updateChannel(ch.id, { label: e.target.value })}
@@ -232,7 +249,7 @@ export function CommunitySection() {
                       )}
                     >
                       <span className="flex items-center gap-2 truncate">
-                        <span className="text-[#5b6577] font-semibold">#</span> {ch.label}
+                        <ChannelGlyph voice={ch.voice} className="text-[#5b6577] shrink-0" /> {ch.label}
                       </span>
                       {ch.locked && <LockIcon className="w-3.5 h-3.5 fill-[#5b6577] shrink-0" />}
                     </button>
@@ -261,7 +278,7 @@ export function CommunitySection() {
                   {isAuthenticated ? (
                     <>
                       <div className="flex items-center gap-2 text-[15px] font-bold tracking-[1.2px] uppercase text-ink">
-                        <span className="text-accent">#</span>
+                        <ChannelGlyph voice={selected.voice} className="text-accent shrink-0" />
                         <input
                           value={selected.label}
                           onChange={(e: ChangeEvent<HTMLInputElement>) => updateChannel(selected.id, { label: e.target.value })}
@@ -282,7 +299,7 @@ export function CommunitySection() {
                   ) : (
                     <>
                       <h4 className="flex items-center gap-2 text-[15px] font-bold tracking-[1.2px] uppercase text-ink">
-                        <span className="text-accent">#</span> {selected.label}
+                        <ChannelGlyph voice={selected.voice} className="text-accent shrink-0" /> {selected.label}
                       </h4>
                       <p className="text-muted text-[15px] mt-2">{selected.description}</p>
                     </>
@@ -302,7 +319,7 @@ export function CommunitySection() {
                   </span>
                   <div>
                     <h4 className="text-[15px] font-bold uppercase tracking-[1.2px] text-ink">
-                      #{selected.label} está bloqueado
+                      {selected.voice ? '' : '#'}{selected.label} está bloqueado
                     </h4>
                     <p className="text-muted text-[15px] mt-2 max-w-sm">
                       Únete a la comunidad en Discord para desbloquear este canal.

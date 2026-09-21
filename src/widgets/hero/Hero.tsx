@@ -25,7 +25,7 @@ export function Hero() {
           className="w-full max-w-5xl bg-panel border border-line rounded-[20px] p-4 sm:p-7 shadow-[0_30px_80px_rgba(0,0,0,0.5)]"
         >
           <VideoPlayer
-            source={{ type: 'placeholder' }}
+            source={{ type: 'youtube', videoId: 'lO-V1CVdbcY' }}
             title="Video de bienvenida"
             className="w-full rounded-xl overflow-hidden"
           />
