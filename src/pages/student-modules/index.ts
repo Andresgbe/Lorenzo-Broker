@@ -1,0 +1,1 @@
+export { StudentModulesPage } from './StudentModulesPage';

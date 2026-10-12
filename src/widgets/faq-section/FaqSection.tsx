@@ -96,7 +96,7 @@ interface FaqSectionProps {
 }
 
 export function FaqSection({ variant = 'full' }: FaqSectionProps) {
-  const { isAuthenticated } = useAuth();
+  const { isAdmin } = useAuth();
   const { value: stored, setValue: persistItems, isLoading } = useSiteContentField('faq.items', DEFAULT_FAQ_ITEMS);
   const [items, setItems] = useState(DEFAULT_FAQ_ITEMS);
   const [openId, setOpenId] = useState<string | null>(null);
@@ -113,8 +113,8 @@ export function FaqSection({ variant = 'full' }: FaqSectionProps) {
   // On /faq, the admin edits question/answer text directly in place.
   // On the home page, the admin can't edit text there — they just pick
   // which bank questions show, via the dropdown selector below.
-  const isAdminEditing = variant === 'full' && isAuthenticated;
-  const canCurateHome = variant === 'home' && isAuthenticated;
+  const isAdminEditing = variant === 'full' && isAdmin;
+  const canCurateHome = variant === 'home' && isAdmin;
   const visibleItems = isAdminEditing
     ? items
     : items.filter((item) => item.enabled && (variant === 'full' || item.showOnHome));

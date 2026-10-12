@@ -119,7 +119,7 @@ function blurOnEnter(event: KeyboardEvent<HTMLInputElement>) {
 }
 
 export function CommunitySection() {
-  const { isAuthenticated } = useAuth();
+  const { isAdmin } = useAuth();
   const { value: storedGroups, setValue: persistGroups, isLoading } = useSiteContentField(
     'community.channels',
     DEFAULT_CHANNEL_GROUPS
@@ -188,7 +188,7 @@ export function CommunitySection() {
           <aside className="bg-bg-2 border-b lg:border-b-0 lg:border-r border-line px-5 py-6">
             <div className="flex items-center gap-2.5 font-bold text-sm tracking-[0.6px] pb-4 border-b border-line mb-4">
               <span className="w-[26px] h-[26px] rounded-lg bg-accent/10 flex items-center justify-center text-[13px] shrink-0">📊</span>
-              {isAuthenticated ? (
+              {isAdmin ? (
                 <input
                   value={serverName}
                   onChange={(e: ChangeEvent<HTMLInputElement>) => setServerName(e.target.value)}
@@ -208,7 +208,7 @@ export function CommunitySection() {
                 {group.channels.map((ch) => {
                   const isSelected = ch.id === selectedId;
 
-                  if (isAuthenticated) {
+                  if (isAdmin) {
                     return (
                       <div
                         key={ch.id}
@@ -275,7 +275,7 @@ export function CommunitySection() {
                     label="Captura próximamente"
                     className="aspect-video w-full rounded-xl mb-6"
                   />
-                  {isAuthenticated ? (
+                  {isAdmin ? (
                     <>
                       <div className="flex items-center gap-2 text-[15px] font-bold tracking-[1.2px] uppercase text-ink">
                         <ChannelGlyph voice={selected.voice} className="text-accent shrink-0" />
