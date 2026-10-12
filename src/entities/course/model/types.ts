@@ -12,5 +12,7 @@ export interface Lesson {
 export interface CourseModule {
   id: string;
   title: string;
+  /** Visible para quien no está suscrito. El resto se muestra bloqueado. */
+  preview?: boolean;
   lessons: Lesson[];
 }

@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { DEMO_PAYMENTS, PAYMENT_STATUS_TONE, type PaymentStatus } from '../../entities/payment';
-import { PRICE_PLACEHOLDER } from '../../entities/plan';
+import { MAIN_PLAN, formatPrice } from '../../entities/plan';
 import { formatDate } from '../../entities/membership';
 import { Button } from '../../shared/ui/Button';
 import { StatusPill } from '../../shared/ui/StatusPill';
@@ -74,7 +74,7 @@ export function AdminPaymentsPage() {
                   <span className="block text-[12px] text-muted">{payment.studentTaxId}</span>
                 </td>
                 <td className="px-5 py-3.5 text-muted">{payment.planName}</td>
-                <td className="px-5 py-3.5 text-ink whitespace-nowrap">${PRICE_PLACEHOLDER}</td>
+                <td className="px-5 py-3.5 text-ink whitespace-nowrap">{formatPrice(MAIN_PLAN.price)}</td>
                 <td className="px-5 py-3.5 text-muted whitespace-nowrap">{payment.method}</td>
                 <td className="px-5 py-3.5">
                   <StatusPill tone={PAYMENT_STATUS_TONE[payment.status]}>{payment.status}</StatusPill>

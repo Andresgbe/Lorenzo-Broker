@@ -8,6 +8,7 @@ export const COURSE_MODULES: CourseModule[] = [
   {
     id: 'fundamentos',
     title: 'Fundamentos del mercado',
+    preview: true,
     lessons: [
       { id: 'que-es-la-bolsa', title: 'Qué es la bolsa y quién participa', kind: 'video', duration: '14:02', moduleId: 'fundamentos' },
       { id: 'tipos-de-orden', title: 'Tipos de orden y cómo se ejecutan', kind: 'video', duration: '11:45', moduleId: 'fundamentos' },

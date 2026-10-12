@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { DEMO_STUDENTS } from '../../entities/student';
 import { DEMO_PAYMENTS, PAYMENT_STATUS_TONE } from '../../entities/payment';
-import { PRICE_PLACEHOLDER } from '../../entities/plan';
+import { MAIN_PLAN, formatPrice } from '../../entities/plan';
 import { formatDate } from '../../entities/membership';
 import { ROUTES } from '../../shared/config/routes';
 import { StatusPill } from '../../shared/ui/StatusPill';
@@ -9,10 +9,11 @@ import { AdminPageHeading } from '../../widgets/admin-shell';
 
 const expiringSoon = DEMO_STUDENTS.filter((student) => student.status === 'Por vencer');
 const pendingPayments = DEMO_PAYMENTS.filter((payment) => payment.status === 'En verificación');
+const collected = DEMO_PAYMENTS.filter((payment) => payment.status === 'Pagado').length * MAIN_PLAN.price;
 
 const TILES = [
   { label: 'Alumnos activos', value: String(DEMO_STUDENTS.filter((s) => s.status === 'Activa').length) },
-  { label: 'Cobrado este mes', value: `$${PRICE_PLACEHOLDER}` },
+  { label: 'Cobrado este mes', value: formatPrice(collected) },
   { label: 'Vencen pronto', value: String(expiringSoon.length) },
   { label: 'Pagos en verificación', value: String(pendingPayments.length) },
 ];
@@ -58,7 +59,7 @@ export function AdminOverviewPage() {
                 {DEMO_PAYMENTS.slice(0, 5).map((payment) => (
                   <tr key={payment.id} className="border-b border-line last:border-b-0">
                     <td className="px-5 py-3 text-ink">{payment.studentName}</td>
-                    <td className="px-5 py-3 text-muted whitespace-nowrap">${PRICE_PLACEHOLDER}</td>
+                    <td className="px-5 py-3 text-muted whitespace-nowrap">{formatPrice(MAIN_PLAN.price)}</td>
                     <td className="px-5 py-3 text-muted whitespace-nowrap">{formatDate(payment.date)}</td>
                     <td className="px-5 py-3 text-right">
                       <StatusPill tone={PAYMENT_STATUS_TONE[payment.status]}>{payment.status}</StatusPill>

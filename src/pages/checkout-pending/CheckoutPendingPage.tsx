@@ -1,5 +1,5 @@
 import { Navigate } from 'react-router-dom';
-import { PRICE_PLACEHOLDER, useSelectedPlan } from '../../entities/plan';
+import { formatPrice, useSelectedPlan } from '../../entities/plan';
 import { ROUTES } from '../../shared/config/routes';
 import { EXTERNAL_LINKS } from '../../shared/config/external-links';
 import { Button } from '../../shared/ui/Button';
@@ -48,7 +48,7 @@ export function CheckoutPendingPage() {
           </div>
           <div className="flex items-baseline justify-between gap-4 text-[14px]">
             <span className="text-muted">Monto</span>
-            <span className="text-ink">${PRICE_PLACEHOLDER}</span>
+            <span className="text-ink">{formatPrice(plan.price)}</span>
           </div>
           <div className="flex items-baseline justify-between gap-4 text-[14px]">
             <span className="text-muted">Estado</span>

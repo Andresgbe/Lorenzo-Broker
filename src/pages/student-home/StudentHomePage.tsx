@@ -3,7 +3,6 @@ import { useAuth } from '../../entities/session';
 import { ALL_LESSONS, COURSE_MODULES, describeModule } from '../../entities/course';
 import { DEMO_MEMBERSHIP, daysUntil, formatDate } from '../../entities/membership';
 import { ROUTES, studentLessonPath } from '../../shared/config/routes';
-import { EXTERNAL_LINKS } from '../../shared/config/external-links';
 import { Button } from '../../shared/ui/Button';
 import { Container } from '../../shared/ui/Container';
 
@@ -45,13 +44,13 @@ export function StudentHomePage() {
         </section>
 
         <section className="bg-panel border border-line rounded-[18px] p-6 flex flex-col items-start">
-          <span className="text-[10.5px] font-bold uppercase tracking-[2.6px] text-accent">Comunidad</span>
-          <p className="font-display font-bold text-[22px] text-ink mt-3">Únete al grupo de alumnos</p>
+          <span className="text-[10.5px] font-bold uppercase tracking-[2.6px] text-accent">Sigue donde quedaste</span>
+          <p className="font-display font-bold text-[22px] text-ink mt-3">Tus clases te esperan</p>
           <p className="text-muted text-[13.5px] mt-1.5 text-pretty">
-            Comparte ideas, resuelve dudas y comenta el mercado con otros alumnos y con Lorenzo.
+            Todas las clases en vivo, las grabaciones y el material, en un solo sitio.
           </p>
-          <Button href={EXTERNAL_LINKS.discordInvite} variant="primary" className="mt-5">
-            Entrar a la comunidad
+          <Button to={ROUTES.studentModules} variant="primary" className="mt-5">
+            Ver los módulos
           </Button>
         </section>
       </div>

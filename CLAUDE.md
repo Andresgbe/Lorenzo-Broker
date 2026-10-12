@@ -50,7 +50,9 @@ There are no path aliases configured — cross-slice imports use relative paths 
 
 `shared/config/routes.ts` is the single source of truth — never hardcode a path string in a component.
 
-Marketing routes are English (`/about`, `/mentorship`, `/community`, `/faq`); the newer student-facing routes are Spanish (`/registro`, `/iniciar-sesion`, `/recuperar-contrasena`). That inconsistency is known and not yet resolved; follow Spanish for new student-facing routes.
+Routes are a mix: some older marketing ones are English (`/about`, `/mentorship`, `/faq`), everything newer is Spanish (`/plataforma`, `/registro`, `/suscripcion`, `/alumno`). That inconsistency is known; use Spanish for anything new.
+
+**Discord is gone.** The product no longer uses it — do not reintroduce a Discord link, icon or mention anywhere. What used to be the Discord showcase (`community-section`, `/community`) is now `platform-section` at `/plataforma`, and it presents the course modules from `entities/course` instead: the module marked `preview: true` shows its lesson list, the rest show a lock and a link to checkout.
 
 Marketing and admin pages render inside `Layout` (Navbar + Footer). Auth pages are registered at the router's top level, outside `Layout`, and bring their own chrome via the `auth-shell` widget — a minimal header (logo + one contextual link) around a centered card.
 
@@ -87,9 +89,9 @@ Four routes under `/suscripcion`, outside `Layout`, wrapped in the `checkout-she
 
 The chosen plan travels in `?plan=<id>`, not in context or router state, so a refresh or a shared link still works. Steps 06-08 read it with `useSelectedPlan()` and `<Navigate>` back to step 1 when it is missing or unknown — keep that guard on any new checkout screen.
 
-Prices are the literal string `PRICE_PLACEHOLDER` (`[PRECIO]`), matching the designs. **Do not invent amounts.** When real prices exist they should come from Supabase alongside the other editable content, not be hardcoded in `entities/plan`.
+**There is one plan: `MAIN_PLAN`, $29/month.** `PLANS` stays an array because the checkout already navigates by id, so adding a plan is adding an entry — but every screen today renders the single plan. `PRICE_PLACEHOLDER` survives only for amounts that genuinely cannot be computed; prices that are known render through `formatPrice`.
 
-Plan names, perks and payment-method timings are provisional copy inferred from the design thumbnails — the user approved them as stand-ins, not as final text. They are flagged with comments in `entities/plan/model/plans.ts` and `shared/config/payment-methods.ts`; replace them once the real artboards are available.
+Plan perks and payment-method timings are provisional copy inferred from the design thumbnails — the user approved them as stand-ins, not as final text. They are flagged with comments in `entities/plan/model/plans.ts` and `shared/config/payment-methods.ts`.
 
 ## Forms
 

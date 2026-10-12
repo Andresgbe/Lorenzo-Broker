@@ -13,14 +13,14 @@ export interface Membership {
  */
 export const DEMO_MEMBERSHIP: Membership = {
   status: 'active',
-  planName: 'Trimestral',
-  expiresOn: '2027-01-08',
+  planName: 'Mensual',
+  expiresOn: '2026-11-08',
 };
 
 /** Para la pantalla de membresía vencida: misma forma, fecha ya pasada. */
 export const DEMO_EXPIRED_MEMBERSHIP: Membership = {
   status: 'expired',
-  planName: 'Trimestral',
+  planName: 'Mensual',
   expiresOn: '2026-09-30',
 };
 

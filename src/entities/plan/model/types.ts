@@ -1,12 +1,11 @@
-export type PlanId = 'mensual' | 'trimestral' | 'anual';
+export type PlanId = 'mensual';
 
 export interface Plan {
   id: PlanId;
   name: string;
-  /** Qué se cobra cada vez, p. ej. "cada 3 meses". */
+  /** Precio en USD, en unidades mayores. */
+  price: number;
+  /** Qué se cobra cada vez, p. ej. "cada mes". */
   billingNote: string;
   perks: string[];
-  /** Solo uno puede ir destacado. */
-  highlighted?: boolean;
-  badge?: string;
 }

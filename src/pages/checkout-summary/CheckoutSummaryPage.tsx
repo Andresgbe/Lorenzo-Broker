@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../entities/session';
-import { PRICE_PLACEHOLDER, useSelectedPlan } from '../../entities/plan';
+import { formatPrice, useSelectedPlan } from '../../entities/plan';
 import { ROUTES } from '../../shared/config/routes';
 import { PAYMENT_METHODS } from '../../shared/config/payment-methods';
 import { Button } from '../../shared/ui/Button';
@@ -97,7 +97,7 @@ export function CheckoutSummaryPage() {
           <div className="flex items-baseline justify-between gap-4">
             <span className="text-[14px] text-muted">Total</span>
             <span className="font-display font-extrabold text-[30px] leading-none text-ink">
-              ${PRICE_PLACEHOLDER}
+              {formatPrice(plan.price)}
             </span>
           </div>
 

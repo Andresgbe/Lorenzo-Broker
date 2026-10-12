@@ -8,7 +8,7 @@ import { VideoPlayer } from '../../features/video-player';
 const STATS = [
   { value: '2×', label: 'sesiones en vivo\npor semana' },
   { value: '100%', label: 'en español,\ndesde LatAm' },
-  { value: '24/7', label: 'comunidad activa\nen Discord' },
+  { value: '24/7', label: 'clases grabadas\nsiempre disponibles' },
 ];
 
 export function Hero() {
