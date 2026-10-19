@@ -29,8 +29,9 @@ function initialsOf(fullName: string | null | undefined, email: string | null | 
 
 /**
  * Avatar redondo arriba a la derecha que abre el menú de la cuenta: nombre y
- * correo, Mi área, las secciones de Mi cuenta y Cerrar sesión. Va en la barra
- * del sitio (con sesión iniciada) y en la del área del alumno.
+ * correo, Mi área, las secciones de Mi cuenta y Cerrar sesión. Sin sesión muestra
+ * el ícono de persona y ofrece Iniciar sesión y Registrarte. Va en la barra del
+ * sitio, en la del área del alumno y en la del panel.
  */
 export function AccountMenu() {
   const { user, logout } = useAuth();
@@ -128,13 +129,22 @@ export function AccountMenu() {
               </button>
             </>
           ) : (
-            <Link
-              to={ROUTES.signIn}
-              role="menuitem"
-              className="block px-3.5 py-2.5 rounded-[10px] text-[13.5px] text-accent hover:bg-white/5 transition-colors"
-            >
-              Iniciar sesión
-            </Link>
+            <>
+              <Link
+                to={ROUTES.signIn}
+                role="menuitem"
+                className="block px-3.5 py-2.5 rounded-[10px] text-[13.5px] text-accent font-semibold hover:bg-white/5 transition-colors"
+              >
+                Iniciar sesión
+              </Link>
+              <Link
+                to={ROUTES.register}
+                role="menuitem"
+                className="block px-3.5 py-2.5 rounded-[10px] text-[13.5px] text-ink hover:bg-white/5 transition-colors"
+              >
+                Registrarte
+              </Link>
+            </>
           )}
         </div>
       )}

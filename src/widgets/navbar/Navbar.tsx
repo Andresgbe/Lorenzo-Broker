@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../entities/session';
 import { ADMIN_SECTIONS, ROUTES } from '../../shared/config/routes';
@@ -20,11 +20,7 @@ const navLinks: NavLinkItem[] = [
 
 const mentorshipLink: NavLinkItem = { label: 'Mentoría 1:1', to: ROUTES.mentorship };
 
-// Acceso de alumnos. Con sesión iniciada se cambia por el avatar (AccountMenu).
-const accountLinks: NavLinkItem[] = [
-  { label: 'Iniciar sesión', to: ROUTES.signIn },
-  { label: 'Registrarte', to: ROUTES.register },
-];
+// Iniciar sesión y Registrarte no van en la barra: los ofrece el avatar (AccountMenu).
 
 const navLinkClasses = 'hover:text-accent transition-colors text-[12.5px] font-semibold tracking-[1.4px] uppercase text-[#c6cedb]';
 
@@ -103,12 +99,12 @@ export function Navbar() {
       <Container className="flex items-center justify-between gap-4 h-[76px]">
         <div className="flex items-center gap-4 min-w-0">
           {/* Desde 1400px el botón sale de la columna y queda en la esquina; antes no cabe sin pisar el logo.
-              Desde xl solo hace falta para el admin: los enlaces del sitio ya están en la barra. */}
+              Desde lg solo hace falta para el admin: los enlaces del sitio ya están en la barra. */}
           <div
             ref={menuRef}
             className={cn(
               'relative shrink-0 min-[1400px]:absolute min-[1400px]:left-5 min-[1400px]:top-1/2 min-[1400px]:-translate-y-1/2',
-              !isAdmin && 'xl:hidden',
+              !isAdmin && 'lg:hidden',
             )}
           >
             <button
@@ -153,17 +149,6 @@ export function Navbar() {
                   </nav>
                 </div>
 
-                {!isAuthenticated && (
-                  <div className="xl:hidden">
-                    <div className="h-px bg-line mx-2 my-2" />
-                    {accountLinks.map((link) => (
-                      <NavLink key={link.label} to={link.to} className={menuItemState}>
-                        {link.label}
-                      </NavLink>
-                    ))}
-                  </div>
-                )}
-
                 {isAuthenticated && (
                   <>
                     <div className="h-px bg-line mx-2 my-2" />
@@ -197,25 +182,8 @@ export function Navbar() {
           <Link to={mentorshipLink.to} className={`hidden lg:inline ${navLinkClasses}`}>
             {mentorshipLink.label}
           </Link>
-          {/* Desde xl hay espacio en la barra; antes va en el menú lateral. */}
-          {!isAuthenticated && (
-            <span className="hidden xl:flex items-center gap-2">
-              {accountLinks.map((link, index) => (
-                <Fragment key={link.label}>
-                  {index > 0 && (
-                    <span aria-hidden="true" className="text-subtle">
-                      /
-                    </span>
-                  )}
-                  <Link to={link.to} className={navLinkClasses}>
-                    {link.label}
-                  </Link>
-                </Fragment>
-              ))}
-            </span>
-          )}
           <SubscribeButton />
-          {isAuthenticated && <AccountMenu />}
+          <AccountMenu />
         </div>
       </Container>
     </header>
