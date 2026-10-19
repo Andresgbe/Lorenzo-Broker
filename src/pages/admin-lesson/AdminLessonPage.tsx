@@ -119,7 +119,7 @@ function LessonForm({ lesson, onSaved }: LessonFormProps) {
         </div>
 
         <div className="grid gap-4 sm:grid-cols-[1fr_140px]">
-          <TextField
+          <TextField 
             label="ID del video en Bunny Stream"
             value={videoId}
             placeholder="p. ej. 3f2a9c1e-…"
