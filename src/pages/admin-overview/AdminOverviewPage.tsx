@@ -1,9 +1,9 @@
-import { Link } from 'react-router-dom';
 import { DEMO_STUDENTS } from '../../entities/student';
 import { DEMO_PAYMENTS, PAYMENT_STATUS_TONE } from '../../entities/payment';
 import { MAIN_PLAN, formatPrice } from '../../entities/plan';
 import { formatDate } from '../../entities/membership';
 import { ROUTES } from '../../shared/config/routes';
+import { Button } from '../../shared/ui/Button';
 import { StatusPill } from '../../shared/ui/StatusPill';
 import { AdminPageHeading } from '../../widgets/admin-shell';
 
@@ -48,9 +48,9 @@ export function AdminOverviewPage() {
         <Panel
           title="Últimos pagos"
           action={
-            <Link to={ROUTES.adminPayments} className="text-[12.5px] text-accent hover:underline">
+            <Button to={ROUTES.adminPayments} variant="ghost" size="sm">
               Ver todos
-            </Link>
+            </Button>
           }
         >
           <div className="overflow-x-auto">
@@ -74,9 +74,9 @@ export function AdminOverviewPage() {
         <Panel
           title="Membresías por vencer"
           action={
-            <Link to={ROUTES.adminStudents} className="text-[12.5px] text-accent hover:underline">
+            <Button to={ROUTES.adminStudents} variant="ghost" size="sm">
               Ver alumnos
-            </Link>
+            </Button>
           }
         >
           {expiringSoon.length === 0 ? (

@@ -8,4 +8,5 @@ export {
   findPlan,
 } from './model/plans';
 export { useSelectedPlan } from './model/useSelectedPlan';
+export { fetchPlanOptions, usePlanOptions, type PlanOption } from './api/planApi';
 export type { Plan, PlanId } from './model/types';

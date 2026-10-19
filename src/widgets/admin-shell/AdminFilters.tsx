@@ -37,10 +37,10 @@ export function AdminFilters<T extends string>({
             onClick={() => onActiveChange(option)}
             aria-pressed={option === active}
             className={cn(
-              'px-3.5 py-2 rounded-lg border text-[12.5px] whitespace-nowrap transition-colors cursor-pointer',
+              'h-10 px-3.5 rounded-[10px] border text-[13px] whitespace-nowrap transition-colors cursor-pointer',
               option === active
                 ? 'border-accent bg-accent/10 text-accent font-semibold'
-                : 'border-line text-muted hover:border-accent/40 hover:text-ink'
+                : 'border-line-strong text-[#c6cedb] hover:border-accent/40 hover:text-ink'
             )}
           >
             {option}

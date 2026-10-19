@@ -1,10 +1,36 @@
+export type { Course, CourseModule, Lesson, LessonAttachment } from './model/types';
 export {
-  COURSE_MODULES,
-  ALL_LESSONS,
-  findLesson,
-  findModule,
-  countLessons,
+  formatDuration,
+  parseDuration,
   describeModule,
-  lessonNeighbours,
-} from './model/modules';
-export type { CourseModule, Lesson, LessonKind } from './model/types';
+  describeCourse,
+  courseLessons,
+  courseProgress,
+  locateLesson,
+  nextPosition,
+  formatFileSize,
+  type LessonLocation,
+} from './model/lib';
+export { useCourseTree } from './model/useCourseTree';
+export { useLessonProgress } from './model/useLessonProgress';
+export {
+  createCourse,
+  updateCourse,
+  deleteCourse,
+  createModule,
+  updateModule,
+  deleteModule,
+  createLesson,
+  updateLesson,
+  deleteLesson,
+  reorderRows,
+  setCoursePlans,
+  uploadAttachment,
+  renameAttachment,
+  deleteAttachment,
+  getAttachmentUrl,
+  type NewCourse,
+  type CoursePatch,
+  type ModulePatch,
+  type LessonPatch,
+} from './api/courseApi';

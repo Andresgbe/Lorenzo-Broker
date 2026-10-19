@@ -18,7 +18,8 @@ export const ROUTES = {
 
   // Área del alumno.
   student: '/alumno',
-  studentModules: '/alumno/modulos',
+  studentCourses: '/alumno/cursos',
+  studentCourse: '/alumno/cursos/:courseId',
   studentLesson: '/alumno/clase/:lessonId',
   studentAccount: '/alumno/cuenta',
   studentExpired: '/alumno/membresia-vencida',
@@ -28,11 +29,27 @@ export const ROUTES = {
   adminOverview: '/admin/resumen',
   adminStudents: '/admin/alumnos',
   adminPayments: '/admin/pagos',
-  adminContent: '/admin/contenido',
+  // Módulo de cursos: el admin edita cursos, módulos y clases fuera de la vista del alumno.
+  adminCourses: '/admin/cursos',
+  adminCourseNew: '/admin/cursos/nuevo',
+  adminCourse: '/admin/cursos/:courseId',
+  adminLesson: '/admin/cursos/:courseId/clases/:lessonId',
 } as const;
 
 export function studentLessonPath(lessonId: string) {
   return ROUTES.studentLesson.replace(':lessonId', lessonId);
+}
+
+export function studentCoursePath(courseId: string) {
+  return ROUTES.studentCourse.replace(':courseId', courseId);
+}
+
+export function adminCoursePath(courseId: string) {
+  return ROUTES.adminCourse.replace(':courseId', courseId);
+}
+
+export function adminLessonPath(courseId: string, lessonId: string) {
+  return ROUTES.adminLesson.replace(':courseId', courseId).replace(':lessonId', lessonId);
 }
 
 export const HOME_SECTIONS = {

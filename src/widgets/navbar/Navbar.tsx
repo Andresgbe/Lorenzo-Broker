@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../../entities/session';
 import { ROUTES } from '../../shared/config/routes';
 import { Container } from '../../shared/ui/Container';
 import { Logo } from '../../shared/ui/Logo';
@@ -17,15 +18,29 @@ const navLinks: NavLinkItem[] = [
 
 const mentorshipLink: NavLinkItem = { label: 'Mentoría 1:1', to: ROUTES.mentorship };
 
+// Solo para administradores: lleva al panel. Gatea en isAdmin, nunca en isAuthenticated.
+const dashboardLink: NavLinkItem = { label: 'Dashboard', to: ROUTES.adminOverview };
+
 const navLinkClasses = 'hover:text-accent transition-colors text-[12.5px] font-semibold tracking-[1.4px] uppercase text-[#c6cedb]';
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
+  const { isAdmin } = useAuth();
 
   return (
     <header className="sticky top-0 z-50 bg-bg/85 backdrop-blur-md border-b border-line">
       <Container className="flex items-center justify-between h-[76px]">
-        <Logo />
+        <div className="flex items-center gap-6 xl:gap-8">
+          <Logo />
+          {isAdmin && (
+            <Link
+              to={dashboardLink.to}
+              className="hidden lg:inline text-[12.5px] font-semibold tracking-[1.4px] uppercase text-accent hover:underline"
+            >
+              {dashboardLink.label}
+            </Link>
+          )}
+        </div>
 
         <nav className="hidden lg:flex items-center gap-7 xl:gap-9">
           {navLinks.map((link) => (
@@ -59,6 +74,11 @@ export function Navbar() {
               {link.label}
             </Link>
           ))}
+          {isAdmin && (
+            <Link to={dashboardLink.to} onClick={() => setOpen(false)} className="text-accent hover:underline">
+              {dashboardLink.label}
+            </Link>
+          )}
         </nav>
       )}
     </header>

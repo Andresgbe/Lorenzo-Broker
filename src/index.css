@@ -6,6 +6,12 @@
   --color-panel: #0f1520;
   --color-panel-2: #121a27;
   --color-line: #1d2634;
+  /* Borde de controles (botones chicos, interruptor apagado, menús): line no se distingue del fondo. */
+  --color-line-strong: #2a3647;
+  /* Íconos secundarios: asas de arrastre, separadores de la ruta. 3.3:1 sobre bg, nunca para texto. */
+  --color-subtle: #5f6b7d;
+  /* Relleno del botón de confirmar un borrado, con texto blanco (4.8:1). */
+  --color-danger-strong: #dc2626;
   --color-ink: #e9edf3;
   --color-ink-inverse: #06130c;
   --color-muted: #96a1b3;
