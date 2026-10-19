@@ -116,7 +116,7 @@ function LessonForm({ lesson, onSaved }: LessonFormProps) {
             placeholder="Qué aprende el alumno en esta clase…"
             className={cn(inputClasses, 'resize-y')}
           />
-        </div>
+        </div> 
  
         <div className="grid gap-4 sm:grid-cols-[1fr_140px]">
           <TextField 
