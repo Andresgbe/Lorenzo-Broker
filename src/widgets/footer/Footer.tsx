@@ -25,7 +25,6 @@ function InstagramIcon({ className }: { className?: string }) {
 
 const navLinks = [
   { label: 'Sobre mí', to: ROUTES.about },
-  { label: 'La plataforma', to: ROUTES.platform },
   { label: 'Mentoría 1:1', to: ROUTES.mentorship },
   { label: 'Preguntas frecuentes', to: ROUTES.faq },
 ];

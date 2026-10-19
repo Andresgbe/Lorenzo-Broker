@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { cn } from '../lib/cn';
 
 interface SectionHeadingProps {
-  eyebrow?: string;
+  eyebrow?: ReactNode;
   title: ReactNode;
   subtitle?: ReactNode;
   align?: 'center' | 'left';

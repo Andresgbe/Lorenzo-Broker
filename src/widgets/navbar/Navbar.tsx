@@ -12,7 +12,6 @@ interface NavLinkItem {
 
 const navLinks: NavLinkItem[] = [
   { label: 'Sobre mí', to: ROUTES.about },
-  { label: 'La plataforma', to: ROUTES.platform },
   { label: 'Preguntas', to: ROUTES.faq },
 ];
 

@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-// Banco de pruebas de la pasarela Cobrix. Solo sandbox: ver assertSandbox().
 import { createHmac, randomUUID, timingSafeEqual } from 'node:crypto';
 import { createServer } from 'node:http';
 import { appendFileSync, existsSync, readFileSync } from 'node:fs';
@@ -9,7 +8,7 @@ import { fileURLToPath } from 'node:url';
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ENV_PATH = join(HERE, '.env');
 const LOG_PATH = join(HERE, 'webhooks.log');
-
+ 
 // ---------------------------------------------------------------- env
 
 function loadEnv(path) {

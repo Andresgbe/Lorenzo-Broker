@@ -4,7 +4,6 @@ import { Layout } from './Layout';
 import { HomePage } from '../pages/home';
 import { AboutPage } from '../pages/about';
 import { MentorshipPage } from '../pages/mentorship';
-import { PlatformPage } from '../pages/platform';
 import { FaqPage } from '../pages/faq';
 import { LoginPage } from '../pages/login';
 import { RegisterPage } from '../pages/register';
@@ -36,7 +35,6 @@ export const router = createBrowserRouter(
         { path: ROUTES.home, element: <HomePage /> },
         { path: ROUTES.about, element: <AboutPage /> },
         { path: ROUTES.mentorship, element: <MentorshipPage /> },
-        { path: ROUTES.platform, element: <PlatformPage /> },
         { path: ROUTES.faq, element: <FaqPage /> },
         { path: ROUTES.adminLogin, element: <LoginPage /> },
       ],

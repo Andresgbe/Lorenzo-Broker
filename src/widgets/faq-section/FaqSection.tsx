@@ -27,7 +27,7 @@ const DEFAULT_FAQ_ITEMS: FaqItem[] = [
     id: '2',
     question: '¿Qué pasa si no puedo asistir a los vivos?',
     answer:
-      'Todo queda grabado. Las sesiones de trading en vivo, los webinars y los Q&A se publican en el canal de repeticiones para que los veas cuando quieras.',
+      'Todo queda grabado. Las sesiones de trading en vivo, los webinars y los Q&A se suben a la plataforma para que los veas cuando quieras.',
     enabled: true,
     showOnHome: true,
   },

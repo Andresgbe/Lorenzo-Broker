@@ -8,6 +8,14 @@ Lorenzo-Broker (React + TypeScript + Vite) started as a single-page marketing si
 
 Designs live in a Claude Design canvas, "Lorenzo Broker — Vistas plataforma" (https://claude.ai/artifact/CZpokBUGWomiVhRv5powms). Views are implemented one at a time, in the user's order — ask for the specific screen rather than guessing, and ask for a screenshot of its artboard: the canvas uses the newer file-based format, which the Artifact tool in some sessions cannot enumerate or read.
 
+## Design system — read it before any UI work
+
+The brand's design system is the artifact **"Lorenzo Broker"**: https://claude.ai/artifact/EY57tXbUVdi5hG2XtkxQLM. It holds the palette with contrast checks, the type scale (Playfair Display + Inter), radii, glows, voice and copy rules, iconography, the logos and photos, and a guideline + preview per shared component (Button, TextField, FormAlert, StatusPill, SectionHeading, Logo, MediaPlaceholder, BenefitCard).
+
+**Before changing UI or adding a view, read its `project/README.md`** (Artifact tool, `read_file`) and the README of every component you touch, and build from those tokens and rules. The canvas above says *what* a screen contains; the design system says *how* it looks and reads.
+
+Keep the two in sync: `src/index.css` `@theme` is the code's copy of the tokens. If you add or change a token, a component's look, or a copy rule in code, update the design system too (read the file, edit, publish only the changed `project/` files, then the index `project/design-system.json` last with a new `lastChange`). Hex literals that exist only in components today (`#c6cedb`, `#aab4c5`, `#6f7a8b`, `#49546a`, `#5b6577`) are documented there as `ink-soft`, `nav-text`, `faint`, `step-idle`, `lock` — promote them to `@theme` instead of copying them again.
+
 Build status by artboard:
 
 - **Acceso — done.** 01 Registro, 02 Iniciar sesión, 03 Recuperar contraseña, 04 Nueva contraseña.
@@ -15,7 +23,7 @@ Build status by artboard:
 - **Área del alumno — UI done, no backend, NOT PROTECTED.** 09 Inicio, 10 Módulos, 11 Clase, 12 Mi cuenta, 13 Membresía vencida. Routes nest under a `student-nav` layout route. Course content and membership are hardcoded demo data in `entities/course` and `entities/membership`; the account forms and "Guardar cambios" do nothing. **Anyone can open `/alumno` without signing in** — there is deliberately no guard yet so the screens can be reviewed. Before any real content is wired, these routes need an auth guard (and the lesson media needs server-side authorization: a guard in React only hides the page, it does not protect a video URL).
 - **Panel de administración — UI done, no backend.** 14 Resumen, 15 Alumnos, 16 Pagos, 17 Contenido. Nested under `admin-shell` (sidebar layout) and wrapped in `RequireAdmin`, so `role=admin` is required — unlike the student area, these routes *are* gated. `/admin` itself stays the login/entry page. Search and filters work client-side over demo arrays in `entities/student` and `entities/payment`; every action button (Confirmar, Rechazar, Guardar cambios, Exportar CSV, Ver detalle) is inert.
 
-None of the pending groups have database tables yet. Each will need schema plus RLS before its UI is worth wiring.
+The schema for those groups is written in `supabase/migrations/0003_platform_schema.sql` (profiles, plans, memberships, payments, course_modules, lessons, lesson_progress, private `lessons` bucket, `confirm_payment`/`reject_payment` RPCs). No UI reads it yet. Confirm with the user that 0003 was applied before wiring anything to it.
 
 ## Commands
 
@@ -50,9 +58,9 @@ There are no path aliases configured — cross-slice imports use relative paths 
 
 `shared/config/routes.ts` is the single source of truth — never hardcode a path string in a component.
 
-Routes are a mix: some older marketing ones are English (`/about`, `/mentorship`, `/faq`), everything newer is Spanish (`/plataforma`, `/registro`, `/suscripcion`, `/alumno`). That inconsistency is known; use Spanish for anything new.
+Routes are a mix: some older marketing ones are English (`/about`, `/mentorship`, `/faq`), everything newer is Spanish (`/registro`, `/suscripcion`, `/alumno`). That inconsistency is known; use Spanish for anything new.
 
-**Discord is gone.** The product no longer uses it — do not reintroduce a Discord link, icon or mention anywhere. What used to be the Discord showcase (`community-section`, `/community`) is now `platform-section` at `/plataforma`, and it presents the course modules from `entities/course` instead: the module marked `preview: true` shows its lesson list, the rest show a lock and a link to checkout.
+**Discord is gone.** The product no longer uses it — do not reintroduce a Discord link, icon or mention anywhere. The old Discord showcase (`community-section`, `/community`) and its successor (`platform-section`, `/plataforma`, the "La plataforma — Todo el temario" module browser) were both removed on the user's request; don't bring either back. Course modules are shown only inside the student area.
 
 Marketing and admin pages render inside `Layout` (Navbar + Footer). Auth pages are registered at the router's top level, outside `Layout`, and bring their own chrome via the `auth-shell` widget — a minimal header (logo + one contextual link) around a centered card.
 
@@ -65,7 +73,7 @@ Auth is Supabase (`shared/lib/supabaseClient.ts`, which returns `null` when env 
 **There are two kinds of user, and the distinction is load-bearing:**
 
 - `isAuthenticated` — somebody is signed in. Says nothing about permissions.
-- `isAdmin` — `app_metadata.role === 'admin'`. **Every admin-only surface must gate on `isAdmin`, never on `isAuthenticated`.** The inline content editors (`PricingSection`, `FaqSection`, `CommunitySection`, `IncludesSection`) and `RequireAdmin` all do.
+- `isAdmin` — `app_metadata.role === 'admin'`. **Every admin-only surface must gate on `isAdmin`, never on `isAuthenticated`.** The inline content editors (`PricingSection`, `FaqSection`, `IncludesSection`) and `RequireAdmin` all do.
 
 The role is read from `app_metadata` because only the server can write it. Never move it to `user_metadata` — users can edit their own `user_metadata`, which would let any student grant themselves admin.
 
@@ -80,6 +88,29 @@ where email = 'admin@example.com';
 **Client-side gating is cosmetic.** It hides UI; it does not protect data. The real boundary is Row Level Security on the Supabase tables (`site_content` above all) — a write policy that requires the admin role. Treat any change that widens who can write as needing an RLS review.
 
 Student access lives at `/registro`, `/iniciar-sesion`, `/recuperar-contrasena` and `/nueva-contrasena`. Admin access lives at `/admin`, deliberately separate.
+
+Current admin accounts (role set 2026-10-18): `menteclon500@gmail.com` and `lorenzoperezus@gmail.com` (Lorenzo, the client). A role change only reaches the browser after signing out and back in, because the role travels inside the JWT.
+
+## Editing site content (the client's workflow)
+
+The client edits the marketing copy himself; this is a core feature, not an admin nicety.
+
+1. He signs in at **`/admin`** (`pages/login` + `features/admin-login`). On success `LoginForm` sends him to the home page.
+2. On the public pages, editable parts show inline editors when `isAdmin`: **PricingSection** (`pricing.plan`), **IncludesSection** (`includes.items`, drag to reorder, Bonus toggle), **FaqSection** (`faq.items`; full editing on `/faq`, choosing which questions appear on the home from the home itself), **AboutPage** (`about.page`) and **MentorshipPage** (`mentorship.page`). Fields save on blur.
+
+   The two pages use the reusable path, which new editable content should follow too: `useSiteContentDraft(key, defaults)` from `entities/site-content` (draft + `update` / `commit` on blur / `replace` for add-remove), `shared/ui/EditableText` (the in-place input/textarea), `shared/ui/EditableParagraphs` (paragraph list with add/remove) and `shared/ui/RichText` (renders `**palabra**` as emphasis — the only formatting stored copy supports). Keep defaults equal to the current copy so a fresh environment looks the same.
+3. Everything lands in one JSON row: `site_content` where `id = 'site'`, one key per section. The stored value overrides the widget's default array.
+
+Known gaps — ask before assuming they are wanted, but keep them in mind:
+- Still hardcoded: the Hero, the closing CTA, the footer, the About photos, and the mentorship application URL (`EXTERNAL_LINKS.mentorshipApplication`, still `REPLACE_ME`).
+- `/admin` shows no link to the admin panel (`/admin/resumen`) once signed in; it only offers "Cerrar sesión".
+- `LoginForm` hand-rolls its inputs instead of using `TextField`.
+
+## Supabase project
+
+- Project **LBP**, ref `vwqivhvhlrzjiqvwnhno` (us-east-1), org "PROJECTS ENVIROMENT". `.env.local` and the GitHub Pages secrets point at it.
+- Migrations live in `supabase/migrations/`, numbered. 0001 (site_content) and 0002 (admin-only writes) are applied. 0003 (platform schema) and 0004 (strip Discord leftovers from site_content) are written; check with the user whether they ran them.
+- Applying SQL: Claude cannot run it from here. The claude.ai Supabase connector only sees another org, and the CLI (`supabase link` done, `supabase/.temp/` gitignored) times out connecting to the pooler. Write the migration file and have the user paste it into LBP's SQL Editor, then paste results back.
 
 Password recovery relies on Supabase's `detectSessionInUrl` (on by default): the emailed link lands on `/nueva-contrasena` carrying a one-time recovery session, which `supabase-js` picks up from the URL before the page renders. So that page gates on having *any* session — no session means the link expired, was already used, or someone typed the URL. After `updateUser({ password })` it signs out and sends the user to `/iniciar-sesion`, so the new password is actually exercised and no recovery session lingers.
 
@@ -107,10 +138,10 @@ Conventions in place:
 
 ## Notable conventions/state
 
-- `src/shared/config/external-links.ts` still holds `https://REPLACE_ME` for `whopCheckout`, `discordInvite` and `mentorshipApplication`. Instagram is set.
+- `src/shared/config/external-links.ts` still holds `https://REPLACE_ME` for `whopCheckout`, `mentorshipApplication` and `whatsappSupport`. Instagram is set.
 - Styling is Tailwind CSS v4 via `@tailwindcss/vite` — no `tailwind.config`; the theme tokens are CSS variables in `src/index.css` (`--color-bg`, `--color-accent`, …), used as Tailwind classes (`bg-bg`, `text-accent`).
 - Animations use `framer-motion` (scroll-in pattern: `initial`/`whileInView`/`viewport`).
-- Icons are inline SVG components defined locally in the widget that uses them (`LockIcon` in `CommunitySection`, `DiscordIcon` in `Footer`). There is no shared icon module; follow the local pattern.
-- Several home sections are live-editable by an admin and persist through `entities/site-content` to the Supabase `site_content` table. The arrays in those widgets (e.g. `DEFAULT_CHANNEL_GROUPS`) are **defaults only** — once a value is saved, the stored row wins and editing the default changes nothing on a configured environment.
+- Icons are inline SVG components defined locally in the widget that uses them (`LockIcon` in `PlatformSection`, `InstagramIcon` in `Footer`). There is no shared icon module; follow the local pattern.
+- Several home sections are live-editable by an admin and persist through `entities/site-content` to the Supabase `site_content` table. The arrays in those widgets (e.g. `DEFAULT_FAQ_ITEMS`) are **defaults only** — once a value is saved, the stored row wins and editing the default changes nothing on a configured environment.
 - Images are imported from `src/shared/assets/images/` so Vite fingerprints them. Compress before committing; `public/` is only for files needing a fixed URL (`favicon.png`).
 - `scripts/cobrix/` is a standalone sandbox test harness for the Cobrix payment gateway (plain Node, no deps, not part of the Vite build). Its `.env` and `webhooks.log` are gitignored.

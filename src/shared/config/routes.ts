@@ -2,7 +2,6 @@ export const ROUTES = {
   home: '/',
   about: '/about',
   mentorship: '/mentorship',
-  platform: '/plataforma',
   faq: '/faq',
 
   // Acceso de alumnos.
