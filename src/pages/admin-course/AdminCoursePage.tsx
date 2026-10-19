@@ -20,6 +20,7 @@ import {
 import { usePlanOptions, type PlanOption } from '../../entities/plan';
 import {
   CheckIcon,
+  CloseButton,
   CourseFields,
   EyeIcon,
   PencilIcon,
@@ -101,7 +102,13 @@ function CourseDetails({ course, plans, isEditing, onEditingChange, onChanged }:
 
   if (isEditing) {
     return (
-      <section className="bg-panel border border-accent/40 rounded-[18px] p-6 sm:p-8">
+      <section className="relative bg-panel border border-accent/40 rounded-[18px] p-6 sm:p-8">
+        <CloseButton
+          onClose={() => onEditingChange(false)}
+          label="Cancelar la edición"
+          confirmTitle="¿Descartar los cambios?"
+          confirmDescription="El curso queda como estaba antes de editarlo."
+        />
         <h2 className={`${sectionLabel} mb-6`}>Editar datos del curso</h2>
         <CourseFields
           autoFocus
@@ -118,13 +125,10 @@ function CourseDetails({ course, plans, isEditing, onEditingChange, onChanged }:
             <FormAlert variant="error">{error}</FormAlert>
           </div>
         )}
-        <div className="flex flex-wrap items-center gap-3 mt-7 pt-6 border-t border-line">
+        <div className="flex justify-center mt-7 pt-6 border-t border-line">
           <Button variant="primary" size="sm" onClick={() => void handleSave()} disabled={isBusy}>
             <CheckIcon className="w-4 h-4" />
             {isBusy ? 'Guardando…' : 'Guardar cambios'}
-          </Button>
-          <Button variant="ghost" size="sm" onClick={() => onEditingChange(false)}>
-            Cancelar
           </Button>
         </div>
       </section>
@@ -389,7 +393,7 @@ export function AdminCoursePage() {
   }
 
   return (
-    <div className="max-w-5xl">
+    <div className="max-w-5xl mx-auto">
       <AdminTopBar
         backTo={ROUTES.adminCourses}
         backLabel="Volver a Cursos"

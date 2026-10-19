@@ -2,7 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createCourse, nextPosition, useCourseTree } from '../../entities/course';
 import { usePlanOptions } from '../../entities/plan';
-import { CheckIcon, CourseFields, useAdminAction, type CourseFieldValues } from '../../features/manage-courses';
+import { CheckIcon, CloseButton, CourseFields, useAdminAction, type CourseFieldValues } from '../../features/manage-courses';
 import { AdminPageHeading, AdminTopBar } from '../../widgets/admin-shell';
 import { ROUTES, adminCoursePath } from '../../shared/config/routes';
 import { Button } from '../../shared/ui/Button';
@@ -50,7 +50,7 @@ export function AdminCourseNewPage() {
   }
 
   return (
-    <div className="max-w-3xl">
+    <div className="max-w-3xl mx-auto">
       <AdminTopBar
         backTo={ROUTES.adminCourses}
         backLabel="Volver a Cursos"
@@ -61,7 +61,13 @@ export function AdminCourseNewPage() {
         subtitle="Paso 1 de 2: los datos del curso. Al crearlo podrás agregarle módulos y clases."
       />
 
-      <form noValidate onSubmit={(event) => void handleSubmit(event)} className="bg-panel border border-line rounded-[18px] p-6 sm:p-8">
+      <form noValidate onSubmit={(event) => void handleSubmit(event)} className="relative bg-panel border border-line rounded-[18px] px-6 sm:px-8 pb-6 sm:pb-8 pt-20">
+        <CloseButton
+          to={ROUTES.adminCourses}
+          label="Cancelar y volver a Cursos"
+          confirmTitle="¿Descartar el curso nuevo?"
+          confirmDescription="El curso no se crea y lo que escribiste se pierde."
+        />
         <CourseFields
           autoFocus
           values={shown}
@@ -84,13 +90,10 @@ export function AdminCourseNewPage() {
           </div>
         )}
 
-        <div className="flex flex-wrap items-center gap-3 mt-7 pt-6 border-t border-line">
+        <div className="flex justify-center mt-7 pt-6 border-t border-line">
           <Button type="submit" variant="primary" size="sm" disabled={isBusy}>
             <CheckIcon className="w-4 h-4" />
             {isBusy ? 'Creando…' : 'Crear curso'}
-          </Button>
-          <Button to={ROUTES.adminCourses} variant="ghost" size="sm">
-            Cancelar
           </Button>
         </div>
       </form>

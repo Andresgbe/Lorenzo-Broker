@@ -5,6 +5,8 @@ interface ConfirmDialogProps {
   title: string;
   description: ReactNode;
   confirmLabel: string;
+  /** Texto del botón que cancela. Por defecto "Cancelar"; al descartar cambios, "Seguir editando". */
+  cancelLabel?: string;
   onConfirm: () => void;
   onCancel: () => void;
   isBusy?: boolean;
@@ -24,7 +26,7 @@ function TrashIcon({ className }: { className?: string }) {
  * Confirmación de una acción destructiva: diálogo centrado sobre la página
  * oscurecida. El foco empieza en "Cancelar"; Escape y el fondo también cancelan.
  */
-export function ConfirmDialog({ open, title, description, confirmLabel, onConfirm, onCancel, isBusy }: ConfirmDialogProps) {
+export function ConfirmDialog({ open, title, description, confirmLabel, cancelLabel = 'Cancelar', onConfirm, onCancel, isBusy }: ConfirmDialogProps) {
   const cancelRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -67,7 +69,7 @@ export function ConfirmDialog({ open, title, description, confirmLabel, onConfir
             disabled={isBusy}
             className="inline-flex items-center h-10 px-4 rounded-[10px] border border-line-strong text-[13.5px] text-[#c6cedb] hover:text-ink hover:border-muted transition-colors cursor-pointer disabled:opacity-50"
           >
-            Cancelar
+            {cancelLabel}
           </button>
           <button
             type="button"

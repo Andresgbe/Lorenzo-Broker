@@ -14,6 +14,7 @@ import { Button } from '../../shared/ui/Button';
 import { Container } from '../../shared/ui/Container';
 import { FormAlert } from '../../shared/ui/FormAlert';
 import { MediaPlaceholder } from '../../shared/ui/MediaPlaceholder';
+import { PageTopBar } from '../../shared/ui/PageTopBar';
 import { cn } from '../../shared/lib/cn';
 
 function PlayIcon({ className }: { className?: string }) {
@@ -102,13 +103,16 @@ export function StudentLessonPage() {
 
   return (
     <Container className="py-10 md:py-14">
-      <nav className="flex flex-wrap items-center gap-2 text-[12.5px] text-muted mb-6">
-        <Link to={studentCoursePath(course.id)} className="hover:text-accent transition-colors">
-          {course.title}
-        </Link>
-        <span aria-hidden="true">/</span>
-        <span className="text-[#c6cedb]">{module.title}</span>
-      </nav>
+      <PageTopBar
+        backTo={studentCoursePath(course.id)}
+        backLabel={`Volver a ${course.title}`}
+        crumbs={[
+          { label: 'Tus cursos', to: ROUTES.studentCourses },
+          { label: course.title, to: studentCoursePath(course.id) },
+          { label: module.title, to: studentCoursePath(course.id) },
+          { label: lesson.title },
+        ]}
+      />
 
       <div className="grid gap-8 lg:grid-cols-[1fr_320px] items-start">
         <div>

@@ -13,6 +13,7 @@ import {
 import { ROUTES, studentLessonPath } from '../../shared/config/routes';
 import { Button } from '../../shared/ui/Button';
 import { Container } from '../../shared/ui/Container';
+import { PageTopBar } from '../../shared/ui/PageTopBar';
 import { MediaPlaceholder } from '../../shared/ui/MediaPlaceholder';
 import { cn } from '../../shared/lib/cn';
 
@@ -71,11 +72,11 @@ export function StudentCoursePage() {
 
   return (
     <Container className="py-12 md:py-16">
-      <nav className="text-[12.5px] text-muted mb-6">
-        <Link to={ROUTES.studentCourses} className="hover:text-accent transition-colors">
-          ← Tus cursos
-        </Link>
-      </nav>
+      <PageTopBar
+        backTo={ROUTES.studentCourses}
+        backLabel="Volver a tus cursos"
+        crumbs={[{ label: 'Tus cursos', to: ROUTES.studentCourses }, { label: course.title }]}
+      />
 
       <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
         <div className="max-w-2xl">

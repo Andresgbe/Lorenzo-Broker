@@ -151,7 +151,7 @@ function LessonForm({ lesson, onSaved }: LessonFormProps) {
         {error && <FormAlert variant="error">{error}</FormAlert>}
         {saved && !error && <FormAlert variant="success">Cambios guardados.</FormAlert>}
 
-        <div className="pt-5 border-t border-line">
+        <div className="flex justify-center pt-5 border-t border-line">
           <Button variant="primary" size="sm" onClick={() => void handleSave()} disabled={isBusy}>
             <CheckIcon className="w-4 h-4" />
             {isBusy ? 'Guardando…' : 'Guardar cambios'}
@@ -283,7 +283,7 @@ export function AdminLessonPage() {
   }
 
   return (
-    <div className="max-w-6xl">
+    <div className="max-w-6xl mx-auto">
       <AdminTopBar
         backTo={adminCoursePath(course.id)}
         backLabel={`Volver a ${course.title}`}

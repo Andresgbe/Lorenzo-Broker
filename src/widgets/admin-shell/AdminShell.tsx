@@ -1,20 +1,23 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../../entities/session';
-import { ROUTES } from '../../shared/config/routes';
+import { ADMIN_SECTIONS as SECTIONS, ROUTES } from '../../shared/config/routes';
 import { Logo } from '../../shared/ui/Logo';
+import { AccountMenu } from '../../features/account-menu';
 import { cn } from '../../shared/lib/cn';
-
-const SECTIONS = [
-  { label: 'Resumen', to: ROUTES.adminOverview },
-  { label: 'Alumnos', to: ROUTES.adminStudents },
-  { label: 'Pagos', to: ROUTES.adminPayments },
-  { label: 'Cursos', to: ROUTES.adminCourses },
-];
 
 function MenuIcon({ open }: { open: boolean }) {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      aria-hidden="true"
+    >
       {open ? (
         <>
           <path d="M6 6l12 12" />
@@ -68,21 +71,72 @@ export function AdminShell() {
 
   return (
     <div className="min-h-dvh flex flex-col bg-bg">
-      <header ref={menuRef} className="sticky top-0 z-50 bg-bg/90 backdrop-blur-md border-b border-line">
-        <div className="flex items-center gap-4 h-16 px-4 sm:px-6">
-          <button
-            type="button"
-            onClick={() => setOpen((value) => !value)}
-            aria-expanded={open}
-            aria-controls="admin-menu"
-            aria-label={open ? 'Cerrar menú' : 'Abrir menú'}
-            className={cn(
-              'flex items-center justify-center w-10 h-10 rounded-[10px] border transition-colors cursor-pointer',
-              open ? 'border-accent text-accent bg-accent/10' : 'border-line-strong text-ink bg-panel-2 hover:border-muted'
-            )}
+      {/* Misma barra que el sitio y el área del alumno: 76px, hamburguesa en la esquina y el
+          avatar (AccountMenu) a la derecha. Va alineada con la columna del contenido (1400px). */}
+      <header className="sticky top-0 z-50 bg-bg/90 backdrop-blur-md border-b border-line">
+        <div className="flex items-center gap-4 h-[76px] w-full max-w-[1400px] mx-auto px-4 sm:px-8">
+          {/* Desde 1500px el botón sale de la columna y queda en la esquina; antes no cabe sin pisar el logo. */}
+          <div
+            ref={menuRef}
+            className="relative shrink-0 min-[1500px]:absolute min-[1500px]:left-5 min-[1500px]:top-1/2 min-[1500px]:-translate-y-1/2"
           >
-            <MenuIcon open={open} />
-          </button>
+            <button
+              type="button"
+              onClick={() => setOpen((value) => !value)}
+              aria-expanded={open}
+              aria-controls="admin-menu"
+              aria-label={open ? 'Cerrar menú' : 'Abrir menú'}
+              className={cn(
+                'flex items-center justify-center w-10 h-10 rounded-[10px] border transition-colors cursor-pointer',
+                open ? 'border-accent text-accent bg-accent/10' : 'border-line-strong text-ink bg-panel-2 hover:border-muted',
+              )}
+            >
+              <MenuIcon open={open} />
+            </button>
+            {/* top: 8px por debajo de la barra (76px). */}
+            {open && (
+              <div
+                id="admin-menu"
+                className="absolute left-0 top-[calc(100%+26px)] w-[min(300px,calc(100vw-32px))] p-2 bg-panel-2 border border-line-strong rounded-[14px] shadow-[0_30px_80px_rgba(0,0,0,0.5)]"
+              >
+                <nav aria-label="Secciones del panel" className="flex flex-col gap-0.5">
+                  {SECTIONS.map((section) => (
+                    <NavLink
+                      key={section.label}
+                      to={section.to}
+                      className={({ isActive }) =>
+                        cn(
+                          'flex items-center justify-between px-3.5 py-3 rounded-[10px] text-[14px] transition-colors',
+                          isActive ? 'bg-accent/10 text-accent font-semibold' : 'text-ink hover:bg-white/5',
+                        )
+                      }
+                    >
+                      {section.label}
+                    </NavLink>
+                  ))}
+                </nav>
+
+                <div className="h-px bg-line mx-2 my-2" />
+
+                <Link
+                  to={ROUTES.home}
+                  className="block px-3.5 py-2.5 rounded-[10px] text-[13.5px] text-muted hover:text-ink hover:bg-white/5 transition-colors"
+                >
+                  Ver el sitio
+                </Link>
+                <p className="px-3.5 pt-2 text-[11.5px] text-muted truncate" title={user?.email}>
+                  {user?.email}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => void logout()}
+                  className="w-full text-left px-3.5 py-2.5 rounded-[10px] text-[13.5px] text-red-400 hover:bg-white/5 transition-colors cursor-pointer"
+                >
+                  Cerrar sesión
+                </button>
+              </div>
+            )}
+          </div>
 
           <Logo />
 
@@ -91,7 +145,7 @@ export function AdminShell() {
               <span aria-hidden="true" className="text-subtle">
                 /
               </span>
-              <span className="text-[#c6cedb]">Panel · {current.label}</span>
+              <span className="text-[#c6cedb]">{current.label}</span>
             </span>
           )}
 
@@ -101,55 +155,26 @@ export function AdminShell() {
               to={ROUTES.studentCourses}
               className="inline-flex items-center gap-2 h-10 px-3.5 rounded-[10px] border border-line-strong text-[13.5px] font-semibold text-[#c6cedb] hover:border-accent hover:text-accent transition-colors whitespace-nowrap"
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
                 <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z" />
                 <circle cx="12" cy="12" r="3" />
               </svg>
               <span className="hidden sm:inline">Vista de alumno</span>
               <span className="sm:hidden">Alumno</span>
             </Link>
-            <span className="hidden lg:block text-[12.5px] text-muted truncate max-w-[220px]" title={user?.email}>
-              {user?.email}
-            </span>
+            <AccountMenu />
           </div>
         </div>
-
-        {open && (
-          <div id="admin-menu" className="absolute left-4 sm:left-6 top-[calc(100%+8px)] w-[min(300px,calc(100vw-32px))] p-2 bg-panel-2 border border-line-strong rounded-[14px] shadow-[0_30px_80px_rgba(0,0,0,0.5)]">
-            <nav aria-label="Secciones del panel" className="flex flex-col gap-0.5">
-              {SECTIONS.map((section) => (
-                <NavLink
-                  key={section.label}
-                  to={section.to}
-                  className={({ isActive }) =>
-                    cn(
-                      'flex items-center justify-between px-3.5 py-3 rounded-[10px] text-[14px] transition-colors',
-                      isActive ? 'bg-accent/10 text-accent font-semibold' : 'text-ink hover:bg-white/5'
-                    )
-                  }
-                >
-                  {section.label}
-                </NavLink>
-              ))}
-            </nav>
-
-            <div className="h-px bg-line mx-2 my-2" />
-
-            <Link to={ROUTES.home} className="block px-3.5 py-2.5 rounded-[10px] text-[13.5px] text-muted hover:text-ink hover:bg-white/5 transition-colors">
-              Ver el sitio
-            </Link>
-            <p className="px-3.5 pt-2 text-[11.5px] text-muted truncate" title={user?.email}>
-              {user?.email}
-            </p>
-            <button
-              type="button"
-              onClick={() => void logout()}
-              className="w-full text-left px-3.5 py-2.5 rounded-[10px] text-[13.5px] text-red-400 hover:bg-white/5 transition-colors cursor-pointer"
-            >
-              Cerrar sesión
-            </button>
-          </div>
-        )}
       </header>
 
       <main className="flex-1 min-w-0 w-full max-w-[1400px] mx-auto px-4 sm:px-8 py-8 sm:py-10">

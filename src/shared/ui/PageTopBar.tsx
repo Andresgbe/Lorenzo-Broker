@@ -7,7 +7,7 @@ export interface Crumb {
   to?: string;
 }
 
-interface AdminTopBarProps {
+interface PageTopBarProps {
   /** A dónde lleva la flecha: el nivel de arriba. */
   backTo: string;
   backLabel: string;
@@ -17,11 +17,12 @@ interface AdminTopBarProps {
 }
 
 /**
- * Encabezado de las páginas del panel que tienen un nivel arriba: volver, ruta
- * en texto plano y acciones. Sin caja ni fondo, para no parecer una segunda
- * barra debajo de la del AdminShell. La ruta va en mayúsculas: CURSOS / CURSO / MÓDULO / CLASE.
+ * Encabezado de las páginas que tienen un nivel arriba, en el panel y en el área
+ * del alumno: volver, ruta en texto plano y acciones. Sin caja ni fondo, para no
+ * parecer una segunda barra. La ruta va en mayúsculas: CURSOS / CURSO / MÓDULO / CLASE.
+ * En el panel se usa con su nombre de siempre, AdminTopBar (widgets/admin-shell).
  */
-export function AdminTopBar({ backTo, backLabel, crumbs, actions }: AdminTopBarProps) {
+export function PageTopBar({ backTo, backLabel, crumbs, actions }: PageTopBarProps) {
   return (
     <div className="flex flex-wrap items-center gap-x-4 gap-y-3 mb-8">
       {/* En pantallas anchas la flecha cuelga en el margen izquierdo, fuera de la columna del contenido. */}

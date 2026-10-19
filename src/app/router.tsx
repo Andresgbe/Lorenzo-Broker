@@ -21,7 +21,7 @@ import { StudentCoursePage } from '../pages/student-course';
 import { StudentLessonPage } from '../pages/student-lesson';
 import { StudentAccountPage } from '../pages/student-account';
 import { StudentExpiredPage } from '../pages/student-expired';
-import { RequireAdmin } from '../entities/session';
+import { RequireAdmin, RequireAuth } from '../entities/session';
 import { AdminShell } from '../widgets/admin-shell';
 import { AdminOverviewPage } from '../pages/admin-overview';
 import { AdminStudentsPage } from '../pages/admin-students';
@@ -55,9 +55,14 @@ export const router = createBrowserRouter(
     { path: ROUTES.checkoutPending, element: <CheckoutPendingPage /> },
     { path: ROUTES.checkoutConfirmed, element: <CheckoutConfirmedPage /> },
 
-    // Área del alumno: nav propia. Sin proteger todavía — ver CLAUDE.md.
+    // Área del alumno: nav propia, protegida con RequireAuth (exige sesión; sin
+    // ella manda a iniciar sesión y vuelve aquí al entrar). El contenido lo filtra RLS.
     {
-      element: <StudentNav />,
+      element: (
+        <RequireAuth>
+          <StudentNav />
+        </RequireAuth>
+      ),
       children: [
         { path: ROUTES.student, element: <StudentHomePage /> },
         { path: ROUTES.studentCourses, element: <StudentCoursesPage /> },

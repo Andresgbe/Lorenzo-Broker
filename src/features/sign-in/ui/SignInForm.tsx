@@ -1,15 +1,20 @@
 import { useState, type FormEvent } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../../entities/session';
+import { useAuth, type SignInRedirectState } from '../../../entities/session';
 import { ROUTES } from '../../../shared/config/routes';
 import { Button } from '../../../shared/ui/Button';
 import { FormAlert } from '../../../shared/ui/FormAlert';
 import { TextField } from '../../../shared/ui/TextField';
 import { isValidEmail } from '../../../shared/lib/validation';
 
-interface SignInLocationState {
+interface SignInLocationState extends Partial<SignInRedirectState> {
   justRegistered?: boolean;
   passwordUpdated?: boolean;
+}
+
+/** Solo rutas internas ("/alumno/..."): nunca "//otro-sitio" ni una URL completa. */
+function safeReturnPath(from: string | undefined) {
+  return from && from.startsWith('/') && !from.startsWith('//') ? from : null;
 }
 
 export function SignInForm() {
@@ -42,11 +47,15 @@ export function SignInForm() {
       setSubmitError('Correo o contraseña incorrectos.');
       return;
     }
-    navigate(ROUTES.home, { replace: true });
+    navigate(safeReturnPath(state?.from) ?? ROUTES.home, { replace: true });
   }
 
   return (
     <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
+      {safeReturnPath(state?.from) && !state?.justRegistered && !state?.passwordUpdated && (
+        <p className="text-[13.5px] text-muted">Inicia sesión para entrar a tu área de alumno.</p>
+      )}
+
       {state?.justRegistered && (
         <FormAlert variant="success">
           Cuenta creada. Revisa tu correo para confirmarla y luego entra aquí.

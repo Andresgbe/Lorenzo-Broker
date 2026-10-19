@@ -44,6 +44,28 @@ export function studentCoursePath(courseId: string) {
   return ROUTES.studentCourse.replace(':courseId', courseId);
 }
 
+// Secciones del panel: el menú hamburguesa del AdminShell y el de la web pública (para el admin)
+// muestran esta misma lista.
+export const ADMIN_SECTIONS = [
+  { label: 'Resumen', to: ROUTES.adminOverview },
+  { label: 'Alumnos', to: ROUTES.adminStudents },
+  { label: 'Pagos', to: ROUTES.adminPayments },
+  { label: 'Cursos', to: ROUTES.adminCourses },
+] as const;
+
+// Secciones de Mi cuenta. Viajan en ?seccion= para que el menú de perfil abra cada una directo.
+export const ACCOUNT_SECTIONS = {
+  profile: 'datos',
+  membership: 'membresia',
+  password: 'clave',
+} as const;
+
+export type AccountSection = (typeof ACCOUNT_SECTIONS)[keyof typeof ACCOUNT_SECTIONS];
+
+export function studentAccountPath(section: AccountSection = ACCOUNT_SECTIONS.profile) {
+  return section === ACCOUNT_SECTIONS.profile ? ROUTES.studentAccount : `${ROUTES.studentAccount}?seccion=${section}`;
+}
+
 export function adminCoursePath(courseId: string) {
   return ROUTES.adminCourse.replace(':courseId', courseId);
 }
