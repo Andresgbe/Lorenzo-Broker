@@ -7,17 +7,15 @@ interface RequireAdminProps {
   children: ReactNode;
 }
 
-// Wrap future admin-only routes/sections with this to redirect anonymous
-// visitors to /login. Ready to use once specific editable sections are defined.
 export function RequireAdmin({ children }: RequireAdminProps) {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAdmin, isLoading } = useAuth();
 
   if (isLoading) {
     return null;
   }
 
-  if (!isAuthenticated) {
-    return <Navigate to={ROUTES.login} replace />;
+  if (!isAdmin) {
+    return <Navigate to={ROUTES.adminLogin} replace />;
   }
 
   return <>{children}</>;

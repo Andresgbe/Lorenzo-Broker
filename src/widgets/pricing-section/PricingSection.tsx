@@ -61,7 +61,7 @@ function PlusIcon({ className }: { className?: string }) {
 }
 
 export function PricingSection() {
-  const { isAuthenticated } = useAuth();
+  const { isAdmin } = useAuth();
   const { value: stored, setValue: persistContent, isLoading } = useSiteContentField(
     'pricing.plan',
     DEFAULT_PRICING
@@ -128,7 +128,7 @@ export function PricingSection() {
             transition={{ duration: 0.5 }}
             className="w-full max-w-[460px] bg-panel border border-accent/40 rounded-[22px] px-6 sm:px-10 py-11 text-center shadow-[0_0_60px_rgba(37,233,138,0.08)]"
           >
-            {isAuthenticated ? (
+            {isAdmin ? (
               <input
                 value={content.planName}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => updateField({ planName: e.target.value })}
@@ -141,7 +141,7 @@ export function PricingSection() {
 
             <div className="font-display font-extrabold text-[56px] mt-4 mb-1 text-ink flex items-baseline justify-center gap-0.5">
               $
-              {isAuthenticated ? (
+              {isAdmin ? (
                 <input
                   value={content.price}
                   onChange={(e: ChangeEvent<HTMLInputElement>) => updateField({ price: e.target.value })}
@@ -154,7 +154,7 @@ export function PricingSection() {
               <small className="text-lg text-muted font-body font-medium">/mes</small>
             </div>
 
-            {isAuthenticated ? (
+            {isAdmin ? (
               <input
                 value={content.billingNote}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => updateField({ billingNote: e.target.value })}
@@ -169,7 +169,7 @@ export function PricingSection() {
               {content.items.map((item) => (
                 <div key={item.id} className="flex gap-3 items-start text-[14.5px] text-[#c6cedb]">
                   <CheckIcon bonus={item.bonus} />
-                  {isAuthenticated ? (
+                  {isAdmin ? (
                     <div className="flex-1 flex items-center gap-2 min-w-0">
                       <input
                         value={item.label}
@@ -202,7 +202,7 @@ export function PricingSection() {
                 </div>
               ))}
 
-              {isAuthenticated && (
+              {isAdmin && (
                 <button
                   type="button"
                   onClick={addItem}

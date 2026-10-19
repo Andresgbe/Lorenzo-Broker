@@ -1,0 +1,1 @@
+export { CheckoutPendingPage } from './CheckoutPendingPage';

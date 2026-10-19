@@ -22,3 +22,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+scripts/cobrix/.env
+scripts/cobrix/webhooks.log
+
+# Supabase CLI link state
+supabase/.temp/

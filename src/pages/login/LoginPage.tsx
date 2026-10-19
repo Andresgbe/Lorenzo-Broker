@@ -3,9 +3,10 @@ import { useAuth } from '../../entities/session';
 import { LoginForm } from '../../features/admin-login';
 import { Button } from '../../shared/ui/Button';
 import { Container } from '../../shared/ui/Container';
+import { FormAlert } from '../../shared/ui/FormAlert';
 
 export function LoginPage() {
-  const { isAuthenticated, isLoading, user, logout } = useAuth();
+  const { isAuthenticated, isAdmin, isLoading, user, logout } = useAuth();
 
   return (
     <Container className="py-24 flex flex-col items-center">
@@ -19,16 +20,27 @@ export function LoginPage() {
           Acceso privado
         </span>
         <h1 className="font-display font-bold text-[clamp(28px,4vw,38px)] text-ink mb-3">
-          {isAuthenticated ? 'Panel de administrador' : 'Iniciar sesión'}
+          {isAdmin ? 'Panel de administrador' : 'Acceso de administración'}
         </h1>
 
         {isLoading ? (
           <p className="text-muted text-[15px]">Cargando…</p>
-        ) : isAuthenticated ? (
+        ) : isAdmin ? (
           <>
             <p className="text-muted text-[15px] mb-8">
               Sesión iniciada como <span className="text-ink font-semibold">{user?.email}</span>.
             </p>
+            <Button variant="ghost" onClick={() => void logout()} className="w-full">
+              Cerrar sesión
+            </Button>
+          </>
+        ) : isAuthenticated ? (
+          <>
+            <div className="mb-8 w-full text-left">
+              <FormAlert variant="error">
+                La cuenta <strong>{user?.email}</strong> no tiene permisos de administración.
+              </FormAlert>
+            </div>
             <Button variant="ghost" onClick={() => void logout()} className="w-full">
               Cerrar sesión
             </Button>

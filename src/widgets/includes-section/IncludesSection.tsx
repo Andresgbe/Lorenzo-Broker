@@ -57,7 +57,7 @@ function PlusIcon({ className }: { className?: string }) {
 }
 
 export function IncludesSection() {
-  const { isAuthenticated } = useAuth();
+  const { isAdmin } = useAuth();
   const { value: stored, setValue: persistItems, isLoading } = useSiteContentField(
     'includes.items',
     DEFAULT_INCLUDES_DATA
@@ -157,7 +157,7 @@ export function IncludesSection() {
           {items.map((item, index) => (
             <div
               key={item.id}
-              draggable={isAuthenticated}
+              draggable={isAdmin}
               onMouseDown={handleMouseDown}
               onDragStart={(e) => handleDragStart(e, item.id)}
               onDragOver={(e) => handleDragOver(e, item.id)}
@@ -174,7 +174,7 @@ export function IncludesSection() {
                 <BenefitCard
                   benefit={item}
                   index={index + 1}
-                  editable={isAuthenticated}
+                  editable={isAdmin}
                   onChange={(patch) => updateItem(item.id, patch)}
                   onBlurSave={saveItems}
                   onToggleBonus={() => toggleBonus(item.id)}
@@ -184,7 +184,7 @@ export function IncludesSection() {
             </div>
           ))}
 
-          {isAuthenticated && (
+          {isAdmin && (
             <button
               type="button"
               onClick={addItem}
