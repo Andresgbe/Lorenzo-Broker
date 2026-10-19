@@ -117,7 +117,7 @@ function LessonForm({ lesson, onSaved }: LessonFormProps) {
             className={cn(inputClasses, 'resize-y')}
           />
         </div>
-
+ 
         <div className="grid gap-4 sm:grid-cols-[1fr_140px]">
           <TextField 
             label="ID del video en Bunny Stream"
