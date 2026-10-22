@@ -14,6 +14,8 @@ export const ROUTES = {
   // Checkout. El plan elegido viaja en ?plan= para que sobreviva a un refresh.
   checkoutPlan: '/suscripcion',
   checkoutSummary: '/suscripcion/resumen',
+  // Datos para pagar con el método elegido (?plan=&metodo=), mientras no haya pasarela.
+  checkoutPay: '/suscripcion/pagar',
   checkoutPending: '/suscripcion/verificando',
   checkoutConfirmed: '/suscripcion/confirmado',
 
@@ -101,5 +103,6 @@ export function adminLessonPath(courseId: string, lessonId: string) {
 export const HOME_SECTIONS = {
   hero: 'hero',
   includes: 'incluye',
+  includesDetail: 'detalle',
   pricing: 'suscribete',
 } as const;

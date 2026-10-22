@@ -6,7 +6,7 @@ import { Container } from '../../shared/ui/Container';
 import { FormAlert } from '../../shared/ui/FormAlert';
 
 export function StudentCoursesPage() {
-  const { courses, isLoading, error } = useCourseTree();
+  const { courses, isLoading, error } = useCourseTree({ publishedOnly: true });
   const { completed } = useLessonProgress();
 
   return (

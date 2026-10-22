@@ -21,6 +21,17 @@ function toSessionUser(user: User | null | undefined): SessionUser | null {
   };
 }
 
+// Preferencia de este navegador: un admin que activó la Vista de alumno la conserva al recargar.
+const VIEW_AS_STUDENT_KEY = 'lb:view-as-student';
+
+function readViewAsStudent() {
+  try {
+    return window.localStorage.getItem(VIEW_AS_STUDENT_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
 function absoluteUrl(path: string) {
   const base = import.meta.env.BASE_URL.replace(/\/$/, '');
   return `${window.location.origin}${base}${path}`;
@@ -29,6 +40,17 @@ function absoluteUrl(path: string) {
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<SessionUser | null>(null);
   const [isLoading, setIsLoading] = useState(() => supabase !== null);
+  const [viewAsStudentPreference, setViewAsStudentPreference] = useState(readViewAsStudent);
+
+  const setViewAsStudent = useCallback((value: boolean) => {
+    setViewAsStudentPreference(value);
+    try {
+      if (value) window.localStorage.setItem(VIEW_AS_STUDENT_KEY, '1');
+      else window.localStorage.removeItem(VIEW_AS_STUDENT_KEY);
+    } catch {
+      // Sin almacenamiento (modo privado): vale solo para esta pestaña.
+    }
+  }, []);
 
   useEffect(() => {
     if (!supabase) return;
@@ -80,15 +102,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const logout = useCallback(async () => {
+    setViewAsStudent(false);
     if (!supabase) return;
     await supabase.auth.signOut();
-  }, []);
+  }, [setViewAsStudent]);
+
+  const isAdminAccount = user?.role === 'admin';
+  // Solo una cuenta admin puede estar en Vista de alumno; para un alumno no cambia nada.
+  const viewAsStudent = isAdminAccount && viewAsStudentPreference;
 
   const value = useMemo<AuthContextValue>(
     () => ({
       user,
       isAuthenticated: user !== null,
-      isAdmin: user?.role === 'admin',
+      isAdmin: isAdminAccount && !viewAsStudent,
+      isAdminAccount,
+      viewAsStudent,
+      setViewAsStudent,
       isLoading,
       login,
       register,
@@ -96,7 +126,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       updatePassword,
       logout,
     }),
-    [user, isLoading, login, register, requestPasswordReset, updatePassword, logout]
+    [user, isLoading, isAdminAccount, viewAsStudent, setViewAsStudent, login, register, requestPasswordReset, updatePassword, logout]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

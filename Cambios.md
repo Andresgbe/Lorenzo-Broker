@@ -2,6 +2,71 @@
 
 Registro de los cambios pedidos sobre la plataforma, del más reciente al más antiguo.
 
+## 22/10/2026 — Contacto: formulario centrado
+
+- En pantallas anchas (desde 1280 px), la tarjeta del formulario queda **centrada en la página**, con un ancho máximo de 640 px.
+- "Otros canales" va **a su derecha y más pequeña**: 280 px de ancho, con íconos y textos más chicos.
+- En pantallas más angostas van las dos centradas, una debajo de la otra, con el formulario primero.
+
+## 22/10/2026 — Portada: sección "Así funciona cada parte"
+
+- Sección nueva en la portada, **debajo de "Un solo plan. Todo incluido."** (antes de las preguntas frecuentes).
+- Explica en detalle cada parte de la membresía, una fila por cada tarjeta de "¿Qué incluye?":
+  1. Educación continua: cursos, libros y PDF.
+  2. Ideas de inversión: chat privado.
+  3. Bonus: Copytrading en Binance, en color petróleo como las demás tarjetas bonus.
+- **Cada fila tiene:**
+  - el número de la tarjeta, el título y una explicación;
+  - una lista de lo que recibes;
+  - un **marco para la captura de pantalla**, con un texto debajo que dice qué muestra.
+- **Distribución:** en computadora, el texto y la captura se alternan de lado en cada fila. En el teléfono la captura va debajo del texto.
+- **Pendiente:**
+  - Los textos son **de ejemplo** para el diseño. Lorenzo los va a reescribir y mandar las capturas reales; hoy están en `src/widgets/includes-detail/IncludesDetail.tsx`.
+  - No se pueden editar desde el sitio, como sí pasa con "¿Qué incluye?".
+
+## 22/10/2026 — Checkout sin Cobrix: datos para pagar y botón de volver
+
+- **Nuevo flujo, mientras no haya pasarela:**
+  1. Plan.
+  2. "Da tu siguiente paso": se elige el método y se toca **"Continuar con [método]"**.
+  3. Pantalla nueva **"Paga con [método]"** (`/suscripcion/pagar`).
+  4. **"Ya pagué"** lleva a "Estamos verificando tu pago".
+- **"Paga con [método]"** muestra:
+  - El **monto**: en bolívares a la tasa del día para PagoMóvil y Transferencia; en dólares para Zelle y Binance Pay.
+  - Los **datos para pagar** del método, cada uno con botón **"Copiar"**.
+  - Un campo para la **referencia del pago**, obligatorio para continuar.
+- **"Estamos verificando tu pago"** muestra además el método elegido.
+- **Botón de volver** (el de siempre, con la ruta en mayúsculas) en el checkout:
+  - Plan: INICIO / PLAN.
+  - Resumen: PLAN / PAGO.
+  - Pagar: PLAN / PAGO / MÉTODO.
+- Se quitaron las menciones a Cobrix: el botón ya no dice "Pagar con Cobrix" y la pantalla del plan dice "Puedes pagar con PagoMóvil, Transferencia, Zelle, Binance Pay".
+- **Pendiente:**
+  - Las cuentas, teléfonos, Pay ID y la tasa (215,37 Bs por dólar) son **datos de ejemplo**, en `src/shared/config/payment-methods.ts`; hay que reemplazarlos por los reales de Lorenzo.
+  - La referencia todavía no se guarda.
+
+## 22/10/2026 — Checkout › "Revisa antes de pagar" en una sola tarjeta
+
+- La pantalla de resumen del pago (`/suscripcion/resumen`) es ahora **una sola tarjeta grande**, más ancha en computadora:
+  - **Arriba, en dos columnas:** "Tus datos" (nombre, cédula o RIF, correo, con "Editar datos") y "Tu plan" (plan, cobro, precio, con "Cambiar de plan").
+  - **En medio:** "Método de pago", con las cuatro opciones en una fila en computadora (dos por fila en tablet, una debajo de otra en el teléfono).
+  - **Abajo, siempre al final:** el total y el botón **"Pagar con Cobrix"**. En computadora el botón va a la derecha y en el teléfono ocupa todo el ancho.
+- "Editar datos" ahora lleva a Mi cuenta (antes llevaba a la página de registro).
+- Las notas de tiempo de cada método ("Suele confirmarse en segundos"…) se quitaron en `payment-methods.ts`; si se vuelven a escribir, aparecen debajo de cada método.
+
+## 22/10/2026 — Interruptor "Vista de alumno" para administradores
+
+- En el menú del avatar, **solo en cuentas de administrador**, hay un interruptor **"Vista de alumno"**.
+- **Encendido:** la plataforma se ve exactamente como la ve un alumno, sin nada de administración. Te lleva al área del alumno y:
+  - desaparecen el menú hamburguesa de admin y la opción "Panel de administrador";
+  - los textos del sitio dejan de ser editables;
+  - el panel (`/admin/...`) no abre: lleva al área del alumno;
+  - en Cursos solo aparece lo **publicado**, sin borradores.
+- **Apagado:** vuelve todo lo de administración y te lleva al panel (Resumen).
+- El botón "Vista de alumno" de la cabecera del panel ahora enciende este mismo interruptor.
+- La elección se recuerda en ese navegador al recargar, y se apaga sola al cerrar sesión.
+- Es solo visual: los permisos reales de la cuenta no cambian. Además, la Vista de alumno muestra todos los cursos publicados, aunque un alumno real solo ve los de su plan.
+
 ## 22/10/2026 — Panel › Pagos: vista "Ver detalle"
 
 - Nueva página de detalle de cada pago (`/admin/pagos/:id`). Se abre con **"Ver detalle"** del menú "⋯" o tocando el nombre del alumno en la tabla.

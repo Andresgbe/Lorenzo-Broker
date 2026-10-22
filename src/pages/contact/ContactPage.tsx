@@ -38,13 +38,13 @@ function QuestionIcon({ className }: { className?: string }) {
 
 function ChannelRow({ icon, title, children }: { icon: ReactNode; title: string; children: ReactNode }) {
   return (
-    <div className="flex gap-4 py-5 first:pt-0 last:pb-0">
-      <span className="flex items-center justify-center w-10 h-10 shrink-0 rounded-full bg-accent/10 border border-accent/30 text-accent">
+    <div className="flex gap-3 py-4 first:pt-0 last:pb-0">
+      <span className="flex items-center justify-center w-8 h-8 shrink-0 rounded-full bg-accent/10 border border-accent/30 text-accent">
         {icon}
       </span>
       <div className="min-w-0">
-        <p className="text-[15px] font-semibold text-ink">{title}</p>
-        <div className="text-[13.5px] text-muted mt-1 leading-relaxed">{children}</div>
+        <p className="text-[14px] font-semibold text-ink">{title}</p>
+        <div className="text-[12.5px] text-muted mt-0.5 leading-relaxed">{children}</div>
       </div>
     </div>
   );
@@ -64,13 +64,16 @@ export function ContactPage() {
           subtitle="Escríbeme tus dudas, sugerencias o cualquier problema con tu pago o tu acceso. Leo cada mensaje y te respondo por correo."
         />
 
-        <div className="grid gap-6 lg:grid-cols-[1.6fr_1fr] mt-14 items-start">
+        {/* El formulario va centrado en la página; Otros canales, más chico, a su derecha.
+            La primera columna queda vacía a propósito para que el centro sea el de la página.
+            Por debajo de xl va todo en una columna centrada. */}
+        <div className="grid gap-6 xl:grid-cols-[1fr_minmax(0,640px)_1fr] mt-14 items-start">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
-            className="bg-panel border border-line rounded-[18px] p-6 sm:p-8"
+            className="w-full max-w-[640px] mx-auto xl:col-start-2 bg-panel border border-line rounded-[18px] p-6 sm:p-8"
           >
             <h2 className="text-[10.5px] font-bold uppercase tracking-[2.6px] text-accent mb-6">Escríbeme</h2>
             <ContactForm />
@@ -81,9 +84,9 @@ export function ContactPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="bg-panel border border-line rounded-[18px] p-6 sm:p-8"
+            className="w-full max-w-[640px] mx-auto xl:max-w-[280px] xl:mx-0 bg-panel border border-line rounded-[18px] p-5"
           >
-            <h2 className="text-[10.5px] font-bold uppercase tracking-[2.6px] text-accent mb-6">Otros canales</h2>
+            <h2 className="text-[10.5px] font-bold uppercase tracking-[2.6px] text-accent mb-4">Otros canales</h2>
             <div className="flex flex-col divide-y divide-line">
               {CONTACT_PHONE && (
                 <ChannelRow icon={<PhoneIcon className="w-[18px] h-[18px]" />} title="Teléfono y WhatsApp">

@@ -1,7 +1,8 @@
-import { Navigate } from 'react-router-dom';
+import { Navigate, useSearchParams } from 'react-router-dom';
 import { formatPrice, useSelectedPlan } from '../../entities/plan';
 import { ROUTES } from '../../shared/config/routes';
 import { EXTERNAL_LINKS } from '../../shared/config/external-links';
+import { findPaymentMethod } from '../../shared/config/payment-methods';
 import { Button } from '../../shared/ui/Button';
 import { CheckoutShell } from '../../widgets/checkout-shell';
 
@@ -25,6 +26,8 @@ function ClockIcon({ className }: { className?: string }) {
 
 export function CheckoutPendingPage() {
   const plan = useSelectedPlan();
+  const [params] = useSearchParams();
+  const method = findPaymentMethod(params.get('metodo'));
 
   if (!plan) {
     return <Navigate to={ROUTES.checkoutPlan} replace />;
@@ -34,7 +37,6 @@ export function CheckoutPendingPage() {
     <CheckoutShell
       step={3}
       title="Estamos verificando tu pago"
-      subtitle="Con PagoMóvil suele confirmarse en segundos; una transferencia puede tardar más. No hace falta que recargues esta página ni que envíes el pago otra vez."
     >
       <div className="flex flex-col items-center gap-7">
         <span className="flex items-center justify-center w-16 h-16 rounded-full bg-gold/10 border border-gold/30">
@@ -50,6 +52,12 @@ export function CheckoutPendingPage() {
             <span className="text-muted">Monto</span>
             <span className="text-ink">{formatPrice(plan.price)}</span>
           </div>
+          {method && (
+            <div className="flex items-baseline justify-between gap-4 text-[14px]">
+              <span className="text-muted">Método</span>
+              <span className="text-ink">{method.label}</span>
+            </div>
+          )}
           <div className="flex items-baseline justify-between gap-4 text-[14px]">
             <span className="text-muted">Estado</span>
             <span className="text-gold font-semibold">En verificación</span>

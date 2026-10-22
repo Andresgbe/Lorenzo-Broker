@@ -11,6 +11,7 @@ export function CheckoutPlanPage() {
   return (
     <CheckoutShell
       step={1}
+      topBar={{ backTo: ROUTES.home, backLabel: 'Volver al inicio', crumbs: [{ label: 'Inicio', to: ROUTES.home }, { label: 'Plan' }] }}
       eyebrow="Suscripción"
       title="Tu membresía"
       subtitle="Un solo plan con todo incluido. Sin permanencia: cancelas cuando quieras."
@@ -26,7 +27,7 @@ export function CheckoutPlanPage() {
       </Button>
 
       <p className="mt-6 text-center text-[12px] text-muted">
-        Pagos procesados por Cobrix · {PAYMENT_METHODS.map((method) => method.label).join(', ')}
+        Puedes pagar con {PAYMENT_METHODS.map((method) => method.label).join(', ')}
       </p>
     </CheckoutShell>
   );

@@ -1,11 +1,27 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { fetchCourseTree } from '../api/courseApi';
 import type { Course } from './types';
 
 const LOAD_ERROR = 'No se pudo cargar el contenido.';
 
-/** Árbol de cursos visible para el usuario actual (RLS decide qué incluye). */
-export function useCourseTree() {
+/** Deja solo cursos, módulos y clases publicados. */
+function onlyPublished(courses: Course[]): Course[] {
+  return courses
+    .filter((course) => course.isPublished)
+    .map((course) => ({
+      ...course,
+      modules: course.modules
+        .filter((module) => module.isPublished)
+        .map((module) => ({ ...module, lessons: module.lessons.filter((lesson) => lesson.isPublished) })),
+    }));
+}
+
+/**
+ * Árbol de cursos visible para el usuario actual (RLS decide qué incluye).
+ * `publishedOnly` lo usan las vistas del alumno: así un admin en Vista de alumno
+ * tampoco ve borradores. El panel lo deja en false para editarlos.
+ */
+export function useCourseTree({ publishedOnly = false }: { publishedOnly?: boolean } = {}) {
   const [courses, setCourses] = useState<Course[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -39,5 +55,7 @@ export function useCourseTree() {
     }
   }, []);
 
-  return { courses, isLoading, error, reload };
+  const visible = useMemo(() => (publishedOnly ? onlyPublished(courses) : courses), [courses, publishedOnly]);
+
+  return { courses: visible, isLoading, error, reload };
 }

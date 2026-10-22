@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../entities/session';
 import { ROUTES } from '../../../shared/config/routes';
 import { cn } from '../../../shared/lib/cn';
+import { Switch } from '../../../shared/ui/Switch';
 
 const ACCOUNT_LINKS = [
   { label: 'Mi área', to: ROUTES.student },
@@ -35,7 +36,7 @@ function initialsOf(fullName: string | null | undefined, email: string | null | 
  * sitio, en la del área del alumno y en la del panel.
  */
 export function AccountMenu() {
-  const { user, isAdmin, logout } = useAuth();
+  const { user, isAdmin, isAdminAccount, viewAsStudent, setViewAsStudent, logout } = useAuth();
   const navigate = useNavigate();
   const { pathname, search } = useLocation();
   const [open, setOpen] = useState(false);
@@ -65,6 +66,13 @@ export function AccountMenu() {
       document.removeEventListener('keydown', handleKey);
     };
   }, [open]);
+
+  // Al encender va al área del alumno; al apagar, al panel. Así se ve el cambio enseguida.
+  function toggleStudentView(next: boolean) {
+    setViewAsStudent(next);
+    setOpen(false);
+    navigate(next ? ROUTES.student : ROUTES.adminOverview);
+  }
 
   async function handleLogout() {
     setOpen(false);
@@ -106,6 +114,22 @@ export function AccountMenu() {
           )}
 
           <div className="h-px bg-line mx-2 mb-1.5" />
+
+          {isAdminAccount && (
+            <>
+              <div className="flex items-center justify-between gap-3 px-3.5 py-2">
+                <span className="text-[13.5px] text-ink">Vista de alumno</span>
+                <Switch
+                  checked={viewAsStudent}
+                  onChange={toggleStudentView}
+                  label="Vista de alumno: ver la plataforma como un alumno, sin nada de administración"
+                  onText="Activa"
+                  offText="Apagada"
+                />
+              </div>
+              <div className="h-px bg-line mx-2 my-1.5" />
+            </>
+          )}
 
           {user ? (
             <>

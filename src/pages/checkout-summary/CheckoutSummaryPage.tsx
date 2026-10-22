@@ -12,9 +12,13 @@ function Row({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-baseline justify-between gap-4 text-[14px]">
       <span className="text-muted">{label}</span>
-      <span className="text-ink text-right">{value}</span>
+      <span className="text-ink text-right break-all">{value}</span>
     </div>
   );
+}
+
+function SectionLabel({ children }: { children: string }) {
+  return <h2 className="text-[10.5px] font-bold uppercase tracking-[2.6px] text-accent mb-4">{children}</h2>;
 }
 
 export function CheckoutSummaryPage() {
@@ -30,93 +34,87 @@ export function CheckoutSummaryPage() {
   return (
     <CheckoutShell
       step={2}
-      width="medium"
+      topBar={{
+        backTo: ROUTES.checkoutPlan,
+        backLabel: 'Volver al plan',
+        crumbs: [{ label: 'Plan', to: ROUTES.checkoutPlan }, { label: 'Pago' }],
+      }}
+      width="wide"
       eyebrow="Confirma tu pago"
-      title="Revisa antes de pagar"
-      subtitle="Te llevaremos a Cobrix para completar el pago con el método que elijas."
+      title="Da tu siguiente paso"
     >
-      <div className="grid gap-5 lg:grid-cols-[1.15fr_1fr] items-start">
-        <div className="flex flex-col gap-5">
-          <section className="bg-panel border border-line rounded-[18px] p-6">
-            <h2 className="text-[10.5px] font-bold uppercase tracking-[2.6px] text-accent mb-4">
-              Datos del alumno
-            </h2>
-            <div className="flex flex-col gap-2.5">
-              <Row label="Nombre" value={user?.fullName ?? '—'} />
-              <Row label="Cédula o RIF" value={user?.taxId ?? '—'} />
-              <Row label="Correo" value={user?.email ?? '—'} />
+      {/* Una sola tarjeta: arriba tus datos y el plan, en medio el método de pago y abajo,
+          siempre al final, el total con el botón de pagar. */}
+      <section className="bg-panel border border-line rounded-[20px] shadow-[0_30px_80px_rgba(0,0,0,0.35)]">
+        <div className="grid md:grid-cols-2">
+          <div className="p-6 sm:p-8">
+            <SectionLabel>Tus datos</SectionLabel>
+            <div className="flex flex-col gap-3">
+              <Row label="Nombre" value={user?.fullName || '—'} />
+              <Row label="Cédula o RIF" value={user?.taxId || '—'} />
+              <Row label="Correo" value={user?.email || '—'} />
             </div>
-            <Link
-              to={ROUTES.register}
-              className="inline-block mt-5 text-[13px] text-accent hover:underline"
-            >
+            <Link to={ROUTES.studentAccount} className="inline-block mt-5 text-[13px] text-accent hover:underline">
               Editar datos
             </Link>
-          </section>
+          </div>
 
-          <section className="bg-panel border border-line rounded-[18px] p-6">
-            <h2 className="text-[10.5px] font-bold uppercase tracking-[2.6px] text-accent mb-4">
-              Método de pago
-            </h2>
-            <div className="flex flex-col gap-2">
-              {PAYMENT_METHODS.map((option) => (
-                <label
-                  key={option.id}
-                  className={cn(
-                    'flex items-center gap-3 px-3.5 py-3 rounded-xl border cursor-pointer transition-colors',
-                    method === option.id ? 'border-accent bg-accent/5' : 'border-line hover:border-accent/40'
-                  )}
-                >
-                  <input
-                    type="radio"
-                    name="payment-method"
-                    value={option.id}
-                    checked={method === option.id}
-                    onChange={() => setMethod(option.id)}
-                    className="w-4 h-4 accent-accent cursor-pointer shrink-0"
-                  />
-                  <span className="flex-1 min-w-0">
-                    <span className="block text-[14px] text-ink">{option.label}</span>
-                    <span className="block text-[12px] text-muted">{option.note}</span>
-                  </span>
-                </label>
-              ))}
+          <div className="p-6 sm:p-8 border-t border-line md:border-t-0 md:border-l">
+            <SectionLabel>Tu plan</SectionLabel>
+            <div className="flex flex-col gap-3">
+              <Row label="Plan" value={plan.name} />
+              <Row label="Cobro" value={plan.billingNote} />
+              <Row label="Precio" value={formatPrice(plan.price)} />
             </div>
-          </section>
+            <Link to={ROUTES.checkoutPlan} className="inline-block mt-5 text-[13px] text-accent hover:underline">
+              Cambiar de plan
+            </Link>
+          </div>
         </div>
 
-        <section className="bg-panel border border-accent/40 rounded-[18px] p-6 shadow-[0_0_50px_rgba(0,176,154,0.08)]">
-          <h2 className="text-[10.5px] font-bold uppercase tracking-[2.6px] text-accent mb-4">Resumen</h2>
-          <div className="flex flex-col gap-2.5">
-            <Row label="Plan" value={plan.name} />
-            <Row label="Cobro" value={plan.billingNote} />
+        <div className="p-6 sm:p-8 border-t border-line">
+          <SectionLabel>Método de pago</SectionLabel>
+          <div role="radiogroup" aria-label="Método de pago" className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-4">
+            {PAYMENT_METHODS.map((option) => (
+              <label
+                key={option.id}
+                className={cn(
+                  'flex items-center gap-3 px-4 py-3.5 rounded-xl border cursor-pointer transition-colors',
+                  method === option.id ? 'border-accent bg-accent/5' : 'border-line hover:border-accent/40'
+                )}
+              >
+                <input
+                  type="radio"
+                  name="payment-method"
+                  value={option.id}
+                  checked={method === option.id}
+                  onChange={() => setMethod(option.id)}
+                  className="w-4 h-4 accent-accent cursor-pointer shrink-0"
+                />
+                <span className="flex-1 min-w-0">
+                  <span className="block text-[14px] text-ink">{option.label}</span>
+                  {option.note && <span className="block text-[12px] text-muted">{option.note}</span>}
+                </span>
+              </label>
+            ))}
           </div>
+        </div>
 
-          <div className="h-px bg-line my-5" />
-
-          <div className="flex items-baseline justify-between gap-4">
-            <span className="text-[14px] text-muted">Total</span>
-            <span className="font-display font-bold text-[30px] leading-none text-ink">
-              {formatPrice(plan.price)}
-            </span>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5 p-6 sm:px-8 border-t border-line bg-bg-2/60 rounded-b-[20px]">
+          <div>
+            <span className="block text-[12.5px] text-muted">Total a pagar</span>
+            <span className="font-display font-bold text-[34px] leading-none text-ink">{formatPrice(plan.price)}</span>
+            <span className="text-[13px] text-muted ml-2">{plan.billingNote.toLowerCase()}</span>
           </div>
-
           <Button
             variant="primary"
-            className="w-full mt-6"
-            onClick={() => navigate(`${ROUTES.checkoutPending}?plan=${plan.id}`)}
+            className="w-full sm:w-auto sm:min-w-[300px]"
+            onClick={() => navigate(`${ROUTES.checkoutPay}?plan=${plan.id}&metodo=${method}`)}
           >
-            Pagar con Cobrix
+            Continuar con {PAYMENT_METHODS.find((option) => option.id === method)?.label}
           </Button>
-
-          <Link
-            to={ROUTES.checkoutPlan}
-            className="block text-center mt-4 text-[13px] text-muted hover:text-accent transition-colors"
-          >
-            Cambiar de plan
-          </Link>
-        </section>
-      </div>
+        </div>
+      </section>
     </CheckoutShell>
   );
 }

@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { motion } from 'framer-motion';
 import { Container } from '../../shared/ui/Container';
 import { Logo } from '../../shared/ui/Logo';
+import { PageTopBar, type Crumb } from '../../shared/ui/PageTopBar';
 import { cn } from '../../shared/lib/cn';
 
 const STEPS = ['Plan', 'Pago', 'Listo'] as const;
@@ -9,16 +10,19 @@ const STEPS = ['Plan', 'Pago', 'Listo'] as const;
 interface CheckoutShellProps {
   /** 1-indexado, contra STEPS. */
   step: 1 | 2 | 3;
+  /** El volver de siempre, encima del título: flecha + ruta en mayúsculas. */
+  topBar?: { backTo: string; backLabel: string; crumbs: Crumb[] };
   eyebrow?: string;
   title: string;
   subtitle?: string;
-  /** 'wide' para la rejilla de planes, 'medium' para el resumen, 'narrow' para los estados. */
-  width?: 'wide' | 'medium' | 'narrow';
+  /** 'full' para el resumen a tres columnas, 'wide' para la rejilla de planes, 'medium' y 'narrow' para los estados. */
+  width?: 'full' | 'wide' | 'medium' | 'narrow';
   children: ReactNode;
 }
 
 export function CheckoutShell({
   step,
+  topBar,
   eyebrow,
   title,
   subtitle,
@@ -62,11 +66,13 @@ export function CheckoutShell({
           transition={{ duration: 0.4, ease: 'easeOut' }}
           className={cn(
             'w-full',
+            width === 'full' && 'max-w-[1180px]',
             width === 'wide' && 'max-w-[980px]',
             width === 'medium' && 'max-w-[760px]',
             width === 'narrow' && 'max-w-[560px]'
           )}
         >
+          {topBar && <PageTopBar backTo={topBar.backTo} backLabel={topBar.backLabel} crumbs={topBar.crumbs} />}
           {eyebrow && (
             <span className="block text-center text-[10.5px] font-bold uppercase tracking-[2.6px] text-accent mb-3">
               {eyebrow}

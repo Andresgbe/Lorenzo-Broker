@@ -43,7 +43,7 @@ function PlayIcon({ className }: { className?: string }) {
 
 export function StudentCoursePage() {
   const { courseId } = useParams();
-  const { courses, isLoading } = useCourseTree();
+  const { courses, isLoading } = useCourseTree({ publishedOnly: true });
   const { completed } = useLessonProgress();
   const [closedIds, setClosedIds] = useState<Set<string>>(new Set());
 

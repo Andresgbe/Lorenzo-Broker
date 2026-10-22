@@ -13,6 +13,7 @@ import { ResetPasswordPage } from '../pages/reset-password';
 import { CheckoutPlanPage } from '../pages/checkout-plan';
 import { CheckoutSummaryPage } from '../pages/checkout-summary';
 import { CheckoutPendingPage } from '../pages/checkout-pending';
+import { CheckoutPayPage } from '../pages/checkout-pay';
 import { CheckoutConfirmedPage } from '../pages/checkout-confirmed';
 import { StudentNav } from '../widgets/student-nav';
 import { StudentHomePage } from '../pages/student-home';
@@ -55,6 +56,7 @@ export const router = createBrowserRouter(
     // Checkout: también fuera del Layout de marketing, con su propio shell por pasos.
     { path: ROUTES.checkoutPlan, element: <CheckoutPlanPage /> },
     { path: ROUTES.checkoutSummary, element: <CheckoutSummaryPage /> },
+    { path: ROUTES.checkoutPay, element: <CheckoutPayPage /> },
     { path: ROUTES.checkoutPending, element: <CheckoutPendingPage /> },
     { path: ROUTES.checkoutConfirmed, element: <CheckoutConfirmedPage /> },
 

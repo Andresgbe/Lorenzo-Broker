@@ -21,8 +21,16 @@ export interface AuthContextValue {
   user: SessionUser | null;
   /** Hay una sesión abierta, de alumno o de administrador. */
   isAuthenticated: boolean;
-  /** Solo para superficies de administración. No uses isAuthenticated para eso. */
+  /**
+   * Solo para superficies de administración. No uses isAuthenticated para eso.
+   * Es false mientras un admin tiene activa la Vista de alumno.
+   */
   isAdmin: boolean;
+  /** La cuenta tiene rol admin, aunque esté en Vista de alumno. Solo para mostrar el interruptor. */
+  isAdminAccount: boolean;
+  /** Un admin navega como alumno: sin panel, sin editores, sin borradores. */
+  viewAsStudent: boolean;
+  setViewAsStudent: (value: boolean) => void;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<LoginResult>;
   register: (input: RegisterInput) => Promise<AuthResult>;

@@ -78,7 +78,7 @@ function DownloadButton({ attachment }: { attachment: LessonAttachment }) {
 
 export function StudentLessonPage() {
   const { lessonId } = useParams();
-  const { courses, isLoading, error } = useCourseTree();
+  const { courses, isLoading, error } = useCourseTree({ publishedOnly: true });
   const { completed, toggle } = useLessonProgress();
 
   if (isLoading) {

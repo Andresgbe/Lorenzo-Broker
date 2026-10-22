@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
+import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../entities/session';
 import { ADMIN_SECTIONS as SECTIONS, ROUTES } from '../../shared/config/routes';
 import { Logo } from '../../shared/ui/Logo';
@@ -39,7 +39,8 @@ function MenuIcon({ open }: { open: boolean }) {
  * cuenta, cerrar sesión). El contenido usa todo el ancho.
  */
 export function AdminShell() {
-  const { user, logout } = useAuth();
+  const { user, logout, setViewAsStudent } = useAuth();
+  const navigate = useNavigate();
   const { pathname } = useLocation();
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -150,10 +151,14 @@ export function AdminShell() {
           )}
 
           <div className="ml-auto flex items-center gap-4">
-            {/* El admin ve los cursos como los ve un alumno (borradores incluidos). */}
-            <Link
-              to={ROUTES.studentCourses}
-              className="inline-flex items-center gap-2 h-10 px-3.5 rounded-[10px] border border-line-strong text-[13.5px] font-semibold text-ink-soft hover:border-accent hover:text-accent transition-colors whitespace-nowrap"
+            {/* Enciende la Vista de alumno: el panel desaparece hasta apagarla desde el avatar. */}
+            <button
+              type="button"
+              onClick={() => {
+                setViewAsStudent(true);
+                navigate(ROUTES.student);
+              }}
+              className="cursor-pointer inline-flex items-center gap-2 h-10 px-3.5 rounded-[10px] border border-line-strong text-[13.5px] font-semibold text-ink-soft hover:border-accent hover:text-accent transition-colors whitespace-nowrap"
             >
               <svg
                 width="16"
@@ -171,7 +176,7 @@ export function AdminShell() {
               </svg>
               <span className="hidden sm:inline">Vista de alumno</span>
               <span className="sm:hidden">Alumno</span>
-            </Link>
+            </button>
             <AccountMenu />
           </div>
         </div>
