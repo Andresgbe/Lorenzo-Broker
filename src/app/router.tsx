@@ -1,11 +1,10 @@
-import { createBrowserRouter } from 'react-router-dom';
+import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { ROUTES } from '../shared/config/routes';
 import { Layout } from './Layout';
 import { HomePage } from '../pages/home';
 import { AboutPage } from '../pages/about';
 import { MentorshipPage } from '../pages/mentorship';
 import { FaqPage } from '../pages/faq';
-import { LoginPage } from '../pages/login';
 import { RegisterPage } from '../pages/register';
 import { SignInPage } from '../pages/sign-in';
 import { ForgotPasswordPage } from '../pages/forgot-password';
@@ -40,12 +39,13 @@ export const router = createBrowserRouter(
         { path: ROUTES.about, element: <AboutPage /> },
         { path: ROUTES.mentorship, element: <MentorshipPage /> },
         { path: ROUTES.faq, element: <FaqPage /> },
-        { path: ROUTES.adminLogin, element: <LoginPage /> },
       ],
     },
     // Acceso de alumnos: sin navbar ni footer de marketing.
     { path: ROUTES.register, element: <RegisterPage /> },
     { path: ROUTES.signIn, element: <SignInPage /> },
+    // El antiguo login de admin: hoy hay un solo login; /admin lleva al panel.
+    { path: ROUTES.admin, element: <Navigate to={ROUTES.adminOverview} replace /> },
     { path: ROUTES.forgotPassword, element: <ForgotPasswordPage /> },
     { path: ROUTES.resetPassword, element: <ResetPasswordPage /> },
 

@@ -2,6 +2,22 @@
 
 Registro de los cambios pedidos sobre la plataforma, del más reciente al más antiguo.
 
+## 22/10/2026 — Campos autocompletados
+
+- Cuando el navegador autocompleta el correo o la contraseña, el campo ya no se pinta de celeste claro: mantiene el fondo oscuro y el texto claro del diseño.
+
+## 22/10/2026 — Un solo inicio de sesión
+
+- **Se quitó el login de administración** (`/admin`). Alumnos y administradores entran por el mismo inicio de sesión, **`/iniciar-sesion`**.
+- **A dónde lleva al entrar:** si la persona venía de una página protegida, vuelve a ella. Si no, un **admin** va al panel (Resumen) y un **alumno** a su área.
+- La dirección `/admin` sigue funcionando: lleva al panel, que pide iniciar sesión si hace falta. Un alumno que intente abrir el panel va a su área.
+- El inicio de sesión tiene ahora el botón para **mostrar u ocultar la contraseña**.
+- Si falta configurar Supabase (`.env.local`), el formulario ya lo dice en lugar de "Correo o contraseña incorrectos".
+
+## 21/10/2026 — Barra de navegación (sitio público)
+
+- "Mentoría 1:1" pasa al grupo central, junto a "Sobre mí" y "Preguntas", en lugar de ir sola a la derecha junto al botón "Suscríbete ahora". El menú del teléfono no cambia.
+
 ## 21/10/2026 — Nuevo diseño: manual de marca de Lorenzo Broker (todo el sitio)
 
 Lorenzo envió un parche con el manual de marca aplicado. Se reprodujo en el código, sobre el registro ya cambiado. **A partir de ahora todas las vistas usan esta paleta.**

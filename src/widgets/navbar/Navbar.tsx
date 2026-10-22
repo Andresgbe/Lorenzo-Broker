@@ -16,9 +16,8 @@ interface NavLinkItem {
 const navLinks: NavLinkItem[] = [
   { label: 'Sobre mí', to: ROUTES.about },
   { label: 'Preguntas', to: ROUTES.faq },
+  { label: 'Mentoría 1:1', to: ROUTES.mentorship },
 ];
-
-const mentorshipLink: NavLinkItem = { label: 'Mentoría 1:1', to: ROUTES.mentorship };
 
 // Iniciar sesión y Registrarte no van en la barra: los ofrece el avatar (AccountMenu).
 
@@ -141,7 +140,7 @@ export function Navbar() {
                 <div className={cn(isAdmin && 'lg:hidden')}>
                   {isAdmin && <div className="h-px bg-line mx-2 my-2" />}
                   <nav aria-label="Secciones del sitio" className="flex flex-col gap-0.5">
-                    {[...navLinks, mentorshipLink].map((link) => (
+                    {navLinks.map((link) => (
                       <NavLink key={link.label} to={link.to} end className={menuItemState}>
                         {link.label}
                       </NavLink>
@@ -179,9 +178,6 @@ export function Navbar() {
         </nav>
 
         <div className="flex items-center gap-3 sm:gap-5">
-          <Link to={mentorshipLink.to} className={`hidden lg:inline ${navLinkClasses}`}>
-            {mentorshipLink.label}
-          </Link>
           {/* En teléfonos no cabe junto al logo; la portada ya muestra el botón grande. */}
           <SubscribeButton className="!hidden sm:!inline-flex" />
           <AccountMenu />

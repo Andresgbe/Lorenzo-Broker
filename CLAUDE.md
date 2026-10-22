@@ -82,7 +82,7 @@ The codebase follows **Feature-Sliced Design (FSD)**, layered under `src/`:
 - `app/` — app-wide composition: `router.tsx` (react-router-dom `createBrowserRouter`) and `Layout.tsx` (persistent Navbar/Footer shell wrapping an `<Outlet />`).
 - `pages/` — one folder per route, each composing widgets/features into a page.
 - `widgets/` — larger composed UI blocks used by pages (`navbar`, `hero`, `footer`, `auth-shell`, …).
-- `features/` — user-facing interactive behavior (`register`, `sign-in`, `password-reset`, `admin-login`, `subscribe-cta`, `video-player`).
+- `features/` — user-facing interactive behavior (`register`, `sign-in`, `password-reset`, `subscribe-cta`, `video-player`).
 - `entities/` — domain data shapes and their presentational units (`entities/benefit`, `entities/session`, `entities/site-content`).
 - `shared/` — reusable, domain-agnostic code: `ui/` (`Button`, `Container`, `TextField`, `FormAlert`, …), `lib/` (`cn.ts`, `validation.ts`, `supabaseClient.ts`), `config/` (`routes.ts`, `external-links.ts`).
 
@@ -111,7 +111,7 @@ Auth is Supabase (`shared/lib/supabaseClient.ts`, which returns `null` when env 
 **There are two kinds of user, and the distinction is load-bearing:**
 
 - `isAuthenticated` — somebody is signed in. Says nothing about permissions.
-- `isAdmin` — `app_metadata.role === 'admin'`. **Every admin-only surface must gate on `isAdmin`, never on `isAuthenticated`.** The inline content editors (`PricingSection`, `FaqSection`, `IncludesSection`, About, Mentoría), the marketing `Navbar`'s hamburger menu (top-left corner of the header; the section links stay visible in the bar), which for an admin is the **same dropdown as `AdminShell`**: same classes and the same panel sections from `ADMIN_SECTIONS` (`shared/config/routes.ts`), then email and Cerrar sesión; on small screens it also carries the site links, and `RequireAdmin` all do. The student area (`StudentNav`) deliberately shows no Dashboard link, even to admins (user's decision, 19 Oct 2026). Its bar holds Inicio and Cursos, plus a profile avatar at top right: `AccountMenu` (`features/account-menu`), which opens name and email, Mi área, Mi cuenta, Membresía y pagos, Cambiar contraseña and Cerrar sesión. The marketing `Navbar` always shows the same avatar: signed out it is a person icon whose menu offers Iniciar sesión and Registrarte (the user found those as text links in the bar ugly, so keep them out of the bar). Mi cuenta (`/alumno/cuenta`) shows one section at a time, picked with `?seccion=datos|membresia|clave` through `studentAccountPath()`.
+- `isAdmin` — `app_metadata.role === 'admin'`. **Every admin-only surface must gate on `isAdmin`, never on `isAuthenticated`.** The inline content editors (`PricingSection`, `FaqSection`, `IncludesSection`, About, Mentoría), the marketing `Navbar`'s hamburger menu (top-left corner of the header; the section links stay visible in the bar), which for an admin is the **same dropdown as `AdminShell`**: same classes and the same panel sections from `ADMIN_SECTIONS` (`shared/config/routes.ts`), then email and Cerrar sesión; on small screens it also carries the site links, and `RequireAdmin` all do (without a session it sends to `/iniciar-sesion` with `state.from`; a signed-in student goes to `/alumno`). The student area (`StudentNav`) deliberately shows no Dashboard link, even to admins (user's decision, 19 Oct 2026). Its bar holds Inicio and Cursos, plus a profile avatar at top right: `AccountMenu` (`features/account-menu`), which opens name and email, Mi área, Mi cuenta, Membresía y pagos, Cambiar contraseña and Cerrar sesión. The marketing `Navbar` always shows the same avatar: signed out it is a person icon whose menu offers Iniciar sesión and Registrarte (the user found those as text links in the bar ugly, so keep them out of the bar). Mi cuenta (`/alumno/cuenta`) shows one section at a time, picked with `?seccion=datos|membresia|clave` through `studentAccountPath()`.
 
 The role is read from `app_metadata` because only the server can write it. Never move it to `user_metadata` — users can edit their own `user_metadata`, which would let any student grant themselves admin.
 
@@ -125,7 +125,7 @@ where email = 'admin@example.com';
 
 **Client-side gating is cosmetic.** It hides UI; it does not protect data. The real boundary is Row Level Security on the Supabase tables (`site_content` above all) — a write policy that requires the admin role. Treat any change that widens who can write as needing an RLS review.
 
-Student access lives at `/registro`, `/iniciar-sesion`, `/recuperar-contrasena` and `/nueva-contrasena`. Admin access lives at `/admin`, deliberately separate.
+Access lives at `/registro`, `/iniciar-sesion`, `/recuperar-contrasena` and `/nueva-contrasena`. **There is one login for everyone** (user's decision, 22 Oct 2026): the old admin login at `/admin` (`pages/login` + `features/admin-login`) was removed, and `/admin` now just redirects to `/admin/resumen`. `SignInForm` returns to `state.from` when present; otherwise an admin lands on `/admin/resumen` and a student on `/alumno`. `login()` returns the account's `role` for that. The only error it shows verbatim is `NOT_CONFIGURED` (missing `.env.local`), which says nothing about the account.
 
 Current admin accounts (role set 2026-10-18): `menteclon500@gmail.com` and `lorenzoperezus@gmail.com` (Lorenzo, the client). A role change only reaches the browser after signing out and back in, because the role travels inside the JWT.
 
@@ -133,7 +133,7 @@ Current admin accounts (role set 2026-10-18): `menteclon500@gmail.com` and `lore
 
 The client edits the marketing copy himself; this is a core feature, not an admin nicety.
 
-1. He signs in at **`/admin`** (`pages/login` + `features/admin-login`). On success `LoginForm` sends him to the home page.
+1. He signs in at **`/iniciar-sesion`** like everyone else and lands on the panel (`/admin/resumen`); "Ver el sitio" in the hamburger menu takes him to the public pages.
 2. On the public pages, editable parts show inline editors when `isAdmin`: **PricingSection** (`pricing.plan`), **IncludesSection** (`includes.items`, drag to reorder, Bonus toggle), **FaqSection** (`faq.items`; full editing on `/faq`, choosing which questions appear on the home from the home itself), **AboutPage** (`about.page`) and **MentorshipPage** (`mentorship.page`). Fields save on blur.
 
    The two pages use the reusable path, which new editable content should follow too: `useSiteContentDraft(key, defaults)` from `entities/site-content` (draft + `update` / `commit` on blur / `replace` for add-remove), `shared/ui/EditableText` (the in-place input/textarea), `shared/ui/EditableParagraphs` (paragraph list with add/remove) and `shared/ui/RichText` (renders `**palabra**` as emphasis — the only formatting stored copy supports). Keep defaults equal to the current copy so a fresh environment looks the same.
@@ -141,7 +141,6 @@ The client edits the marketing copy himself; this is a core feature, not an admi
 
 Known gaps — ask before assuming they are wanted, but keep them in mind:
 - Still hardcoded: the Hero, the closing CTA, the footer, the About photos, and the mentorship application URL (`EXTERNAL_LINKS.mentorshipApplication`, still `REPLACE_ME`).
-- `LoginForm` hand-rolls its inputs instead of using `TextField`.
 
 ## Supabase project
 

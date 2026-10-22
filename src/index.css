@@ -65,6 +65,16 @@
     outline-offset: 3px;
     border-radius: 6px;
   }
+
+  /* El autocompletado del navegador pinta los campos de celeste claro: se mantiene el fondo bg-2 y el texto ink. */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus {
+    -webkit-text-fill-color: var(--color-ink);
+    caret-color: var(--color-ink);
+    box-shadow: 0 0 0 1000px var(--color-bg-2) inset;
+    transition: background-color 9999s ease-out 0s;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

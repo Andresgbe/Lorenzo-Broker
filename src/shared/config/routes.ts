@@ -24,8 +24,9 @@ export const ROUTES = {
   studentAccount: '/alumno/cuenta',
   studentExpired: '/alumno/membresia-vencida',
 
-  // Acceso de administración, separado del de alumnos a propósito.
-  adminLogin: '/admin',
+  // Panel de administración. Se entra por el mismo login que los alumnos (signIn);
+  // /admin solo redirige al Resumen.
+  admin: '/admin',
   adminOverview: '/admin/resumen',
   adminStudents: '/admin/alumnos',
   adminPayments: '/admin/pagos',

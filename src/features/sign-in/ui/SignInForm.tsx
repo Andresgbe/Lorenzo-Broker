@@ -1,9 +1,10 @@
 import { useState, type FormEvent } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useAuth, type SignInRedirectState } from '../../../entities/session';
+import { NOT_CONFIGURED, useAuth, type SignInRedirectState } from '../../../entities/session';
 import { ROUTES } from '../../../shared/config/routes';
 import { Button } from '../../../shared/ui/Button';
 import { FormAlert } from '../../../shared/ui/FormAlert';
+import { PasswordField } from '../../../shared/ui/PasswordField';
 import { TextField } from '../../../shared/ui/TextField';
 import { isValidEmail } from '../../../shared/lib/validation';
 
@@ -39,21 +40,25 @@ export function SignInForm() {
 
     setIsSubmitting(true);
     setSubmitError(null);
-    const { error } = await login(email.trim(), password);
+    const { error, role } = await login(email.trim(), password);
     setIsSubmitting(false);
 
     if (error) {
-      // Mensaje genérico a propósito: no revelamos si el correo existe.
-      setSubmitError('Correo o contraseña incorrectos.');
+      // Mensaje genérico a propósito: no revelamos si el correo existe. Lo único
+      // que se dice tal cual es que falta configurar Supabase, que no es de la cuenta.
+      setSubmitError(error === NOT_CONFIGURED ? error : 'Correo o contraseña incorrectos.');
       return;
     }
-    navigate(safeReturnPath(state?.from) ?? ROUTES.home, { replace: true });
+    // Un solo login para todos: vuelve a la página pedida o, si no hay, el admin
+    // va al panel y el alumno a su área.
+    const fallback = role === 'admin' ? ROUTES.adminOverview : ROUTES.student;
+    navigate(safeReturnPath(state?.from) ?? fallback, { replace: true });
   }
 
   return (
     <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
       {safeReturnPath(state?.from) && !state?.justRegistered && !state?.passwordUpdated && (
-        <p className="text-[13.5px] text-muted">Inicia sesión para entrar a tu área de alumno.</p>
+        <p className="text-[13.5px] text-muted">Inicia sesión para continuar.</p>
       )}
 
       {state?.justRegistered && (
@@ -79,10 +84,9 @@ export function SignInForm() {
         error={fieldError ?? undefined}
       />
 
-      <TextField
+      <PasswordField
         label="Contraseña"
         name="password"
-        type="password"
         autoComplete="current-password"
         placeholder="Tu contraseña"
         value={password}

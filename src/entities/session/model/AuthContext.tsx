@@ -5,7 +5,7 @@ import { ROUTES } from '../../../shared/config/routes';
 import { AuthContext, type AuthContextValue, type RegisterInput } from './auth-context';
 import type { SessionUser } from './types';
 
-const NOT_CONFIGURED = 'Supabase no está configurado en este entorno.';
+export const NOT_CONFIGURED = 'Supabase no está configurado en este entorno.';
 
 // El rol se lee de app_metadata, que solo se puede escribir desde el servidor.
 // user_metadata lo puede editar el propio usuario, así que no sirve para permisos.
@@ -45,9 +45,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {
-    if (!supabase) return { error: NOT_CONFIGURED };
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    return { error: error ? error.message : null };
+    if (!supabase) return { error: NOT_CONFIGURED, role: null };
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) return { error: error.message, role: null };
+    return { error: null, role: toSessionUser(data.user)?.role ?? null };
   }, []);
 
   const register = useCallback(async ({ email, password, fullName, taxId }: RegisterInput) => {

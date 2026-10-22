@@ -7,7 +7,7 @@ export function SignInPage() {
   return (
     <AuthShell
       title="Bienvenido de vuelta"
-      subtitle="Entra con tu correo para ver tus clases."
+      subtitle="Entra con tu correo para ver tus clases o administrar la comunidad."
       headerAside={
         <p className="text-[13px] text-muted">
           ¿No tienes cuenta?{' '}
