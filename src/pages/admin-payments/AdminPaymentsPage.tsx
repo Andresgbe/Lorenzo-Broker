@@ -1,7 +1,9 @@
 import { useMemo, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { DEMO_PAYMENTS, PAYMENT_STATUS_TONE, type Payment, type PaymentStatus } from '../../entities/payment';
 import { MAIN_PLAN, formatPrice } from '../../entities/plan';
 import { formatDate } from '../../entities/membership';
+import { adminPaymentPath } from '../../shared/config/routes';
 import { Button } from '../../shared/ui/Button';
 import { ConfirmDialog } from '../../shared/ui/ConfirmDialog';
 import { MenuButton, type MenuItem } from '../../shared/ui/MenuButton';
@@ -27,6 +29,7 @@ export function AdminPaymentsPage() {
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState<Filter>('Todos');
   const [rejecting, setRejecting] = useState<Payment | null>(null);
+  const navigate = useNavigate();
 
   const rows = useMemo(() => {
     const needle = query.trim().toLowerCase();
@@ -40,12 +43,13 @@ export function AdminPaymentsPage() {
     });
   }, [query, filter]);
 
-  // Datos de ejemplo: las acciones todavía no escriben nada.
+  // Datos de ejemplo: confirmar y rechazar todavía no escriben nada.
   function actionsFor(payment: Payment): MenuItem[] {
-    if (payment.status !== 'En verificación') return [{ label: 'Ver detalle', onSelect: () => {} }];
+    const detail: MenuItem = { label: 'Ver detalle', onSelect: () => navigate(adminPaymentPath(payment.id)) };
+    if (payment.status !== 'En verificación') return [detail];
     return [
-      { label: 'Confirmar pago', onSelect: () => {} },
-      { label: 'Ver detalle', onSelect: () => {} },
+      { label: 'Confirmar pago', onSelect: () => navigate(adminPaymentPath(payment.id)) },
+      detail,
       { label: 'Rechazar pago', tone: 'danger', onSelect: () => setRejecting(payment) },
     ];
   }
@@ -90,7 +94,9 @@ export function AdminPaymentsPage() {
               <tr key={payment.id} className="border-b border-line last:border-b-0 hover:bg-bg-2/40 transition-colors">
                 <td className="px-5 py-3 text-muted whitespace-nowrap">{formatDate(payment.date)}</td>
                 <td className="px-5 py-3">
-                  <span className="block text-ink">{payment.studentName}</span>
+                  <Link to={adminPaymentPath(payment.id)} className="block text-ink hover:text-accent transition-colors">
+                    {payment.studentName}
+                  </Link>
                   <span className="block text-[12px] text-muted">{payment.studentTaxId}</span>
                 </td>
                 <td className="px-5 py-3 text-muted">{payment.planName}</td>

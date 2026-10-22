@@ -17,6 +17,7 @@ function toSessionUser(user: User | null | undefined): SessionUser | null {
     role: user.app_metadata?.role === 'admin' ? 'admin' : 'student',
     fullName: user.user_metadata?.full_name ?? null,
     taxId: user.user_metadata?.tax_id ?? null,
+    phone: user.user_metadata?.phone ?? null,
   };
 }
 

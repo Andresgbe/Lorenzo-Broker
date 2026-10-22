@@ -8,4 +8,6 @@ export interface SessionUser {
   /** Datos del registro. Vienen de user_metadata: sirven para mostrar, nunca para decidir permisos. */
   fullName: string | null;
   taxId: string | null;
+  /** WhatsApp del alumno, editable en Mi cuenta. */
+  phone: string | null;
 }

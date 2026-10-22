@@ -17,6 +17,7 @@ const navLinks: NavLinkItem[] = [
   { label: 'Sobre mí', to: ROUTES.about },
   { label: 'Preguntas', to: ROUTES.faq },
   { label: 'Mentoría 1:1', to: ROUTES.mentorship },
+  { label: 'Contacto', to: ROUTES.contact },
 ];
 
 // Iniciar sesión y Registrarte no van en la barra: los ofrece el avatar (AccountMenu).

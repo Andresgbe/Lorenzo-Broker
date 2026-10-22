@@ -1,0 +1,1 @@
+export { AdminPaymentPage } from './AdminPaymentPage';

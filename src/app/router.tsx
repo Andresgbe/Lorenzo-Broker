@@ -5,6 +5,7 @@ import { HomePage } from '../pages/home';
 import { AboutPage } from '../pages/about';
 import { MentorshipPage } from '../pages/mentorship';
 import { FaqPage } from '../pages/faq';
+import { ContactPage } from '../pages/contact';
 import { RegisterPage } from '../pages/register';
 import { SignInPage } from '../pages/sign-in';
 import { ForgotPasswordPage } from '../pages/forgot-password';
@@ -25,6 +26,7 @@ import { AdminShell } from '../widgets/admin-shell';
 import { AdminOverviewPage } from '../pages/admin-overview';
 import { AdminStudentsPage } from '../pages/admin-students';
 import { AdminPaymentsPage } from '../pages/admin-payments';
+import { AdminPaymentPage } from '../pages/admin-payment';
 import { AdminCoursesPage } from '../pages/admin-courses';
 import { AdminCoursePage } from '../pages/admin-course';
 import { AdminCourseNewPage } from '../pages/admin-course-new';
@@ -39,6 +41,7 @@ export const router = createBrowserRouter(
         { path: ROUTES.about, element: <AboutPage /> },
         { path: ROUTES.mentorship, element: <MentorshipPage /> },
         { path: ROUTES.faq, element: <FaqPage /> },
+        { path: ROUTES.contact, element: <ContactPage /> },
       ],
     },
     // Acceso de alumnos: sin navbar ni footer de marketing.
@@ -70,6 +73,8 @@ export const router = createBrowserRouter(
         { path: ROUTES.studentLesson, element: <StudentLessonPage /> },
         { path: ROUTES.studentAccount, element: <StudentAccountPage /> },
         { path: ROUTES.studentExpired, element: <StudentExpiredPage /> },
+        // Direcciones viejas o mal escritas (/alumno/modulos): pasan por el guard y van al inicio del alumno.
+        { path: `${ROUTES.student}/*`, element: <Navigate to={ROUTES.student} replace /> },
       ],
     },
 
@@ -84,12 +89,18 @@ export const router = createBrowserRouter(
         { path: ROUTES.adminOverview, element: <AdminOverviewPage /> },
         { path: ROUTES.adminStudents, element: <AdminStudentsPage /> },
         { path: ROUTES.adminPayments, element: <AdminPaymentsPage /> },
+        { path: ROUTES.adminPayment, element: <AdminPaymentPage /> },
         { path: ROUTES.adminCourses, element: <AdminCoursesPage /> },
         { path: ROUTES.adminCourseNew, element: <AdminCourseNewPage /> },
         { path: ROUTES.adminCourse, element: <AdminCoursePage /> },
         { path: ROUTES.adminLesson, element: <AdminLessonPage /> },
+        // Direcciones viejas o mal escritas (/admin/contenido): pasan por el guard y van al Resumen.
+        { path: `${ROUTES.admin}/*`, element: <Navigate to={ROUTES.adminOverview} replace /> },
       ],
     },
+
+    // Cualquier otra dirección desconocida vuelve a la portada en lugar de mostrar el error del router.
+    { path: '*', element: <Navigate to={ROUTES.home} replace /> },
   ],
   { basename: import.meta.env.BASE_URL.replace(/\/$/, '') }
 );

@@ -27,6 +27,7 @@ const navLinks = [
   { label: 'Sobre mí', to: ROUTES.about },
   { label: 'Mentoría 1:1', to: ROUTES.mentorship },
   { label: 'Preguntas frecuentes', to: ROUTES.faq },
+  { label: 'Contacto', to: ROUTES.contact },
 ];
 
 const eyebrowClasses = 'text-[10.5px] font-bold uppercase tracking-[2.6px] text-accent';

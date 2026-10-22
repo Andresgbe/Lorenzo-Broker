@@ -12,11 +12,13 @@ interface AuthShellProps {
   children: ReactNode;
   /** Contenido bajo la tarjeta, fuera del formulario. */
   footer?: ReactNode;
+  /** Encima de la tarjeta: el PageTopBar cuando se llega desde otra parte de la app. */
+  topBar?: ReactNode;
   /** `wide` ensancha la tarjeta en computadora para formularios a dos columnas. */
   size?: 'default' | 'wide';
 }
 
-export function AuthShell({ title, subtitle, headerAside, children, footer, size = 'default' }: AuthShellProps) {
+export function AuthShell({ title, subtitle, headerAside, children, footer, topBar, size = 'default' }: AuthShellProps) {
   return (
     <div className="min-h-dvh flex flex-col bg-bg">
       <header className="border-b border-line">
@@ -33,6 +35,7 @@ export function AuthShell({ title, subtitle, headerAside, children, footer, size
           transition={{ duration: 0.4, ease: 'easeOut' }}
           className={cn('w-full', size === 'wide' ? 'max-w-[420px] md:max-w-[840px]' : 'max-w-[420px]')}
         >
+          {topBar}
           <div className={cn('bg-panel border border-line rounded-[20px] px-6 sm:px-8 py-9 shadow-[0_30px_80px_rgba(0,0,0,0.45)]', size === 'wide' && 'md:px-12 md:py-11')}>
             <h1 className="font-display font-bold text-[26px] leading-tight text-ink text-center">{title}</h1>
             <p className="text-muted text-[14.5px] leading-relaxed text-center mt-2.5 text-pretty">{subtitle}</p>

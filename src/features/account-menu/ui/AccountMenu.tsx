@@ -1,15 +1,16 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../entities/session';
-import { ACCOUNT_SECTIONS, ROUTES, studentAccountPath } from '../../../shared/config/routes';
+import { ROUTES } from '../../../shared/config/routes';
 import { cn } from '../../../shared/lib/cn';
 
 const ACCOUNT_LINKS = [
   { label: 'Mi área', to: ROUTES.student },
-  { label: 'Mi cuenta', to: studentAccountPath(ACCOUNT_SECTIONS.profile) },
-  { label: 'Membresía y pagos', to: studentAccountPath(ACCOUNT_SECTIONS.membership) },
-  { label: 'Cambiar contraseña', to: studentAccountPath(ACCOUNT_SECTIONS.password) },
+  { label: 'Mi cuenta', to: ROUTES.studentAccount },
 ];
+
+// Solo para administradores (gatea en isAdmin, nunca en isAuthenticated).
+const ADMIN_LINK = { label: 'Panel de administrador', to: ROUTES.adminOverview };
 
 function UserIcon({ className }: { className?: string }) {
   return (
@@ -29,12 +30,12 @@ function initialsOf(fullName: string | null | undefined, email: string | null | 
 
 /**
  * Avatar redondo arriba a la derecha que abre el menú de la cuenta: nombre y
- * correo, Mi área, las secciones de Mi cuenta y Cerrar sesión. Sin sesión muestra
+ * correo, Panel de administrador (solo admins), Mi área, Mi cuenta y Cerrar sesión. Sin sesión muestra
  * el ícono de persona y ofrece Iniciar sesión y Registrarte. Va en la barra del
  * sitio, en la del área del alumno y en la del panel.
  */
 export function AccountMenu() {
-  const { user, logout } = useAuth();
+  const { user, isAdmin, logout } = useAuth();
   const navigate = useNavigate();
   const { pathname, search } = useLocation();
   const [open, setOpen] = useState(false);
@@ -108,7 +109,7 @@ export function AccountMenu() {
 
           {user ? (
             <>
-              {ACCOUNT_LINKS.map((link) => (
+              {[...(isAdmin ? [ADMIN_LINK] : []), ...ACCOUNT_LINKS].map((link) => (
                 <Link
                   key={link.label}
                   to={link.to}

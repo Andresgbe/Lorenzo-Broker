@@ -1,12 +1,14 @@
-import { useState } from 'react';
+import { useCallback, useState, type FormEvent, type ReactNode } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../entities/session';
 import { DEMO_MEMBERSHIP, formatDate } from '../../entities/membership';
 import { DEMO_PAYMENTS, PAYMENT_STATUS_TONE } from '../../entities/payment';
-import { ACCOUNT_SECTIONS, ROUTES, studentAccountPath, type AccountSection } from '../../shared/config/routes';
+import { ACCOUNT_SECTIONS, ROUTES, studentAccountPath, type AccountSection, type BackLinkState } from '../../shared/config/routes';
 import { cn } from '../../shared/lib/cn';
 import { Button } from '../../shared/ui/Button';
 import { Container } from '../../shared/ui/Container';
+import { Modal } from '../../shared/ui/Modal';
+import { PasswordField } from '../../shared/ui/PasswordField';
 import { TextField } from '../../shared/ui/TextField';
 import { StatusPill } from '../../shared/ui/StatusPill';
 
@@ -16,31 +18,143 @@ const myPayments = DEMO_PAYMENTS.filter((payment) => payment.studentName === 'Ma
 const TABS: { section: AccountSection; label: string }[] = [
   { section: ACCOUNT_SECTIONS.profile, label: 'Datos personales' },
   { section: ACCOUNT_SECTIONS.membership, label: 'Membresía y pagos' },
-  { section: ACCOUNT_SECTIONS.password, label: 'Contraseña' },
+  { section: ACCOUNT_SECTIONS.security, label: 'Seguridad' },
 ];
 
-function Card({ title, children }: { title: string; children: React.ReactNode }) {
+function Card({ title, action, children }: { title: string; action?: ReactNode; children: ReactNode }) {
   return (
     <section className="bg-panel border border-line rounded-[18px] p-6 sm:p-8">
-      <h2 className="text-[10.5px] font-bold uppercase tracking-[2.6px] text-accent mb-6">{title}</h2>
+      <div className="flex items-center justify-between gap-4 mb-6">
+        <h2 className="text-[10.5px] font-bold uppercase tracking-[2.6px] text-accent">{title}</h2>
+        {action}
+      </div>
       {children}
     </section>
   );
 }
 
+// Los datos se leen primero; "Editar" abre el formulario. El correo no se edita aquí:
+// se cambia en la pestaña Seguridad, porque exige confirmarlo por correo.
+// Todavía no se guarda en Supabase: "Guardar cambios" solo actualiza la vista.
 function ProfileSection() {
   const { user } = useAuth();
+  const [saved, setSaved] = useState<ProfileValues>(() => ({
+    fullName: user?.fullName ?? '',
+    taxId: user?.taxId ?? '',
+    phone: user?.phone ?? '',
+  }));
+  const [draft, setDraft] = useState<ProfileValues>(saved);
+  const [isEditing, setIsEditing] = useState(false);
+
+  function startEditing() {
+    setDraft(saved);
+    setIsEditing(true);
+  }
+
+  function save(event: FormEvent) {
+    event.preventDefault();
+    setSaved({ fullName: draft.fullName.trim(), taxId: draft.taxId.trim(), phone: draft.phone.trim() });
+    setIsEditing(false);
+  }
+
   return (
-    <Card title="Datos personales">
-      <div className="flex flex-col gap-4">
-        <TextField label="Nombre y apellido" defaultValue={user?.fullName ?? ''} placeholder="Ej. María Pérez" />
-        <TextField label="Correo electrónico" type="email" defaultValue={user?.email ?? ''} placeholder="nombre@ejemplo.com" />
-        <TextField label="Cédula o RIF" defaultValue={user?.taxId ?? ''} placeholder="V-12345678" />
-        <Button variant="primary" className="self-start mt-2">
-          Guardar cambios
-        </Button>
-      </div>
+    <Card
+      title="Datos personales"
+      action={
+        !isEditing && (
+          <Button size="sm" variant="ghost" onClick={startEditing}>
+            <PencilIcon className="w-4 h-4" />
+            Editar
+          </Button>
+        )
+      }
+    >
+      {isEditing ? (
+        <form onSubmit={save} noValidate className="flex flex-col gap-4">
+          <TextField
+            label="Nombre y apellido"
+            autoComplete="name"
+            placeholder="Ej. María Pérez"
+            value={draft.fullName}
+            onChange={(e) => setDraft((prev) => ({ ...prev, fullName: e.target.value }))}
+          />
+          <TextField
+            label="Cédula o RIF"
+            placeholder="V-12345678"
+            value={draft.taxId}
+            onChange={(e) => setDraft((prev) => ({ ...prev, taxId: e.target.value }))}
+          />
+          <TextField
+            label="Teléfono (WhatsApp)"
+            type="tel"
+            inputMode="tel"
+            autoComplete="tel"
+            placeholder="0414-1234567"
+            value={draft.phone}
+            onChange={(e) => setDraft((prev) => ({ ...prev, phone: e.target.value }))}
+          />
+          <div className="flex flex-col gap-1">
+            <span className="text-[13px] text-ink-soft">Correo electrónico</span>
+            <p className="text-[15px] text-muted">{user?.email}</p>
+            <p className="text-[11.5px] leading-snug text-muted">
+              Se cambia en{' '}
+              <Link to={studentAccountPath(ACCOUNT_SECTIONS.security)} className="text-accent hover:underline">
+                la pestaña Seguridad
+              </Link>
+              .
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center justify-end gap-3 mt-2">
+            <Button type="button" size="sm" variant="ghost" onClick={() => setIsEditing(false)}>
+              Cancelar
+            </Button>
+            <Button type="submit" size="sm" variant="primary">
+              Guardar cambios
+            </Button>
+          </div>
+        </form>
+      ) : (
+        <dl className="grid gap-5 sm:grid-cols-2">
+          <InfoRow label="Nombre y apellido" value={saved.fullName} />
+          <InfoRow label="Correo electrónico" value={user?.email ?? ''} />
+          <InfoRow label="Cédula o RIF" value={saved.taxId} />
+          <InfoRow label="Teléfono (WhatsApp)" value={saved.phone} />
+        </dl>
+      )}
     </Card>
+  );
+}
+
+interface ProfileValues {
+  fullName: string;
+  taxId: string;
+  phone: string;
+}
+
+function InfoRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex flex-col gap-1 min-w-0">
+      <dt className="text-[12.5px] text-muted">{label}</dt>
+      <dd className={cn('text-[15px] break-words', value ? 'text-ink' : 'text-muted italic')}>{value || 'Sin agregar'}</dd>
+    </div>
+  );
+}
+
+function PencilIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <path d="M12 20h9" />
+      <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
+    </svg>
   );
 }
 
@@ -128,30 +242,116 @@ function MembershipSection() {
   );
 }
 
-function PasswordSection() {
+type SecurityOption = 'password' | 'email';
+
+// Seguridad de la cuenta: correo y contraseña. Cada opción abre su formulario en un
+// modal, no dentro de la tarjeta. Todavía no se guarda en Supabase.
+function SecuritySection() {
+  const { user } = useAuth();
+  const [open, setOpen] = useState<SecurityOption | null>(null);
+  const close = useCallback(() => setOpen(null), []);
+
   return (
-    <Card title="Cambiar contraseña">
-      <div className="flex flex-col gap-4">
-        <TextField label="Contraseña actual" type="password" autoComplete="current-password" placeholder="Tu contraseña" />
-        <TextField label="Contraseña nueva" type="password" autoComplete="new-password" placeholder="Mínimo 8 caracteres" />
-        <Button variant="primary" className="self-start mt-2">
-          Actualizar contraseña
-        </Button>
+    <Card title="Seguridad">
+      <div className="flex flex-col divide-y divide-line">
+        <SecurityRow
+          title="Correo electrónico"
+          description={user?.email ?? ''}
+          actionLabel="Cambiar correo"
+          onAction={() => setOpen('email')}
+        />
+        <SecurityRow
+          title="Contraseña"
+          description="La que usas para entrar a tu cuenta."
+          actionLabel="Cambiar contraseña"
+          onAction={() => setOpen('password')}
+        />
       </div>
-      <p className="text-[12.5px] text-muted mt-5">
-        ¿La olvidaste?{' '}
-        <Link to={ROUTES.forgotPassword} className="text-accent hover:underline">
-          Recupérala por correo
-        </Link>
-        .
-      </p>
+
+      <Modal
+        open={open === 'email'}
+        title="Cambiar correo"
+        description={
+          <>
+            Tu correo actual es <span className="text-ink-soft">{user?.email}</span>.
+          </>
+        }
+        onClose={close}
+      >
+        <form noValidate onSubmit={(event) => event.preventDefault()} className="flex flex-col gap-4">
+          <TextField label="Correo nuevo" type="email" autoComplete="email" placeholder="nombre@ejemplo.com" />
+          <PasswordField
+            label="Contraseña actual"
+            autoComplete="current-password"
+            placeholder="Para confirmar que eres tú"
+            hint="Te enviaremos un enlace al correo nuevo. El cambio se aplica cuando lo abras."
+          />
+          <ModalActions submitLabel="Cambiar correo" />
+        </form>
+      </Modal>
+
+      <Modal open={open === 'password'} title="Cambiar contraseña" onClose={close}>
+        <form noValidate onSubmit={(event) => event.preventDefault()} className="flex flex-col gap-4">
+          <PasswordField
+            label="Contraseña actual"
+            autoComplete="current-password"
+            placeholder="Tu contraseña"
+            labelAside={
+              <Link
+                to={ROUTES.forgotPassword}
+                state={{ from: studentAccountPath(ACCOUNT_SECTIONS.security), fromTitle: 'Mi cuenta' } satisfies BackLinkState}
+                className="text-[12.5px] text-accent hover:underline"
+              >
+                ¿La olvidaste?
+              </Link>
+            }
+          />
+          <PasswordField label="Contraseña nueva" autoComplete="new-password" placeholder="Mínimo 8 caracteres" />
+          <PasswordField label="Confirmar contraseña nueva" autoComplete="new-password" placeholder="Repite la contraseña nueva" />
+          <ModalActions submitLabel="Actualizar contraseña" />
+        </form>
+      </Modal>
     </Card>
+  );
+}
+
+interface SecurityRowProps {
+  title: string;
+  description: string;
+  actionLabel: string;
+  onAction: () => void;
+}
+
+function SecurityRow({ title, description, actionLabel, onAction }: SecurityRowProps) {
+  return (
+    <div className="flex flex-wrap items-center justify-between gap-3 py-5 first:pt-0 last:pb-0">
+      <div className="min-w-0">
+        <p className="text-[15px] font-semibold text-ink">{title}</p>
+        <p className="text-[13.5px] text-muted mt-0.5 break-words">{description}</p>
+      </div>
+      <Button size="sm" variant="ghost" onClick={onAction}>
+        {actionLabel}
+      </Button>
+    </div>
+  );
+}
+
+/** Pie de los formularios en modal: solo la acción principal, a la derecha. Se cancela con la X del modal. */
+function ModalActions({ submitLabel }: { submitLabel: string }) {
+  return (
+    <div className="flex justify-end mt-2">
+      <Button type="submit" size="sm" variant="primary">
+        {submitLabel}
+      </Button>
+    </div>
   );
 }
 
 export function StudentAccountPage() {
   const [params] = useSearchParams();
-  const requested = params.get('seccion');
+  // Direcciones viejas: ?seccion=clave (Cambiar contraseña) y ?seccion=configuracion hoy abren Seguridad.
+  const raw = params.get('seccion');
+  const requested = raw === 'clave' || raw === 'configuracion' ? ACCOUNT_SECTIONS.security : raw;
   const section = TABS.find((tab) => tab.section === requested)?.section ?? ACCOUNT_SECTIONS.profile;
 
   return (
@@ -179,7 +379,7 @@ export function StudentAccountPage() {
 
         {section === ACCOUNT_SECTIONS.profile && <ProfileSection />}
         {section === ACCOUNT_SECTIONS.membership && <MembershipSection />}
-        {section === ACCOUNT_SECTIONS.password && <PasswordSection />}
+        {section === ACCOUNT_SECTIONS.security && <SecuritySection />}
       </div>
     </Container>
   );

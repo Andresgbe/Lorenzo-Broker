@@ -3,6 +3,7 @@ export const ROUTES = {
   about: '/about',
   mentorship: '/mentorship',
   faq: '/faq',
+  contact: '/contacto',
 
   // Acceso de alumnos.
   register: '/registro',
@@ -30,12 +31,29 @@ export const ROUTES = {
   adminOverview: '/admin/resumen',
   adminStudents: '/admin/alumnos',
   adminPayments: '/admin/pagos',
+  adminPayment: '/admin/pagos/:paymentId',
   // Módulo de cursos: el admin edita cursos, módulos y clases fuera de la vista del alumno.
   adminCourses: '/admin/cursos',
   adminCourseNew: '/admin/cursos/nuevo',
   adminCourse: '/admin/cursos/:courseId',
   adminLesson: '/admin/cursos/:courseId/clases/:lessonId',
 } as const;
+
+/**
+ * State para abrir una pantalla de acceso (p. ej. Recuperar contraseña) desde otra
+ * parte de la app: esa pantalla muestra arriba el PageTopBar (flecha + "{fromTitle} / …")
+ * hacia `from`, en lugar de "Volver a iniciar sesión".
+ */
+export interface BackLinkState {
+  from: string;
+  /** Nombre de la página de origen, como en la ruta: "Mi cuenta". */
+  fromTitle: string;
+}
+
+/** Solo rutas internas ("/alumno/..."): nunca "//otro-sitio" ni una URL completa. */
+export function safeInternalPath(path: unknown): string | null {
+  return typeof path === 'string' && path.startsWith('/') && !path.startsWith('//') ? path : null;
+}
 
 export function studentLessonPath(lessonId: string) {
   return ROUTES.studentLesson.replace(':lessonId', lessonId);
@@ -58,13 +76,18 @@ export const ADMIN_SECTIONS = [
 export const ACCOUNT_SECTIONS = {
   profile: 'datos',
   membership: 'membresia',
-  password: 'clave',
+  // Seguridad de la cuenta: cambiar correo y contraseña.
+  security: 'seguridad',
 } as const;
 
 export type AccountSection = (typeof ACCOUNT_SECTIONS)[keyof typeof ACCOUNT_SECTIONS];
 
 export function studentAccountPath(section: AccountSection = ACCOUNT_SECTIONS.profile) {
   return section === ACCOUNT_SECTIONS.profile ? ROUTES.studentAccount : `${ROUTES.studentAccount}?seccion=${section}`;
+}
+
+export function adminPaymentPath(paymentId: string) {
+  return ROUTES.adminPayment.replace(':paymentId', paymentId);
 }
 
 export function adminCoursePath(courseId: string) {
