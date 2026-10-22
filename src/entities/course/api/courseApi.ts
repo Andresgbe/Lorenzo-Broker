@@ -200,13 +200,15 @@ export async function createCourse(course: NewCourse, position: number): Promise
 export const updateCourse = (id: string, patch: CoursePatch) => updateRow('courses', id, toColumns(patch));
 export const deleteCourse = (id: string) => deleteRow('courses', id);
 
+// Módulos y clases nacen publicados (decisión del usuario, 22/10/2026): el alumno los ve
+// en cuanto el curso está publicado. Para esconder uno, se pasa a borrador con su interruptor.
 export const createModule = (courseId: string, title: string, position: number) =>
-  insertRow('modules', { course_id: courseId, title, position });
+  insertRow('modules', { course_id: courseId, title, position, is_published: true });
 export const updateModule = (id: string, patch: ModulePatch) => updateRow('modules', id, toColumns(patch));
 export const deleteModule = (id: string) => deleteRow('modules', id);
 
 export const createLesson = (moduleId: string, title: string, position: number) =>
-  insertRow('lessons', { module_id: moduleId, title, position });
+  insertRow('lessons', { module_id: moduleId, title, position, is_published: true });
 export const updateLesson = (id: string, patch: LessonPatch) => updateRow('lessons', id, toColumns(patch));
 export const deleteLesson = (id: string) => deleteRow('lessons', id);
 

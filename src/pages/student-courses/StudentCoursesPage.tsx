@@ -1,12 +1,14 @@
 import { Link } from 'react-router-dom';
 import { courseProgress, describeCourse, useCourseTree, useLessonProgress } from '../../entities/course';
+import { useAuth } from '../../entities/session';
 import { ROUTES, studentCoursePath } from '../../shared/config/routes';
 import { Button } from '../../shared/ui/Button';
 import { Container } from '../../shared/ui/Container';
 import { FormAlert } from '../../shared/ui/FormAlert';
 
 export function StudentCoursesPage() {
-  const { courses, isLoading, error } = useCourseTree({ publishedOnly: true });
+  const { viewAsStudent } = useAuth();
+  const { courses, isLoading, error } = useCourseTree({ publishedOnly: viewAsStudent });
   const { completed } = useLessonProgress();
 
   return (

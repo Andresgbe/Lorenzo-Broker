@@ -2,6 +2,28 @@
 
 Registro de los cambios pedidos sobre la plataforma, del más reciente al más antiguo.
 
+## 22/10/2026 — Módulos y clases nuevos se crean publicados
+
+- Al crear un **módulo** o una **clase** en Panel › Cursos, ahora nace **publicado**: los alumnos lo ven en cuanto el curso está publicado.
+- Para esconder uno mientras lo armas, pásalo a borrador con su interruptor.
+- **Los que ya existían no cambian:** siguen en borrador hasta publicarlos con su interruptor. También se pueden publicar todos de una vez en Supabase (SQL Editor):
+
+  ```sql
+  update public.modules set is_published = true where not is_published;
+  update public.lessons set is_published = true where not is_published;
+  ```
+- Los cursos siguen naciendo en borrador y se publican con "Publicar".
+
+## 22/10/2026 — Curso sin módulos visibles (corrección)
+
+- **Problema:** al abrir un curso desde la cuenta de admin aparecía "Este curso todavía no tiene clases", aunque tuviera módulos.
+- **Causa:** con el cambio de "Vista de alumno", las páginas del alumno ocultaban siempre los módulos y clases en **borrador**, también para el admin.
+- **Ahora:**
+  - **Admin sin Vista de alumno:** ve los borradores, marcados con la etiqueta **"Borrador · no lo ven los alumnos"**.
+  - **Admin con Vista de alumno:** se ocultan, igual que para un alumno.
+  - **Alumnos:** nunca reciben borradores; eso lo controla Supabase.
+- Para que un alumno vea un módulo o una clase, hay que **publicarlo** con el interruptor en Panel › Cursos.
+
 ## 22/10/2026 — Contacto: formulario centrado
 
 - En pantallas anchas (desde 1280 px), la tarjeta del formulario queda **centrada en la página**, con un ancho máximo de 640 px.

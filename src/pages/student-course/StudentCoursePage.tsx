@@ -10,6 +10,7 @@ import {
   useCourseTree,
   useLessonProgress,
 } from '../../entities/course';
+import { useAuth } from '../../entities/session';
 import { ROUTES, studentLessonPath } from '../../shared/config/routes';
 import { Button } from '../../shared/ui/Button';
 import { Container } from '../../shared/ui/Container';
@@ -41,9 +42,19 @@ function PlayIcon({ className }: { className?: string }) {
   );
 }
 
+/** Solo lo ve un admin fuera de Vista de alumno: a los alumnos no les llegan los borradores. */
+function DraftPill({ className }: { className?: string }) {
+  return (
+    <span className={cn('inline-flex items-center px-2 py-0.5 rounded-full border border-gold/40 bg-gold/10 text-[10.5px] font-semibold text-gold align-middle', className)}>
+      Borrador · no lo ven los alumnos
+    </span>
+  );
+}
+
 export function StudentCoursePage() {
   const { courseId } = useParams();
-  const { courses, isLoading } = useCourseTree({ publishedOnly: true });
+  const { viewAsStudent } = useAuth();
+  const { courses, isLoading } = useCourseTree({ publishedOnly: viewAsStudent });
   const { completed } = useLessonProgress();
   const [closedIds, setClosedIds] = useState<Set<string>>(new Set());
 
@@ -133,7 +144,10 @@ export function StudentCoursePage() {
                 >
                   <span>
                     <span className="block text-[10.5px] font-bold uppercase tracking-[1.8px] text-muted">Módulo {index + 1}</span>
-                    <span className="block text-[15.5px] text-ink mt-1">{module.title}</span>
+                    <span className="flex flex-wrap items-center gap-2 text-[15.5px] text-ink mt-1">
+                      {module.title}
+                      {!module.isPublished && <DraftPill />}
+                    </span>
                     <span className="block text-[12.5px] text-muted mt-1">
                       {describeModule(module)} · {done}/{module.lessons.length} completadas
                     </span>
@@ -172,6 +186,7 @@ export function StudentCoursePage() {
                                 </span>
                                 <span className="flex-1 min-w-0">
                                   {lesson.title}
+                                  {!lesson.isPublished && <DraftPill className="ml-2" />}
                                   {isDone && <span className="sr-only"> (completada)</span>}
                                 </span>
                                 <span className="text-[12.5px] text-muted shrink-0">

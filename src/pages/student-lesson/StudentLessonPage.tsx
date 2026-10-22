@@ -9,6 +9,7 @@ import {
   useLessonProgress,
   type LessonAttachment,
 } from '../../entities/course';
+import { useAuth } from '../../entities/session';
 import { ROUTES, studentCoursePath, studentLessonPath } from '../../shared/config/routes';
 import { Button } from '../../shared/ui/Button';
 import { Container } from '../../shared/ui/Container';
@@ -78,7 +79,8 @@ function DownloadButton({ attachment }: { attachment: LessonAttachment }) {
 
 export function StudentLessonPage() {
   const { lessonId } = useParams();
-  const { courses, isLoading, error } = useCourseTree({ publishedOnly: true });
+  const { viewAsStudent } = useAuth();
+  const { courses, isLoading, error } = useCourseTree({ publishedOnly: viewAsStudent });
   const { completed, toggle } = useLessonProgress();
 
   if (isLoading) {

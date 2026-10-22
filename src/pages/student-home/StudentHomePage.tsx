@@ -7,8 +7,8 @@ import { Button } from '../../shared/ui/Button';
 import { Container } from '../../shared/ui/Container';
 
 export function StudentHomePage() {
-  const { user } = useAuth();
-  const { courses, isLoading } = useCourseTree({ publishedOnly: true });
+  const { user, viewAsStudent } = useAuth();
+  const { courses, isLoading } = useCourseTree({ publishedOnly: viewAsStudent });
   const { completed } = useLessonProgress();
   const firstName = user?.fullName?.split(' ')[0] ?? 'de nuevo';
   // La membresía sigue siendo de ejemplo hasta conectar entitlements.
