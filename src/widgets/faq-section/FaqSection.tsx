@@ -195,7 +195,7 @@ export function FaqSection({ variant = 'full' }: FaqSectionProps) {
                             onChange={() => toggleField(item.id, 'showOnHome')}
                             className="w-4 h-4 accent-accent cursor-pointer shrink-0"
                           />
-                          <span className="text-[#c6cedb]">{item.question}</span>
+                          <span className="text-ink-soft">{item.question}</span>
                         </label>
                       ))}
                   </div>

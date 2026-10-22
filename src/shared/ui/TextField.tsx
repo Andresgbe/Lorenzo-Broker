@@ -24,7 +24,7 @@ export function TextField({ label, labelAside, hint, error, control, className, 
   return (
     <div className="flex flex-col gap-1.5">
       <div className="flex items-baseline justify-between gap-3">
-        <label htmlFor={id} className="text-[13px] text-[#c6cedb]">
+        <label htmlFor={id} className="text-[13px] text-ink-soft">
           {label}
         </label>
         {labelAside}

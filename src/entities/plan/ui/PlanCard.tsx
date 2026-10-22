@@ -20,13 +20,13 @@ function CheckIcon({ className }: { className?: string }) {
 
 export function PlanCard({ plan }: { plan: Plan }) {
   return (
-    <div className="rounded-[18px] border border-accent/40 bg-panel p-7 flex flex-col gap-5 shadow-[0_0_50px_rgba(37,233,138,0.1)]">
+    <div className="rounded-[18px] border border-accent/40 bg-panel p-7 flex flex-col gap-5 shadow-[0_0_50px_rgba(0,176,154,0.1)]">
       <div>
         <h2 className="text-[15px] font-bold uppercase tracking-[1.6px] text-ink">{plan.name}</h2>
         <p className="text-muted text-[12.5px] mt-1">{plan.billingNote}</p>
       </div>
 
-      <p className="font-display font-extrabold text-[48px] leading-none text-ink flex items-baseline gap-1">
+      <p className="font-display font-bold text-[48px] leading-none text-ink flex items-baseline gap-1">
         {formatPrice(plan.price)}
         <span className="font-body font-medium text-[17px] text-muted">/mes</span>
       </p>

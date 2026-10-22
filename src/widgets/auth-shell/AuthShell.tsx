@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { motion } from 'framer-motion';
+import { cn } from '../../shared/lib/cn';
 import { Container } from '../../shared/ui/Container';
 import { Logo } from '../../shared/ui/Logo';
 
@@ -11,9 +12,11 @@ interface AuthShellProps {
   children: ReactNode;
   /** Contenido bajo la tarjeta, fuera del formulario. */
   footer?: ReactNode;
+  /** `wide` ensancha la tarjeta en computadora para formularios a dos columnas. */
+  size?: 'default' | 'wide';
 }
 
-export function AuthShell({ title, subtitle, headerAside, children, footer }: AuthShellProps) {
+export function AuthShell({ title, subtitle, headerAside, children, footer, size = 'default' }: AuthShellProps) {
   return (
     <div className="min-h-dvh flex flex-col bg-bg">
       <header className="border-b border-line">
@@ -28,9 +31,9 @@ export function AuthShell({ title, subtitle, headerAside, children, footer }: Au
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: 'easeOut' }}
-          className="w-full max-w-[420px]"
+          className={cn('w-full', size === 'wide' ? 'max-w-[420px] md:max-w-[840px]' : 'max-w-[420px]')}
         >
-          <div className="bg-panel border border-line rounded-[20px] px-6 sm:px-8 py-9 shadow-[0_30px_80px_rgba(0,0,0,0.45)]">
+          <div className={cn('bg-panel border border-line rounded-[20px] px-6 sm:px-8 py-9 shadow-[0_30px_80px_rgba(0,0,0,0.45)]', size === 'wide' && 'md:px-12 md:py-11')}>
             <h1 className="font-display font-bold text-[26px] leading-tight text-ink text-center">{title}</h1>
             <p className="text-muted text-[14.5px] leading-relaxed text-center mt-2.5 text-pretty">{subtitle}</p>
 

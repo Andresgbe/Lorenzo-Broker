@@ -32,7 +32,7 @@ export function Switch({
       onClick={() => onChange(!checked)}
       className={cn('inline-flex items-center gap-2.5 cursor-pointer disabled:opacity-50 disabled:cursor-default', className)}
     >
-      <span className={cn('text-[12.5px] whitespace-nowrap', checked ? 'text-[#c6cedb]' : 'text-muted')}>
+      <span className={cn('text-[12.5px] whitespace-nowrap', checked ? 'text-ink-soft' : 'text-muted')}>
         {checked ? onText : offText}
       </span>
       <span

@@ -145,7 +145,7 @@ function CourseDetails({ course, plans, isEditing, onEditingChange, onChanged }:
           <span>Borrador: los alumnos todavía no lo ven</span>
         )}
       </p>
-      <p className={cn('mt-3 text-[15px] leading-relaxed text-pretty max-w-3xl', course.description ? 'text-[#c6cedb]' : 'text-muted italic')}>
+      <p className={cn('mt-3 text-[15px] leading-relaxed text-pretty max-w-3xl', course.description ? 'text-ink-soft' : 'text-muted italic')}>
         {course.description || 'Sin descripción. Agrégala con “Editar” para que el alumno sepa qué va a aprender.'}
       </p>
       <p className="mt-4 flex items-center gap-1.5 text-[12.5px] text-muted">
@@ -213,7 +213,7 @@ function ModuleCard({ course, module, index, isDragging, dragProps, onChanged }:
       {...dragProps}
       className={cn(
         'bg-panel border rounded-[18px] transition-all',
-        isDragging ? 'border-accent shadow-[0_0_24px_rgba(37,233,138,0.2)] opacity-90' : 'border-line'
+        isDragging ? 'border-accent shadow-[0_0_24px_rgba(0,176,154,0.2)] opacity-90' : 'border-line'
       )}
     >
       <div className="flex flex-wrap items-start gap-3 pl-3 pr-5 sm:pr-6 py-5 border-b border-line">
@@ -293,7 +293,7 @@ function ModuleCard({ course, module, index, isDragging, dragProps, onChanged }:
               <span className="w-6 text-[12px] text-muted shrink-0">{lessonIndex + 1}.</span>
               <Link
                 to={adminLessonPath(course.id, lesson.id)}
-                className="flex-1 min-w-[180px] text-[14px] text-[#c6cedb] hover:text-accent transition-colors"
+                className="flex-1 min-w-[180px] text-[14px] text-ink-soft hover:text-accent transition-colors"
               >
                 {lesson.title}
               </Link>

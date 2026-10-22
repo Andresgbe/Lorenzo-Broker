@@ -43,7 +43,7 @@ export function CheckoutShell({
                     className={cn(
                       isCurrent && 'text-accent',
                       isDone && 'text-muted',
-                      !isCurrent && !isDone && 'text-[#49546a]'
+                      !isCurrent && !isDone && 'text-step-idle'
                     )}
                   >
                     {position}. {label}

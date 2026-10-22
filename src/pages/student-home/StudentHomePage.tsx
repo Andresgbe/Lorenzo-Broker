@@ -23,7 +23,7 @@ export function StudentHomePage() {
       <p className="text-muted text-[15px] mt-2">Qué bueno verte. Sigue aprendiendo a tu ritmo.</p>
 
       <div className="grid gap-5 lg:grid-cols-2 mt-9">
-        <section className="bg-panel border border-accent/40 rounded-[18px] p-6 shadow-[0_0_50px_rgba(37,233,138,0.08)]">
+        <section className="bg-panel border border-accent/40 rounded-[18px] p-6 shadow-[0_0_50px_rgba(0,176,154,0.08)]">
           <span className="text-[10.5px] font-bold uppercase tracking-[2.6px] text-accent">Membresía activa</span>
           <p className="font-display font-bold text-[22px] text-ink mt-3">Plan {DEMO_MEMBERSHIP.planName}</p>
           <p className="text-muted text-[13.5px] mt-1.5">

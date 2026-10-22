@@ -22,7 +22,7 @@ const mentorshipLink: NavLinkItem = { label: 'Mentoría 1:1', to: ROUTES.mentors
 
 // Iniciar sesión y Registrarte no van en la barra: los ofrece el avatar (AccountMenu).
 
-const navLinkClasses = 'hover:text-accent transition-colors text-[12.5px] font-semibold tracking-[1.4px] uppercase text-[#c6cedb]';
+const navLinkClasses = 'hover:text-accent transition-colors text-[12.5px] font-semibold tracking-[1.4px] uppercase text-ink-soft';
 
 // El menú hamburguesa es el mismo del panel (AdminShell): mismas clases, y para el admin
 // las mismas secciones. Gatea en isAdmin, nunca en isAuthenticated.
@@ -182,7 +182,8 @@ export function Navbar() {
           <Link to={mentorshipLink.to} className={`hidden lg:inline ${navLinkClasses}`}>
             {mentorshipLink.label}
           </Link>
-          <SubscribeButton />
+          {/* En teléfonos no cabe junto al logo; la portada ya muestra el botón grande. */}
+          <SubscribeButton className="!hidden sm:!inline-flex" />
           <AccountMenu />
         </div>
       </Container>

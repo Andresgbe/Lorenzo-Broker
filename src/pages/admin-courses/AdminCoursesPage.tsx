@@ -62,7 +62,7 @@ export function AdminCoursesPage() {
               className={cn(
                 'flex flex-wrap items-center gap-4 bg-panel border rounded-[18px] pl-3 pr-5 py-4 transition-all',
                 draggedId === course.id
-                  ? 'border-accent shadow-[0_0_24px_rgba(37,233,138,0.2)] opacity-90'
+                  ? 'border-accent shadow-[0_0_24px_rgba(0,176,154,0.2)] opacity-90'
                   : 'border-line hover:border-accent/40'
               )}
             >

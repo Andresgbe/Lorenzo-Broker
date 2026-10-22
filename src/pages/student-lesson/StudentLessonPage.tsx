@@ -192,7 +192,7 @@ export function StudentLessonPage() {
                     aria-current={isCurrent ? 'page' : undefined}
                     className={cn(
                       'flex items-center gap-3 px-5 py-3 text-[13.5px] transition-colors',
-                      isCurrent ? 'text-accent bg-accent/10' : 'text-[#c6cedb] hover:text-accent hover:bg-bg-2/60'
+                      isCurrent ? 'text-accent bg-accent/10' : 'text-ink-soft hover:text-accent hover:bg-bg-2/60'
                     )}
                   >
                     <CheckIcon className={cn('w-3.5 h-3.5 shrink-0', itemDone ? 'text-accent' : 'text-transparent')} />

@@ -1,20 +1,25 @@
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../config/routes';
 import { cn } from '../lib/cn';
-import logoMark from '../assets/images/LorenzoBroker.png';
+// Imagotipo oficial de Lorenzo Broker, versión negativa (blanca): el manual de marca
+// no permite las versiones a color sobre fondos oscuros, ni separar o reacomodar
+// símbolo y tipografía. Se usa completo, sin alterar.
+import logoNegativo from '../assets/images/logo-lorenzo-broker-negativo.png';
 
 interface LogoProps {
   className?: string;
+  /** 'md' para cabeceras (48 px en teléfono, 62 px desde sm; cabe en la de 76 px); 'lg' para el pie. */
+  size?: 'md' | 'lg';
 }
 
-export function Logo({ className }: LogoProps) {
+export function Logo({ className, size = 'md' }: LogoProps) {
   return (
-    <Link to={ROUTES.home} className={cn('flex items-center gap-3', className)} aria-label="Lorenzo Broker — inicio">
-      <img src={logoMark} alt="" aria-hidden="true" className="w-9 h-9 shrink-0 object-contain" />
-      <span className="leading-none">
-        <span className="block font-display font-bold text-[22px] tracking-[0.2px] text-ink">Lorenzo</span>
-        <span className="block text-[9px] tracking-[4px] text-muted font-semibold mt-[3px]">BROKER</span>
-      </span>
+    <Link to={ROUTES.home} className={cn('inline-flex items-center shrink-0', className)} aria-label="Lorenzo Broker — inicio">
+      <img
+        src={logoNegativo}
+        alt="Lorenzo Broker"
+        className={cn('w-auto object-contain', size === 'lg' ? 'h-[84px]' : 'h-[48px] sm:h-[62px]')}
+      />
     </Link>
   );
 }

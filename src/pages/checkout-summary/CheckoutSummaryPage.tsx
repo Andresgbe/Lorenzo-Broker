@@ -85,7 +85,7 @@ export function CheckoutSummaryPage() {
           </section>
         </div>
 
-        <section className="bg-panel border border-accent/40 rounded-[18px] p-6 shadow-[0_0_50px_rgba(37,233,138,0.08)]">
+        <section className="bg-panel border border-accent/40 rounded-[18px] p-6 shadow-[0_0_50px_rgba(0,176,154,0.08)]">
           <h2 className="text-[10.5px] font-bold uppercase tracking-[2.6px] text-accent mb-4">Resumen</h2>
           <div className="flex flex-col gap-2.5">
             <Row label="Plan" value={plan.name} />
@@ -96,7 +96,7 @@ export function CheckoutSummaryPage() {
 
           <div className="flex items-baseline justify-between gap-4">
             <span className="text-[14px] text-muted">Total</span>
-            <span className="font-display font-extrabold text-[30px] leading-none text-ink">
+            <span className="font-display font-bold text-[30px] leading-none text-ink">
               {formatPrice(plan.price)}
             </span>
           </div>

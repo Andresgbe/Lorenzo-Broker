@@ -35,7 +35,7 @@ export function CheckoutConfirmedPage() {
       subtitle="Tu membresía ya está activa. Te llegará el comprobante por correo."
     >
       <div className="flex flex-col items-center gap-7">
-        <span className="flex items-center justify-center w-16 h-16 rounded-full bg-accent/10 border border-accent/40 shadow-[0_0_40px_rgba(37,233,138,0.2)]">
+        <span className="flex items-center justify-center w-16 h-16 rounded-full bg-accent/10 border border-accent/40 shadow-[0_0_40px_rgba(0,176,154,0.2)]">
           <CheckIcon className="w-7 h-7 text-accent" />
         </span>
 

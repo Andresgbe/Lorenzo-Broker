@@ -40,7 +40,7 @@ export function AdminFilters<T extends string>({
               'h-10 px-3.5 rounded-[10px] border text-[13px] whitespace-nowrap transition-colors cursor-pointer',
               option === active
                 ? 'border-accent bg-accent/10 text-accent font-semibold'
-                : 'border-line-strong text-[#c6cedb] hover:border-accent/40 hover:text-ink'
+                : 'border-line-strong text-ink-soft hover:border-accent/40 hover:text-ink'
             )}
           >
             {option}

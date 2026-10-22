@@ -39,7 +39,7 @@ export function AdminOverviewPage() {
         {TILES.map((tile) => (
           <div key={tile.label} className="bg-panel border border-line rounded-[18px] p-5">
             <p className="text-[11.5px] uppercase tracking-[1.6px] text-muted">{tile.label}</p>
-            <p className="font-display font-extrabold text-[30px] text-ink mt-2 leading-none">{tile.value}</p>
+            <p className="font-display font-bold text-[30px] text-ink mt-2 leading-none">{tile.value}</p>
           </div>
         ))}
       </div>

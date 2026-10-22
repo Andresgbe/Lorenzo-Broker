@@ -160,7 +160,7 @@ export function StudentCoursePage() {
                             <li key={lesson.id} className="border-b border-line last:border-b-0">
                               <Link
                                 to={studentLessonPath(lesson.id)}
-                                className="flex items-center gap-3 px-5 py-3 text-[14px] text-[#c6cedb] hover:text-accent hover:bg-bg-2/60 transition-colors"
+                                className="flex items-center gap-3 px-5 py-3 text-[14px] text-ink-soft hover:text-accent hover:bg-bg-2/60 transition-colors"
                               >
                                 <span
                                   className={cn(

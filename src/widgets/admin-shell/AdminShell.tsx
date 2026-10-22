@@ -145,7 +145,7 @@ export function AdminShell() {
               <span aria-hidden="true" className="text-subtle">
                 /
               </span>
-              <span className="text-[#c6cedb]">{current.label}</span>
+              <span className="text-ink-soft">{current.label}</span>
             </span>
           )}
 
@@ -153,7 +153,7 @@ export function AdminShell() {
             {/* El admin ve los cursos como los ve un alumno (borradores incluidos). */}
             <Link
               to={ROUTES.studentCourses}
-              className="inline-flex items-center gap-2 h-10 px-3.5 rounded-[10px] border border-line-strong text-[13.5px] font-semibold text-[#c6cedb] hover:border-accent hover:text-accent transition-colors whitespace-nowrap"
+              className="inline-flex items-center gap-2 h-10 px-3.5 rounded-[10px] border border-line-strong text-[13.5px] font-semibold text-ink-soft hover:border-accent hover:text-accent transition-colors whitespace-nowrap"
             >
               <svg
                 width="16"

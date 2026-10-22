@@ -102,7 +102,7 @@ function LessonForm({ lesson, onSaved }: LessonFormProps) {
         />
 
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="lesson-description" className="text-[13px] text-[#c6cedb]">
+          <label htmlFor="lesson-description" className="text-[13px] text-ink-soft">
             Descripción
           </label>
           <textarea

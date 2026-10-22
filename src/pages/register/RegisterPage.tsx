@@ -6,6 +6,7 @@ import { RegisterForm } from '../../features/register';
 export function RegisterPage() {
   return (
     <AuthShell
+      size="wide"
       title="Crea tu cuenta"
       subtitle="Regístrate para elegir tu membresía y entrar a las clases."
       headerAside={

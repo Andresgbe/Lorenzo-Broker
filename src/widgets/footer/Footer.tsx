@@ -38,7 +38,7 @@ export function Footer() {
       <Container className="flex flex-col gap-11">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr] lg:gap-14">
           <div className="flex flex-col items-start gap-[18px]">
-            <Logo />
+            <Logo size="lg" />
             <p className="text-sm leading-relaxed text-muted max-w-[320px] text-pretty">
               Trading en vivo, señales swing con tesis completa y educación de bolsa en español — con un
               corredor real operando frente a ti.
@@ -81,13 +81,13 @@ export function Footer() {
         <div className="flex flex-col gap-[22px]">
           <div className="h-px bg-line" />
           <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 md:gap-14">
-            <p className="max-w-[800px] text-xs leading-[1.65] text-[#6f7a8b] text-pretty">
+            <p className="max-w-[800px] text-xs leading-[1.65] text-faint text-pretty">
               <span className="text-muted font-semibold">Aviso de riesgo.</span> Contenido exclusivamente
               educativo; no constituye asesoría financiera ni recomendación de inversión. Operar en los
               mercados implica un riesgo elevado de pérdida de capital y los resultados pasados no garantizan
               resultados futuros.
             </p>
-            <p className="text-[12.5px] text-[#6f7a8b] md:whitespace-nowrap">
+            <p className="text-[12.5px] text-faint md:whitespace-nowrap">
               © {new Date().getFullYear()} Lorenzo Broker
             </p>
           </div>

@@ -38,8 +38,8 @@ const DEFAULT_PRICING: PricingContent = {
 function CheckIcon({ bonus }: { bonus?: boolean }) {
   return (
     <svg width="18" height="18" viewBox="0 0 20 20" fill="none" className="shrink-0 mt-0.5">
-      <circle cx="10" cy="10" r="9" stroke={bonus ? '#f2b636' : '#25e98a'} strokeWidth="1.6" />
-      <path d="M6 10.5 L9 13 L14 7.5" stroke={bonus ? '#f2b636' : '#25e98a'} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="10" cy="10" r="9" stroke={bonus ? 'var(--color-highlight)' : 'var(--color-accent)'} strokeWidth="1.6" />
+      <path d="M6 10.5 L9 13 L14 7.5" stroke={bonus ? 'var(--color-highlight)' : 'var(--color-accent)'} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -126,7 +126,7 @@ export function PricingSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-80px' }}
             transition={{ duration: 0.5 }}
-            className="w-full max-w-[460px] bg-panel border border-accent/40 rounded-[22px] px-6 sm:px-10 py-11 text-center shadow-[0_0_60px_rgba(37,233,138,0.08)]"
+            className="w-full max-w-[460px] bg-panel border border-accent/40 rounded-[22px] px-6 sm:px-10 py-11 text-center shadow-[0_0_60px_rgba(0,176,154,0.08)]"
           >
             {isAdmin ? (
               <input
@@ -139,7 +139,7 @@ export function PricingSection() {
               <div className="text-xs font-bold tracking-[3px] uppercase text-accent">{content.planName}</div>
             )}
 
-            <div className="font-display font-extrabold text-[56px] mt-4 mb-1 text-ink flex items-baseline justify-center gap-0.5">
+            <div className="font-display font-bold text-[56px] mt-4 mb-1 text-ink flex items-baseline justify-center gap-0.5">
               $
               {isAdmin ? (
                 <input
@@ -167,7 +167,7 @@ export function PricingSection() {
 
             <div className="text-left grid gap-3 mb-8">
               {content.items.map((item) => (
-                <div key={item.id} className="flex gap-3 items-start text-[14.5px] text-[#c6cedb]">
+                <div key={item.id} className="flex gap-3 items-start text-[14.5px] text-ink-soft">
                   <CheckIcon bonus={item.bonus} />
                   {isAdmin ? (
                     <div className="flex-1 flex items-center gap-2 min-w-0">
@@ -182,7 +182,7 @@ export function PricingSection() {
                         onClick={() => toggleBonus(item.id)}
                         className={cn(
                           'text-[9px] font-bold uppercase px-1.5 py-0.5 rounded border shrink-0 cursor-pointer transition-colors',
-                          item.bonus ? 'border-gold/50 text-gold' : 'border-line text-muted hover:text-ink'
+                          item.bonus ? 'border-highlight/50 text-highlight' : 'border-line text-muted hover:text-ink'
                         )}
                       >
                         {item.bonus ? 'Bonus' : 'Normal'}

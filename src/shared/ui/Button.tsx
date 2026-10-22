@@ -46,11 +46,11 @@ export function Button({
       : 'font-bold text-[13px] uppercase tracking-[1.2px] px-7 py-3.5 rounded-xl',
     variant === 'primary' &&
       (isSmall
-        ? 'bg-accent text-ink-inverse hover:shadow-[0_0_24px_rgba(37,233,138,0.35)]'
-        : 'bg-accent text-ink-inverse shadow-[0_0_24px_rgba(37,233,138,0.35)] hover:shadow-[0_0_34px_rgba(37,233,138,0.5)]'),
+        ? 'bg-accent text-ink-inverse hover:shadow-[0_0_24px_rgba(0,176,154,0.35)]'
+        : 'bg-accent text-ink-inverse shadow-[0_0_24px_rgba(0,176,154,0.35)] hover:shadow-[0_0_34px_rgba(0,176,154,0.5)]'),
     variant === 'ghost' &&
       (isSmall
-        ? 'bg-transparent text-[#c6cedb] border border-line-strong hover:border-accent hover:text-accent'
+        ? 'bg-transparent text-ink-soft border border-line-strong hover:border-accent hover:text-accent'
         : 'bg-transparent text-ink border border-line shadow-none hover:border-accent hover:text-accent'),
     className
   );

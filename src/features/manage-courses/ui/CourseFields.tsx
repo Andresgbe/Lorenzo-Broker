@@ -37,7 +37,7 @@ export function CourseFields({ values, onChange, plans, titleError, autoFocus }:
       />
 
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="course-description" className="text-[13px] text-[#c6cedb]">
+        <label htmlFor="course-description" className="text-[13px] text-ink-soft">
           Descripción
         </label>
         <textarea
@@ -59,7 +59,7 @@ export function CourseFields({ values, onChange, plans, titleError, autoFocus }:
       />
 
       <fieldset className="flex flex-col gap-2.5">
-        <legend className="text-[13px] text-[#c6cedb] mb-2">Incluido en</legend>
+        <legend className="text-[13px] text-ink-soft mb-2">Incluido en</legend>
         {plans.length === 0 ? (
           <p className="text-[12.5px] text-muted">No hay planes guardados todavía.</p>
         ) : (
@@ -78,7 +78,7 @@ export function CourseFields({ values, onChange, plans, titleError, autoFocus }:
                     type="checkbox"
                     checked={checked}
                     onChange={() => togglePlan(plan.id)}
-                    className="w-4 h-4 accent-[#25e98a] cursor-pointer"
+                    className="w-4 h-4 accent-accent cursor-pointer"
                   />
                   {plan.name}
                   {!plan.isActive && <span className="text-[11.5px] text-muted">(inactivo)</span>}

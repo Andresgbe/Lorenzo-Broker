@@ -112,9 +112,9 @@ function MembershipSection() {
             <tbody>
               {myPayments.map((payment) => (
                 <tr key={payment.id} className="border-b border-line last:border-b-0">
-                  <td className="px-6 sm:pl-8 py-3.5 text-[#c6cedb]">{formatDate(payment.date)}</td>
-                  <td className="px-6 py-3.5 text-[#c6cedb]">{payment.planName}</td>
-                  <td className="px-6 py-3.5 text-[#c6cedb]">{payment.method}</td>
+                  <td className="px-6 sm:pl-8 py-3.5 text-ink-soft">{formatDate(payment.date)}</td>
+                  <td className="px-6 py-3.5 text-ink-soft">{payment.planName}</td>
+                  <td className="px-6 py-3.5 text-ink-soft">{payment.method}</td>
                   <td className="px-6 py-3.5">
                     <StatusPill tone={PAYMENT_STATUS_TONE[payment.status]}>{payment.status}</StatusPill>
                   </td>

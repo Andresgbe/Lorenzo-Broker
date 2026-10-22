@@ -5,7 +5,7 @@ import { Button } from '../../shared/ui/Button';
 
 export function ClosingCta() {
   return (
-    <section className="py-24 text-center bg-[radial-gradient(700px_300px_at_50%_0%,rgba(37,233,138,0.10),transparent_65%)] bg-bg-2 border-t border-line">
+    <section className="py-24 text-center bg-[radial-gradient(700px_300px_at_50%_0%,rgba(0,110,150,0.25),transparent_65%)] bg-bg-2 border-t border-line">
       <Container>
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
@@ -30,7 +30,7 @@ export function ClosingCta() {
           transition={{ duration: 0.5, delay: 0.1 }}
           className="max-w-[900px] mx-auto mt-14 px-5 sm:px-6 py-5 border border-line rounded-2xl bg-panel text-muted text-[12.5px] text-left"
         >
-          <b className="text-[#c6cedb]">Aviso de riesgo.</b> El contenido de esta comunidad es exclusivamente educativo y
+          <b className="text-ink-soft">Aviso de riesgo.</b> El contenido de esta comunidad es exclusivamente educativo y
           no constituye asesoría financiera ni recomendación de inversión. Operar en los mercados financieros,
           incluyendo acciones, futuros y criptomonedas, implica un riesgo elevado de pérdida de capital. Los
           resultados pasados no garantizan resultados futuros. Cada miembro es responsable de sus propias

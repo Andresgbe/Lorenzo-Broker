@@ -31,7 +31,7 @@ export function SectionHeading({ eyebrow, title, subtitle, align = 'center', cla
       </h2>
       <div
         className={cn(
-          'w-[120px] h-1 bg-accent rounded-full mt-6 shadow-[0_0_18px_rgba(37,233,138,0.6)]',
+          'w-[120px] h-1 bg-accent rounded-full mt-6 shadow-[0_0_18px_rgba(0,176,154,0.6)]',
           !isLeft && 'mx-auto'
         )}
       />

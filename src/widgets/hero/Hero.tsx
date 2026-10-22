@@ -15,7 +15,7 @@ export function Hero() {
   return (
     <section
       id={HOME_SECTIONS.hero}
-      className="pt-16 sm:pt-[110px] pb-16 sm:pb-[90px] bg-[radial-gradient(900px_420px_at_70%_-10%,rgba(37,233,138,0.09),transparent_60%),radial-gradient(700px_380px_at_10%_110%,rgba(37,233,138,0.05),transparent_60%)]"
+      className="pt-16 sm:pt-[110px] pb-16 sm:pb-[90px] bg-[radial-gradient(900px_420px_at_70%_-10%,rgba(0,110,150,0.22),transparent_60%),radial-gradient(700px_380px_at_10%_110%,rgba(40,51,128,0.30),transparent_60%)]"
     >
       <Container className="flex flex-col items-center text-center">
         <motion.div
@@ -37,7 +37,7 @@ export function Hero() {
           transition={{ duration: 0.6, ease: 'easeOut', delay: 0.2 }}
           className="w-full mt-12"
         >
-          <h1 className="font-display font-extrabold text-[clamp(34px,5.4vw,62px)] leading-[1.12] text-ink text-balance max-w-5xl mx-auto">
+          <h1 className="font-display font-bold text-[clamp(34px,5.4vw,62px)] leading-[1.12] text-ink text-balance max-w-5xl mx-auto">
             Aprende bolsa con un <span className="text-accent">corredor real</span>, operando en vivo.
           </h1>
           <p className="text-muted text-[17px] sm:text-lg mt-6 mb-9 max-w-3xl mx-auto">

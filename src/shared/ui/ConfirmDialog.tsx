@@ -67,7 +67,7 @@ export function ConfirmDialog({ open, title, description, confirmLabel, cancelLa
             type="button"
             onClick={onCancel}
             disabled={isBusy}
-            className="inline-flex items-center h-10 px-4 rounded-[10px] border border-line-strong text-[13.5px] text-[#c6cedb] hover:text-ink hover:border-muted transition-colors cursor-pointer disabled:opacity-50"
+            className="inline-flex items-center h-10 px-4 rounded-[10px] border border-line-strong text-[13.5px] text-ink-soft hover:text-ink hover:border-muted transition-colors cursor-pointer disabled:opacity-50"
           >
             {cancelLabel}
           </button>

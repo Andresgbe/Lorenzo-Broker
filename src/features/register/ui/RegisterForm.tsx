@@ -4,6 +4,7 @@ import { useAuth } from '../../../entities/session';
 import { ROUTES } from '../../../shared/config/routes';
 import { Button } from '../../../shared/ui/Button';
 import { FormAlert } from '../../../shared/ui/FormAlert';
+import { PasswordField } from '../../../shared/ui/PasswordField';
 import { TextField, inputClasses } from '../../../shared/ui/TextField';
 import { cn } from '../../../shared/lib/cn';
 import {
@@ -53,7 +54,7 @@ export function RegisterForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
+    <form onSubmit={handleSubmit} noValidate className="grid items-start gap-4 md:grid-cols-2 md:gap-x-6 md:gap-y-5">
       <TextField
         label="Nombre y apellido"
         name="name"
@@ -63,17 +64,6 @@ export function RegisterForm() {
         value={values.fullName}
         onChange={(e) => set('fullName', e.target.value)}
         error={errors.fullName}
-      />
-
-      <TextField
-        label="Correo electrónico"
-        name="email"
-        type="email"
-        autoComplete="email"
-        placeholder="nombre@ejemplo.com"
-        value={values.email}
-        onChange={(e) => set('email', e.target.value)}
-        error={errors.email}
       />
 
       <TextField
@@ -110,10 +100,22 @@ export function RegisterForm() {
         )}
       />
 
-      <TextField
+      <div className="md:col-span-2">
+        <TextField
+          label="Correo electrónico"
+          name="email"
+          type="email"
+          autoComplete="email"
+          placeholder="nombre@ejemplo.com"
+          value={values.email}
+          onChange={(e) => set('email', e.target.value)}
+          error={errors.email}
+        />
+      </div>
+
+      <PasswordField
         label="Contraseña"
         name="password"
-        type="password"
         autoComplete="new-password"
         placeholder="Mínimo 8 caracteres"
         value={values.password}
@@ -121,8 +123,18 @@ export function RegisterForm() {
         error={errors.password}
       />
 
-      <div className="flex flex-col gap-1.5">
-        <label className="flex items-start gap-2.5 text-[13px] text-[#c6cedb] cursor-pointer">
+      <PasswordField
+        label="Confirmar contraseña"
+        name="confirmPassword"
+        autoComplete="new-password"
+        placeholder="Repite tu contraseña"
+        value={values.confirmPassword}
+        onChange={(e) => set('confirmPassword', e.target.value)}
+        error={errors.confirmPassword}
+      />
+
+      <div className="flex flex-col gap-1.5 md:col-span-2">
+        <label className="flex items-start gap-2.5 text-[13px] text-ink-soft cursor-pointer">
           <input
             type="checkbox"
             checked={values.acceptedTerms}
@@ -143,9 +155,13 @@ export function RegisterForm() {
         )}
       </div>
 
-      {submitError && <FormAlert variant="error">{submitError}</FormAlert>}
+      {submitError && (
+        <div className="md:col-span-2">
+          <FormAlert variant="error">{submitError}</FormAlert>
+        </div>
+      )}
 
-      <Button type="submit" variant="primary" className="mt-1 w-full" disabled={isSubmitting}>
+      <Button type="submit" variant="primary" className="mt-1 w-full md:col-span-2 md:w-[340px] md:justify-self-center" disabled={isSubmitting}>
         {isSubmitting ? 'Creando cuenta…' : 'Crear cuenta'}
       </Button>
     </form>

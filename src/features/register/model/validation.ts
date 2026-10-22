@@ -11,6 +11,7 @@ export interface RegisterValues {
   taxIdPrefix: TaxIdPrefix;
   taxIdNumber: string;
   password: string;
+  confirmPassword: string;
   acceptedTerms: boolean;
 }
 
@@ -22,6 +23,7 @@ export const EMPTY_REGISTER_VALUES: RegisterValues = {
   taxIdPrefix: 'V',
   taxIdNumber: '',
   password: '',
+  confirmPassword: '',
   acceptedTerms: false,
 };
 
@@ -46,6 +48,12 @@ export function validateRegister(values: RegisterValues): RegisterErrors {
 
   if (values.password.length < MIN_PASSWORD_LENGTH) {
     errors.password = `Mínimo ${MIN_PASSWORD_LENGTH} caracteres.`;
+  }
+
+  if (!values.confirmPassword) {
+    errors.confirmPassword = 'Repite tu contraseña.';
+  } else if (values.confirmPassword !== values.password) {
+    errors.confirmPassword = 'Las contraseñas no coinciden.';
   }
 
   if (!values.acceptedTerms) {

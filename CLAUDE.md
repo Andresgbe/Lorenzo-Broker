@@ -26,7 +26,7 @@ Designs live in a Claude Design canvas, "Lorenzo Broker — Vistas plataforma" (
 
 ## Design system — read it before any UI work
 
-The brand's design system is the artifact **"Lorenzo Broker"**: https://claude.ai/artifact/EY57tXbUVdi5hG2XtkxQLM. It holds the palette with contrast checks, the type scale (Playfair Display + Inter), radii, glows, voice and copy rules, iconography, the logos and photos, and a guideline + preview per shared component (Button, TextField, FormAlert, StatusPill, SectionHeading, Logo, MediaPlaceholder, BenefitCard, EditableText, AdminTopBar, Switch, ConfirmDialog, MenuButton, DragHandle).
+The brand's design system is the artifact **"Lorenzo Broker"**: https://claude.ai/artifact/EY57tXbUVdi5hG2XtkxQLM. It holds the palette with contrast checks, the type scale (Domine + Inter), radii, glows, voice and copy rules, iconography, the logos and photos, and a guideline + preview per shared component (Button, TextField, FormAlert, StatusPill, SectionHeading, Logo, MediaPlaceholder, BenefitCard, EditableText, AdminTopBar, Switch, ConfirmDialog, MenuButton, DragHandle).
 
 **Admin panel patterns, chosen by the user (19 Oct 2026) from the options canvas https://claude.ai/artifact/PxER1YcP8UoHbzHsybK1Yw.** Use them on every admin page:
 - `AdminShell` has no sidebar. Its sticky header matches the site's and the student area's (19 Oct 2026): 76 px tall, aligned with the 1400 px content column. It holds a **hamburger button that opens a dropdown menu** (Resumen, Alumnos, Pagos, Cursos, Ver el sitio, Cerrar sesión); from 1500 px the button sits in the header's top-left corner. On the right are a "Vista de alumno" button that opens `/alumno/cursos` and the profile avatar (`AccountMenu`). Content gets the full width (max 1400 px). It closes on navigation, outside click or Escape.
@@ -42,7 +42,17 @@ The brand's design system is the artifact **"Lorenzo Broker"**: https://claude.a
 
 **Before changing UI or adding a view, read its `project/README.md`** (Artifact tool, `read_file`) and the README of every component you touch, and build from those tokens and rules. The canvas above says *what* a screen contains; the design system says *how* it looks and reads.
 
-Keep the two in sync: `src/index.css` `@theme` is the code's copy of the tokens. If you add or change a token, a component's look, or a copy rule in code, update the design system too (read the file, edit, publish only the changed `project/` files, then the index `project/design-system.json` last with a new `lastChange`). Hex literals that exist only in components today (`#c6cedb`, `#6f7a8b`, `#49546a`) are documented there as `ink-soft`, `faint`, `step-idle` — promote them to `@theme` instead of copying them again.
+Keep the two in sync: `src/index.css` `@theme` is the code's copy of the tokens. If you add or change a token, a component's look, or a copy rule in code, update the design system too (read the file, edit, publish only the changed `project/` files, then the index `project/design-system.json` last with a new `lastChange`).
+
+**Brand palette — the current design (21 Oct 2026).** Lorenzo applied his *Manual de Marca* (his patch `0001-Aplicar-el-manual-de-marca…`, reproduced in the code). It replaced the old near-black + neon green (`#25e98a`) + gold look on every screen, and **every view, new or old, uses it from now on**:
+- Pantone colors as tokens: `brand-gray` #4b4f54 (7540 C), `brand-black` #262729 (426 C), `brand-navy` #283380 (072 C; the manual writes #060e9f but its swatches and logo use #283380), `brand-petrol` #006e96 (7705 C), `brand-teal` #00b09a (3275 C).
+- Surfaces are brand grays: `bg` #1c1d1f → `bg-2` #222326 → `panel` #262729 → `panel-2` #2c2e31, `line` #373a3e, `line-strong` #4b4f54. Text: `ink` #f4f5f6, `ink-soft` #d0d3d7, `muted` #a7acb3, `faint` #868b93, `ink-inverse` #0f1415 on the accent.
+- `accent` is teal 3275 C (#00b09a): buttons, links, the highlighted word, focus. Glows use `rgba(0,176,154,…)`. Navy and petrol go **only** in gradients and fills (hero and closing-CTA halos, the Bonus badge), never as text on dark: they fail contrast.
+- **Bonus** items (BenefitCard, pricing checks) are petrol: `brand-petrol` border/badge and `highlight` (#4cb3dc) for their text. **`gold` is no longer a brand color**: it stays only for waiting/warning states (En verificación, Por vencer, Vencida, borrador).
+- Fonts: **Domine** (display, replaces Playfair Display; max weight 700, so never `font-extrabold`/`font-black` on display text) and **Inter** (body). Clarendon and Theinhardt, the manual's paid fonts, are listed as fallbacks in `--font-display` / `--font-body`.
+- **Logo:** the official full lockup, negative (white) version, `shared/assets/images/logo-lorenzo-broker-negativo.png`, via `Logo` (`size="md"` 48 → 62 px in headers, `size="lg"` 84 px in the footer). The manual forbids the color versions on dark backgrounds and separating or rearranging the mark and the wordmark.
+- Never hardcode a hex or an rgba of the old palette; use the tokens. The old hex literals (`#c6cedb`, `#6f7a8b`, `#49546a`) are now `ink-soft`, `faint`, `step-idle` in `@theme`.
+- On phones the navbar hides "Suscríbete ahora" below `sm` (it overlapped the logo; the hero shows the big button).
 
 Build status by artboard:
 

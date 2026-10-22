@@ -27,7 +27,7 @@ export function StudentNav() {
                   to={link.to}
                   end={link.end}
                   className={({ isActive }) =>
-                    cn(linkClasses, isActive ? 'text-accent' : 'text-[#c6cedb] hover:text-accent')
+                    cn(linkClasses, isActive ? 'text-accent' : 'text-ink-soft hover:text-accent')
                   }
                 >
                   {link.label}
