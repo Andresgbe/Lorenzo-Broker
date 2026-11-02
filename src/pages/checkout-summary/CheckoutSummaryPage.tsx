@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../entities/session';
+import { caracasDay, formatDate } from '../../entities/membership';
 import { formatPrice, useSelectedPlan } from '../../entities/plan';
+import { monthsLabel, useCheckoutOrder } from '../../features/renew-membership';
 import { ROUTES } from '../../shared/config/routes';
 import { PAYMENT_METHODS } from '../../shared/config/payment-methods';
 import { Button } from '../../shared/ui/Button';
-import { CheckoutShell } from '../../widgets/checkout-shell';
+import { CheckoutLoading, CheckoutShell } from '../../widgets/checkout-shell';
 import { cn } from '../../shared/lib/cn';
 
 function Row({ label, value }: { label: string; value: string }) {
@@ -26,22 +28,27 @@ export function CheckoutSummaryPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [method, setMethod] = useState(PAYMENT_METHODS[0].id);
+  const order = useCheckoutOrder(plan?.price ?? 0);
 
   if (!plan) {
     return <Navigate to={ROUTES.checkoutPlan} replace />;
   }
+  if (order.isLoading) return <CheckoutLoading step={2} />;
+
+  const { membership, isRenewal, months, monthsQuery } = order;
+  const planPath = monthsQuery ? `${ROUTES.checkoutPlan}?${monthsQuery.slice(1)}` : ROUTES.checkoutPlan;
 
   return (
     <CheckoutShell
       step={2}
       topBar={{
-        backTo: ROUTES.checkoutPlan,
-        backLabel: 'Volver al plan',
-        crumbs: [{ label: 'Plan', to: ROUTES.checkoutPlan }, { label: 'Pago' }],
+        backTo: planPath,
+        backLabel: isRenewal ? 'Volver a la renovación' : 'Volver al plan',
+        crumbs: [{ label: isRenewal ? 'Renovar' : 'Plan', to: planPath }, { label: 'Pago' }],
       }}
       width="wide"
-      eyebrow="Confirma tu pago"
-      title="Da tu siguiente paso"
+      eyebrow={isRenewal ? 'Confirma tu renovación' : 'Confirma tu pago'}
+      title={isRenewal ? 'Renueva tu membresía' : 'Da tu siguiente paso'}
     >
       {/* Una sola tarjeta: arriba tus datos y el plan, en medio el método de pago y abajo,
           siempre al final, el total con el botón de pagar. */}
@@ -60,14 +67,26 @@ export function CheckoutSummaryPage() {
           </div>
 
           <div className="p-6 sm:p-8 border-t border-line md:border-t-0 md:border-l">
-            <SectionLabel>Tu plan</SectionLabel>
-            <div className="flex flex-col gap-3">
-              <Row label="Plan" value={plan.name} />
-              <Row label="Cobro" value={plan.billingNote} />
-              <Row label="Precio" value={formatPrice(plan.price)} />
-            </div>
-            <Link to={ROUTES.checkoutPlan} className="inline-block mt-5 text-[13px] text-accent hover:underline">
-              Cambiar de plan
+            <SectionLabel>{isRenewal ? 'Tu renovación' : 'Tu plan'}</SectionLabel>
+            {membership ? (
+              <div className="flex flex-col gap-3">
+                <Row label="Plan" value={membership.planName} />
+                <Row label="Vas a pagar" value={monthsLabel(months)} />
+                <Row
+                  label={membership.status === 'active' ? 'Vence el' : 'Venció el'}
+                  value={formatDate(caracasDay(membership.expiresAt))}
+                />
+                <Row label="Tu acceso llegará hasta el" value={order.newExpiresOn ? formatDate(order.newExpiresOn) : '—'} />
+              </div>
+            ) : (
+              <div className="flex flex-col gap-3">
+                <Row label="Plan" value={plan.name} />
+                <Row label="Cobro" value={plan.billingNote} />
+                <Row label="Precio" value={formatPrice(plan.price)} />
+              </div>
+            )}
+            <Link to={planPath} className="inline-block mt-5 text-[13px] text-accent hover:underline">
+              {isRenewal ? 'Cambiar los meses' : 'Cambiar de plan'}
             </Link>
           </div>
         </div>
@@ -103,13 +122,13 @@ export function CheckoutSummaryPage() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5 p-6 sm:px-8 border-t border-line bg-bg-2/60 rounded-b-[20px]">
           <div>
             <span className="block text-[12.5px] text-muted">Total a pagar</span>
-            <span className="font-display font-bold text-[34px] leading-none text-ink">{formatPrice(plan.price)}</span>
-            <span className="text-[13px] text-muted ml-2">{plan.billingNote.toLowerCase()}</span>
+            <span className="font-display font-bold text-[34px] leading-none text-ink">{formatPrice(order.total)}</span>
+            <span className="text-[13px] text-muted ml-2">{isRenewal ? `por ${monthsLabel(months)}` : plan.billingNote.toLowerCase()}</span>
           </div>
           <Button
             variant="primary"
             className="w-full sm:w-auto sm:min-w-[300px]"
-            onClick={() => navigate(`${ROUTES.checkoutPay}?plan=${plan.id}&metodo=${method}`)}
+            onClick={() => navigate(`${ROUTES.checkoutPay}?plan=${plan.id}&metodo=${method}${monthsQuery}`)}
           >
             Continuar con {PAYMENT_METHODS.find((option) => option.id === method)?.label}
           </Button>

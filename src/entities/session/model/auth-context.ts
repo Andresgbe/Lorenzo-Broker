@@ -17,6 +17,13 @@ export interface RegisterInput {
   taxId: string;
 }
 
+/** Datos personales que el propio usuario edita en Mi cuenta. El correo no: va por Seguridad. */
+export interface ProfileInput {
+  fullName: string;
+  taxId: string;
+  phone: string;
+}
+
 export interface AuthContextValue {
   user: SessionUser | null;
   /** Hay una sesión abierta, de alumno o de administrador. */
@@ -37,6 +44,7 @@ export interface AuthContextValue {
   requestPasswordReset: (email: string) => Promise<AuthResult>;
   /** Cambia la contraseña de la sesión abierta (la de recuperación, al volver del correo). */
   updatePassword: (password: string) => Promise<AuthResult>;
+  updateProfile: (input: ProfileInput) => Promise<AuthResult>;
   logout: () => Promise<void>;
 }
 

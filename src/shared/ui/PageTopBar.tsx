@@ -1,5 +1,6 @@
 import { Fragment, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
+import { cn } from '../lib/cn';
 
 export interface Crumb {
   label: string;
@@ -14,6 +15,8 @@ interface PageTopBarProps {
   crumbs: Crumb[];
   /** Botones a la derecha (Button size="sm", MenuButton). */
   actions?: ReactNode;
+  /** La flecha no cuelga en el margen, para páginas sin margen libre a la izquierda (el panel). */
+  backInColumn?: boolean;
 }
 
 /**
@@ -22,7 +25,7 @@ interface PageTopBarProps {
  * parecer una segunda barra. La ruta va en mayúsculas: CURSOS / CURSO / MÓDULO / CLASE.
  * En el panel se usa con su nombre de siempre, AdminTopBar (widgets/admin-shell).
  */
-export function PageTopBar({ backTo, backLabel, crumbs, actions }: PageTopBarProps) {
+export function PageTopBar({ backTo, backLabel, crumbs, actions, backInColumn }: PageTopBarProps) {
   return (
     <div className="flex flex-wrap items-center gap-x-4 gap-y-3 mb-8">
       {/* En pantallas anchas la flecha cuelga en el margen izquierdo, fuera de la columna del contenido. */}
@@ -30,7 +33,10 @@ export function PageTopBar({ backTo, backLabel, crumbs, actions }: PageTopBarPro
         to={backTo}
         aria-label={backLabel}
         title={backLabel}
-        className="flex items-center justify-center w-12 h-12 shrink-0 min-[1500px]:-ml-16 rounded-xl bg-panel-2 border border-line-strong text-ink hover:border-accent hover:text-accent transition-colors"
+        className={cn(
+          'flex items-center justify-center w-12 h-12 shrink-0 rounded-xl bg-panel-2 border border-line-strong text-ink hover:border-accent hover:text-accent transition-colors',
+          !backInColumn && 'min-[1500px]:-ml-16',
+        )}
       >
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <path d="M15 18l-6-6 6-6" />

@@ -1,5 +1,5 @@
 import { Button } from '../../../shared/ui/Button';
-import { EXTERNAL_LINKS } from '../../../shared/config/external-links';
+import { ROUTES } from '../../../shared/config/routes';
 
 interface SubscribeButtonProps {
   label?: string;
@@ -8,7 +8,7 @@ interface SubscribeButtonProps {
 
 export function SubscribeButton({ label = "Suscríbete ahora", className }: SubscribeButtonProps) {
   return (
-    <Button href={EXTERNAL_LINKS.whopCheckout} variant="primary" className={className}>
+    <Button to={ROUTES.checkoutPlan} variant="primary" className={className}>
       {label}
     </Button>
   );

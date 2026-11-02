@@ -1,12 +1,13 @@
 import { useCallback, useState, type FormEvent, type ReactNode } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../entities/session';
-import { DEMO_MEMBERSHIP, formatDate } from '../../entities/membership';
+import { describeMembership, formatDate, useMembership } from '../../entities/membership';
 import { DEMO_PAYMENTS, PAYMENT_STATUS_TONE } from '../../entities/payment';
 import { ACCOUNT_SECTIONS, ROUTES, studentAccountPath, type AccountSection, type BackLinkState } from '../../shared/config/routes';
 import { cn } from '../../shared/lib/cn';
 import { Button } from '../../shared/ui/Button';
 import { Container } from '../../shared/ui/Container';
+import { FormAlert } from '../../shared/ui/FormAlert';
 import { Modal } from '../../shared/ui/Modal';
 import { PasswordField } from '../../shared/ui/PasswordField';
 import { TextField } from '../../shared/ui/TextField';
@@ -35,25 +36,41 @@ function Card({ title, action, children }: { title: string; action?: ReactNode; 
 
 // Los datos se leen primero; "Editar" abre el formulario. El correo no se edita aquí:
 // se cambia en la pestaña Seguridad, porque exige confirmarlo por correo.
-// Todavía no se guarda en Supabase: "Guardar cambios" solo actualiza la vista.
 function ProfileSection() {
-  const { user } = useAuth();
-  const [saved, setSaved] = useState<ProfileValues>(() => ({
+  const { user, updateProfile } = useAuth();
+  const saved: ProfileValues = {
     fullName: user?.fullName ?? '',
     taxId: user?.taxId ?? '',
     phone: user?.phone ?? '',
-  }));
+  };
   const [draft, setDraft] = useState<ProfileValues>(saved);
   const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [nameError, setNameError] = useState<string | undefined>();
+  const [saveError, setSaveError] = useState(false);
 
   function startEditing() {
     setDraft(saved);
+    setNameError(undefined);
+    setSaveError(false);
     setIsEditing(true);
   }
 
-  function save(event: FormEvent) {
+  async function save(event: FormEvent) {
     event.preventDefault();
-    setSaved({ fullName: draft.fullName.trim(), taxId: draft.taxId.trim(), phone: draft.phone.trim() });
+    const fullName = draft.fullName.trim();
+    if (fullName.length < 3) {
+      setNameError('Escribe tu nombre y apellido.');
+      return;
+    }
+    setIsSaving(true);
+    setSaveError(false);
+    const { error } = await updateProfile({ fullName, taxId: draft.taxId.trim(), phone: draft.phone.trim() });
+    setIsSaving(false);
+    if (error) {
+      setSaveError(true);
+      return;
+    }
     setIsEditing(false);
   }
 
@@ -70,13 +87,18 @@ function ProfileSection() {
       }
     >
       {isEditing ? (
-        <form onSubmit={save} noValidate className="flex flex-col gap-4">
+        <form onSubmit={(event) => void save(event)} noValidate className="flex flex-col gap-4">
+          {saveError && <FormAlert variant="error">No pudimos guardar tus datos. Intenta de nuevo en un momento.</FormAlert>}
           <TextField
             label="Nombre y apellido"
             autoComplete="name"
             placeholder="Ej. María Pérez"
             value={draft.fullName}
-            onChange={(e) => setDraft((prev) => ({ ...prev, fullName: e.target.value }))}
+            error={nameError}
+            onChange={(e) => {
+              setNameError(undefined);
+              setDraft((prev) => ({ ...prev, fullName: e.target.value }));
+            }}
           />
           <TextField
             label="Cédula o RIF"
@@ -108,8 +130,8 @@ function ProfileSection() {
             <Button type="button" size="sm" variant="ghost" onClick={() => setIsEditing(false)}>
               Cancelar
             </Button>
-            <Button type="submit" size="sm" variant="primary">
-              Guardar cambios
+            <Button type="submit" size="sm" variant="primary" disabled={isSaving}>
+              {isSaving ? 'Guardando…' : 'Guardar cambios'}
             </Button>
           </div>
         </form>
@@ -178,21 +200,33 @@ function ChevronIcon({ className }: { className?: string }) {
 function MembershipSection() {
   // El historial va escondido: se abre con un botón pequeño debajo de la membresía.
   const [showPayments, setShowPayments] = useState(false);
+  const { user } = useAuth();
+  const { membership, failed, isLoading } = useMembership(user?.id);
+  const isActive = membership?.status === 'active';
 
   return (
     <div className="flex flex-col gap-5">
       <Card title="Membresía">
-        <div className="flex flex-wrap items-end justify-between gap-5">
-          <div>
-            <p className="font-display font-bold text-[22px] text-ink">Plan {DEMO_MEMBERSHIP.planName}</p>
-            <p className="text-muted text-[13.5px] mt-1.5">
-              Vence el {formatDate(DEMO_MEMBERSHIP.expiresOn)} · <span className="text-accent font-semibold">Activa</span>
-            </p>
+        {isLoading ? (
+          <p className="text-muted text-[14px]">Cargando…</p>
+        ) : failed ? (
+          <p className="text-muted text-[14px]">No pudimos cargar tu membresía. Intenta de nuevo en un momento.</p>
+        ) : (
+          <div className="flex flex-wrap items-end justify-between gap-5">
+            <div>
+              <div className="flex flex-wrap items-center gap-3">
+                <p className="font-display font-bold text-[22px] text-ink">{membership ? membership.planName : 'Todavía no tienes un plan'}</p>
+                {membership && <StatusPill tone={isActive ? 'success' : 'warning'}>{isActive ? 'Activa' : 'Vencida'}</StatusPill>}
+              </div>
+              <p className="text-muted text-[13.5px] mt-1.5">
+                {membership ? describeMembership(membership) : 'Suscríbete para entrar a todos los cursos.'}
+              </p>
+            </div>
+            <Button to={ROUTES.checkoutPlan} variant={membership ? 'ghost' : 'primary'}>
+              {!membership ? 'Ver el plan' : isActive ? 'Renovar o adelantar meses' : 'Renovar membresía'}
+            </Button>
           </div>
-          <Button to={ROUTES.checkoutPlan} variant="ghost">
-            Cambiar de plan
-          </Button>
-        </div>
+        )}
       </Card>
 
       <button

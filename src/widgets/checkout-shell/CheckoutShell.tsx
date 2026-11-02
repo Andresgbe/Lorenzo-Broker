@@ -20,6 +20,15 @@ interface CheckoutShellProps {
   children: ReactNode;
 }
 
+/** Mientras se sabe si es primera compra o renovación: evita mostrar los textos equivocados. */
+export function CheckoutLoading({ step }: { step: CheckoutShellProps['step'] }) {
+  return (
+    <CheckoutShell step={step} title="Un momento…">
+      <span />
+    </CheckoutShell>
+  );
+}
+
 export function CheckoutShell({
   step,
   topBar,

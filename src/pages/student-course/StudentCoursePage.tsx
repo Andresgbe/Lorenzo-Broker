@@ -11,11 +11,11 @@ import {
   useLessonProgress,
 } from '../../entities/course';
 import { useAuth } from '../../entities/session';
+import { VideoPlayer } from '../../features/video-player';
 import { ROUTES, studentLessonPath } from '../../shared/config/routes';
 import { Button } from '../../shared/ui/Button';
 import { Container } from '../../shared/ui/Container';
 import { PageTopBar } from '../../shared/ui/PageTopBar';
-import { MediaPlaceholder } from '../../shared/ui/MediaPlaceholder';
 import { cn } from '../../shared/lib/cn';
 
 function ChevronIcon({ className }: { className?: string }) {
@@ -117,12 +117,11 @@ export function StudentCoursePage() {
           <h2 id="welcome-video" className="text-[10.5px] font-bold uppercase tracking-[2.6px] text-accent mb-4">
             Bienvenida al curso
           </h2>
-          {/* Igual que en la clase: el reproductor de Bunny espera la URL firmada del servidor
-              (Edge Function, pendiente). Hasta entonces se muestra el marcador. */}
-          <MediaPlaceholder
-            icon={<PlayIcon className="w-6 h-6 fill-ink-inverse translate-x-[1px]" />}
-            label="Video en preparación"
-            className="aspect-video w-full max-w-4xl rounded-[18px] border border-line"
+          {/* Igual que en la clase: embed público hasta tener la URL firmada del servidor. */}
+          <VideoPlayer
+            source={{ type: 'bunny', videoId: course.welcomeVideoId }}
+            title={`Bienvenida a ${course.title}`}
+            className="w-full max-w-4xl rounded-[18px] border border-line"
           />
         </section>
       )}

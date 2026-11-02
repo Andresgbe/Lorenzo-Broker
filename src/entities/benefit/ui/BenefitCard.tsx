@@ -129,10 +129,10 @@ export function BenefitCard({ benefit, index, className, editable, onChange, onB
           onChange={(e) => onChange?.({ description: e.target.value })}
           onBlur={onBlurSave}
           rows={3}
-          className="w-full bg-transparent outline-none resize-none text-muted text-[14.5px] border border-dashed border-line focus:border-accent rounded-lg p-2 -mx-2"
+          className="w-full bg-transparent outline-none resize-none text-muted text-[14.5px] text-justify hyphens-auto border border-dashed border-line focus:border-accent rounded-lg p-2 -mx-2"
         />
       ) : (
-        <p className="text-muted text-[14.5px]">{benefit.description}</p>
+        <p className="text-muted text-[14.5px] text-justify hyphens-auto">{benefit.description}</p>
       )}
     </div>
   );

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react
 import type { User } from '@supabase/supabase-js';
 import { supabase } from '../../../shared/lib/supabaseClient';
 import { ROUTES } from '../../../shared/config/routes';
-import { AuthContext, type AuthContextValue, type RegisterInput } from './auth-context';
+import { AuthContext, type AuthContextValue, type ProfileInput, type RegisterInput } from './auth-context';
 import type { SessionUser } from './types';
 
 export const NOT_CONFIGURED = 'Supabase no está configurado en este entorno.';
@@ -101,6 +101,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error: error ? error.message : null };
   }, []);
 
+  // Se guarda en los dos sitios: user_metadata es lo que lee la sesión (saludo, avatar) y
+  // profiles lo que leerá el panel de admin; el trigger de registro solo copia al crear la cuenta.
+  const updateProfile = useCallback(async ({ fullName, taxId, phone }: ProfileInput) => {
+    if (!supabase) return { error: NOT_CONFIGURED };
+    const fields = { full_name: fullName || null, tax_id: taxId || null, phone: phone || null };
+    const { data, error } = await supabase.auth.updateUser({ data: fields });
+    if (error) return { error: error.message };
+    setUser(toSessionUser(data.user));
+    const { error: profileError } = await supabase.from('profiles').update(fields).eq('id', data.user.id);
+    return { error: profileError ? profileError.message : null };
+  }, []);
+
   const logout = useCallback(async () => {
     setViewAsStudent(false);
     if (!supabase) return;
@@ -124,9 +136,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       register,
       requestPasswordReset,
       updatePassword,
+      updateProfile,
       logout,
     }),
-    [user, isLoading, isAdminAccount, viewAsStudent, setViewAsStudent, login, register, requestPasswordReset, updatePassword, logout]
+    [user, isLoading, isAdminAccount, viewAsStudent, setViewAsStudent, login, register, requestPasswordReset, updatePassword, updateProfile, logout]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

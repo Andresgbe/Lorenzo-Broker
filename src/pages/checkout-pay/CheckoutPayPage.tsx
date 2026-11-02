@@ -2,11 +2,12 @@ import { useState, type FormEvent } from 'react';
 import { Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import { formatBs } from '../../entities/payment';
 import { formatPrice, useSelectedPlan } from '../../entities/plan';
+import { monthsLabel, useCheckoutOrder } from '../../features/renew-membership';
 import { DEMO_EXCHANGE_RATE, findPaymentMethod } from '../../shared/config/payment-methods';
 import { ROUTES } from '../../shared/config/routes';
 import { Button } from '../../shared/ui/Button';
 import { TextField } from '../../shared/ui/TextField';
-import { CheckoutShell } from '../../widgets/checkout-shell';
+import { CheckoutLoading, CheckoutShell } from '../../widgets/checkout-shell';
 
 function CopyButton({ value, label }: { value: string; label: string }) {
   const [copied, setCopied] = useState(false);
@@ -57,13 +58,17 @@ export function CheckoutPayPage() {
   const navigate = useNavigate();
   const [reference, setReference] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const order = useCheckoutOrder(plan?.price ?? 0);
 
   if (!plan) return <Navigate to={ROUTES.checkoutPlan} replace />;
-  if (!method) return <Navigate to={`${ROUTES.checkoutSummary}?plan=${plan.id}`} replace />;
+  if (order.isLoading) return <CheckoutLoading step={2} />;
+  const { isRenewal, months, monthsQuery, total } = order;
+  const summaryPath = `${ROUTES.checkoutSummary}?plan=${plan.id}${monthsQuery}`;
+  if (!method) return <Navigate to={summaryPath} replace />;
 
-  const summaryPath = `${ROUTES.checkoutSummary}?plan=${plan.id}`;
+  const planPath = monthsQuery ? `${ROUTES.checkoutPlan}?${monthsQuery.slice(1)}` : ROUTES.checkoutPlan;
   const amount =
-    method.currency === 'VES' ? formatBs(Math.round(plan.price * 100 * DEMO_EXCHANGE_RATE)) : `${formatPrice(plan.price)} USD`;
+    method.currency === 'VES' ? formatBs(Math.round(total * 100 * DEMO_EXCHANGE_RATE)) : `${formatPrice(total)} USD`;
 
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
@@ -71,7 +76,7 @@ export function CheckoutPayPage() {
       setError('Escribe la referencia que te dio tu banco o app.');
       return;
     }
-    navigate(`${ROUTES.checkoutPending}?plan=${plan!.id}&metodo=${method!.id}`);
+    navigate(`${ROUTES.checkoutPending}?plan=${plan!.id}&metodo=${method!.id}${monthsQuery}`);
   }
 
   return (
@@ -81,7 +86,7 @@ export function CheckoutPayPage() {
         backTo: summaryPath,
         backLabel: 'Volver a elegir el método de pago',
         crumbs: [
-          { label: 'Plan', to: `${ROUTES.checkoutPlan}` },
+          { label: isRenewal ? 'Renovar' : 'Plan', to: planPath },
           { label: 'Pago', to: summaryPath },
           { label: method.label },
         ],
@@ -95,7 +100,7 @@ export function CheckoutPayPage() {
           <span className="font-display font-bold text-[34px] leading-none text-ink">{amount}</span>
           {method.currency === 'VES' && (
             <span className="text-[12.5px] text-muted">
-              {formatPrice(plan.price)} a la tasa de {DEMO_EXCHANGE_RATE.toLocaleString('es-VE')} Bs por dólar
+              {formatPrice(total)} a la tasa de {DEMO_EXCHANGE_RATE.toLocaleString('es-VE')} Bs por dólar
             </span>
           )}
         </div>
@@ -105,7 +110,7 @@ export function CheckoutPayPage() {
           {method.payTo.map((row) => (
             <Row key={row.label} label={row.label} value={row.value} copy />
           ))}
-          <Row label="Concepto" value={plan.name} />
+          <Row label="Concepto" value={isRenewal ? `Renovación · ${plan.name} · ${monthsLabel(months)}` : plan.name} />
         </div>
 
         <div className="bg-panel border border-line rounded-[18px] p-6">

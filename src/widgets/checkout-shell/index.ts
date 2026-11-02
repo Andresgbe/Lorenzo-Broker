@@ -1,1 +1,1 @@
-export { CheckoutShell } from './CheckoutShell';
+export { CheckoutLoading, CheckoutShell } from './CheckoutShell';

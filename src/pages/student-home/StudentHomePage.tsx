@@ -1,18 +1,20 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../entities/session';
 import { courseLessons, courseProgress, describeCourse, useCourseTree, useLessonProgress } from '../../entities/course';
-import { DEMO_MEMBERSHIP, daysUntil, formatDate } from '../../entities/membership';
+import { caracasDay, daysUntil, describeMembership, useMembership } from '../../entities/membership';
 import { ROUTES, studentCoursePath, studentLessonPath } from '../../shared/config/routes';
 import { Button } from '../../shared/ui/Button';
 import { Container } from '../../shared/ui/Container';
+import { cn } from '../../shared/lib/cn';
 
 export function StudentHomePage() {
   const { user, viewAsStudent } = useAuth();
   const { courses, isLoading } = useCourseTree({ publishedOnly: viewAsStudent });
   const { completed } = useLessonProgress();
   const firstName = user?.fullName?.split(' ')[0] ?? 'de nuevo';
-  // La membresía sigue siendo de ejemplo hasta conectar entitlements.
-  const remaining = daysUntil(DEMO_MEMBERSHIP.expiresOn);
+  const { membership, failed, isLoading: isMembershipLoading } = useMembership(user?.id);
+  const isActive = membership?.status === 'active';
+  const isExpiringSoon = isActive && daysUntil(caracasDay(membership.expiresAt)) <= 3;
 
   // La primera clase sin completar, recorriendo los cursos en orden.
   const nextLesson = courses.flatMap(courseLessons).find((lesson) => !completed.has(lesson.id));
@@ -24,14 +26,31 @@ export function StudentHomePage() {
 
       <div className="grid gap-5 lg:grid-cols-2 mt-9">
         <section className="bg-panel border border-accent/40 rounded-[18px] p-6 shadow-[0_0_50px_rgba(0,176,154,0.08)]">
-          <span className="text-[10.5px] font-bold uppercase tracking-[2.6px] text-accent">Membresía activa</span>
-          <p className="font-display font-bold text-[22px] text-ink mt-3">Plan {DEMO_MEMBERSHIP.planName}</p>
-          <p className="text-muted text-[13.5px] mt-1.5">
-            Vence el {formatDate(DEMO_MEMBERSHIP.expiresOn)} · {remaining} días restantes
-          </p>
-          <Link to={ROUTES.checkoutPlan} className="inline-block mt-5 text-[13px] text-accent hover:underline">
-            Renovar o cambiar de plan
-          </Link>
+          {isMembershipLoading ? (
+            <p className="text-muted text-[14px]">Cargando…</p>
+          ) : failed ? (
+            <p className="text-muted text-[14px]">No pudimos cargar tu membresía. Intenta de nuevo en un momento.</p>
+          ) : membership ? (
+            <>
+              <span className={cn('text-[10.5px] font-bold uppercase tracking-[2.6px]', isActive && !isExpiringSoon ? 'text-accent' : 'text-gold')}>
+                {isExpiringSoon ? 'Por vencer' : isActive ? 'Membresía activa' : 'Membresía vencida'}
+              </span>
+              <p className="font-display font-bold text-[22px] text-ink mt-3">{membership.planName}</p>
+              <p className="text-muted text-[13.5px] mt-1.5">{describeMembership(membership)}</p>
+              <Link to={ROUTES.checkoutPlan} className="inline-block mt-5 text-[13px] text-accent hover:underline">
+                {isActive ? 'Renovar o adelantar meses' : 'Renovar membresía'}
+              </Link>
+            </>
+          ) : (
+            <>
+              <span className="text-[10.5px] font-bold uppercase tracking-[2.6px] text-muted">Sin membresía</span>
+              <p className="font-display font-bold text-[22px] text-ink mt-3">Todavía no tienes un plan</p>
+              <p className="text-muted text-[13.5px] mt-1.5">Suscríbete para entrar a todos los cursos.</p>
+              <Link to={ROUTES.checkoutPlan} className="inline-block mt-5 text-[13px] text-accent hover:underline">
+                Ver el plan
+              </Link>
+            </>
+          )}
         </section>
 
         <section className="bg-panel border border-line rounded-[18px] p-6 flex flex-col items-start">

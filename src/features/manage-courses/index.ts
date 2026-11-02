@@ -1,3 +1,4 @@
 export { CloseButton, DeleteButton, EyeIcon, PencilIcon, CheckIcon } from './ui/controls';
 export { CourseFields, type CourseFieldValues } from './ui/CourseFields';
+export { LessonPublishSwitch } from './ui/LessonPublishSwitch';
 export { useAdminAction } from './model/useAdminAction';

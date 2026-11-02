@@ -13,10 +13,11 @@ import {
   updateLesson,
   uploadAttachment,
   useCourseTree,
+  type CourseModule,
   type Lesson,
   type LessonAttachment,
 } from '../../entities/course';
-import { CheckIcon, DeleteButton, EyeIcon, useAdminAction } from '../../features/manage-courses';
+import { CheckIcon, DeleteButton, EyeIcon, LessonPublishSwitch, useAdminAction } from '../../features/manage-courses';
 import { AdminTopBar } from '../../widgets/admin-shell';
 import { ROUTES, adminCoursePath, adminLessonPath, studentLessonPath } from '../../shared/config/routes';
 import { cn } from '../../shared/lib/cn';
@@ -24,7 +25,6 @@ import { Button } from '../../shared/ui/Button';
 import { ConfirmDialog } from '../../shared/ui/ConfirmDialog';
 import { FormAlert } from '../../shared/ui/FormAlert';
 import { MenuButton } from '../../shared/ui/MenuButton';
-import { Switch } from '../../shared/ui/Switch';
 import { TextField, inputClasses } from '../../shared/ui/TextField';
 
 const sectionLabel = 'text-[10.5px] font-bold uppercase tracking-[2.6px] text-accent';
@@ -34,10 +34,11 @@ const MAX_PDF_BYTES = 50 * 1024 * 1024;
 
 interface LessonFormProps {
   lesson: Lesson;
+  module: CourseModule;
   onSaved: () => Promise<void>;
 }
 
-function LessonForm({ lesson, onSaved }: LessonFormProps) {
+function LessonForm({ lesson, module, onSaved }: LessonFormProps) {
   const [title, setTitle] = useState(lesson.title);
   const [description, setDescription] = useState(lesson.description);
   const [videoId, setVideoId] = useState(lesson.bunnyVideoId ?? '');
@@ -79,13 +80,15 @@ function LessonForm({ lesson, onSaved }: LessonFormProps) {
     <section className="bg-panel border border-line rounded-[18px] p-6 sm:p-7">
       <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
         <h2 className={sectionLabel}>Datos de la clase</h2>
-        <Switch
+        <LessonPublishSwitch
           checked={isPublished}
           onChange={(checked) => {
             setIsPublished(checked);
             touch();
           }}
           label="Publicar esta clase"
+          moduleTitle={module.title}
+          isModulePublished={module.isPublished}
         />
       </div>
 
@@ -143,8 +146,10 @@ function LessonForm({ lesson, onSaved }: LessonFormProps) {
         </div>
 
         <p className="text-[12px] text-muted">
-          {isPublished
-            ? 'Publicada: los alumnos con acceso la ven si su módulo y su curso también están publicados.'
+          {!module.isPublished
+            ? 'Su módulo está en borrador: los alumnos no la ven hasta publicarlo.'
+            : isPublished
+            ? 'Publicada: los alumnos con acceso la ven si su curso también está publicado.'
             : 'Borrador: solo la ven los administradores.'}
         </p>
 
@@ -319,6 +324,7 @@ export function AdminLessonPage() {
         <LessonForm
           key={`${lesson.id}-${lesson.title}-${lesson.isPublished}-${lesson.bunnyVideoId}-${lesson.durationSeconds}`}
           lesson={lesson}
+          module={module}
           onSaved={reload}
         />
         <AttachmentsSection lesson={lesson} onChanged={reload} />

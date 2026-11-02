@@ -1,8 +1,9 @@
 import { Navigate } from 'react-router-dom';
 import { formatPrice, useSelectedPlan } from '../../entities/plan';
+import { useCheckoutOrder } from '../../features/renew-membership';
 import { ROUTES } from '../../shared/config/routes';
 import { Button } from '../../shared/ui/Button';
-import { CheckoutShell } from '../../widgets/checkout-shell';
+import { CheckoutLoading, CheckoutShell } from '../../widgets/checkout-shell';
 
 function CheckIcon({ className }: { className?: string }) {
   return (
@@ -23,16 +24,22 @@ function CheckIcon({ className }: { className?: string }) {
 
 export function CheckoutConfirmedPage() {
   const plan = useSelectedPlan();
+  const order = useCheckoutOrder(plan?.price ?? 0);
 
   if (!plan) {
     return <Navigate to={ROUTES.checkoutPlan} replace />;
   }
+  if (order.isLoading) return <CheckoutLoading step={3} />;
 
   return (
     <CheckoutShell
       step={3}
-      title="¡Pago confirmado!"
-      subtitle="Tu membresía ya está activa. Te llegará el comprobante por correo."
+      title={order.isRenewal ? '¡Renovación confirmada!' : '¡Pago confirmado!'}
+      subtitle={
+        order.isRenewal
+          ? 'Tu membresía quedó renovada. Te llegará el comprobante por correo.'
+          : 'Tu membresía ya está activa. Te llegará el comprobante por correo.'
+      }
     >
       <div className="flex flex-col items-center gap-7">
         <span className="flex items-center justify-center w-16 h-16 rounded-full bg-accent/10 border border-accent/40 shadow-[0_0_40px_rgba(0,176,154,0.2)]">
@@ -46,7 +53,7 @@ export function CheckoutConfirmedPage() {
           </div>
           <div className="flex items-baseline justify-between gap-4 text-[14px]">
             <span className="text-muted">Monto</span>
-            <span className="text-ink">{formatPrice(plan.price)}</span>
+            <span className="text-ink">{formatPrice(order.total)}</span>
           </div>
           <div className="flex items-baseline justify-between gap-4 text-[14px]">
             <span className="text-muted">Estado</span>
@@ -54,7 +61,7 @@ export function CheckoutConfirmedPage() {
           </div>
         </div>
 
-        <Button to={ROUTES.home} variant="primary" className="w-full">
+        <Button to={ROUTES.student} variant="primary" className="w-full">
           Entrar ahora
         </Button>
       </div>

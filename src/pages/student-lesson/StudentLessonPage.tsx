@@ -10,6 +10,7 @@ import {
   type LessonAttachment,
 } from '../../entities/course';
 import { useAuth } from '../../entities/session';
+import { VideoPlayer } from '../../features/video-player';
 import { ROUTES, studentCoursePath, studentLessonPath } from '../../shared/config/routes';
 import { Button } from '../../shared/ui/Button';
 import { Container } from '../../shared/ui/Container';
@@ -118,13 +119,22 @@ export function StudentLessonPage() {
 
       <div className="grid gap-8 lg:grid-cols-[1fr_320px] items-start">
         <div>
-          {/* El reproductor de Bunny necesita una URL firmada que emite el servidor tras validar
-              el acceso (Edge Function, pendiente). Hasta entonces se muestra el marcador. */}
-          <MediaPlaceholder
-            icon={<PlayIcon className="w-6 h-6 fill-ink-inverse translate-x-[1px]" />}
-            label={lesson.bunnyVideoId ? 'Video en preparación' : 'Esta clase no tiene video'}
-            className="aspect-video w-full rounded-[18px]"
-          />
+          {/* Embed público de Bunny por ahora. Con Token Authentication la URL firmada la
+              emitirá la Edge Function tras validar el acceso (pendiente, ver TODO.md). */}
+          {lesson.bunnyVideoId ? (
+            <VideoPlayer
+              key={lesson.id}
+              source={{ type: 'bunny', videoId: lesson.bunnyVideoId }}
+              title={lesson.title}
+              className="w-full rounded-[18px]"
+            />
+          ) : (
+            <MediaPlaceholder
+              icon={<PlayIcon className="w-6 h-6 fill-ink-inverse translate-x-[1px]" />}
+              label="Esta clase no tiene video"
+              className="aspect-video w-full rounded-[18px]"
+            />
+          )}
 
           <div className="flex flex-wrap items-start justify-between gap-4 mt-7">
             <h1 className="font-display font-bold text-[clamp(21px,2.8vw,27px)] text-ink text-balance">{lesson.title}</h1>

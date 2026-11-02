@@ -23,6 +23,7 @@ import {
   CloseButton,
   CourseFields,
   EyeIcon,
+  LessonPublishSwitch,
   PencilIcon,
   useAdminAction,
   type CourseFieldValues,
@@ -313,10 +314,12 @@ function ModuleCard({ course, module, index, isDragging, dragProps, onChanged }:
                   </span>
                 )}
               </span>
-              <Switch
+              <LessonPublishSwitch
                 checked={lesson.isPublished}
                 onChange={(checked) => void run(() => updateLesson(lesson.id, { isPublished: checked })).then((ok) => (ok ? onChanged() : undefined))}
                 label={`Publicar la clase ${lesson.title}`}
+                moduleTitle={module.title}
+                isModulePublished={module.isPublished}
                 disabled={isBusy}
               />
               <Link to={adminLessonPath(course.id, lesson.id)} className="text-[13px] font-semibold text-accent hover:underline">

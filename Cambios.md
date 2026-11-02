@@ -2,6 +2,65 @@
 
 Registro de los cambios pedidos sobre la plataforma, del más reciente al más antiguo.
 
+## 02/11/2026 — Panel: una clase no sale publicada si su módulo está en borrador
+
+- Con el **módulo en borrador**, el interruptor de sus clases se ve **apagado**, en la lista del curso y en la página de la clase.
+- Al tocarlo aparece un aviso: "Primero publica el módulo".
+- Al publicar el módulo, cada clase **vuelve a como estaba**: las publicadas se encienden solas y las que estaban en borrador siguen así.
+- Los alumnos no notan cambios: nunca han podido ver clases de un módulo en borrador.
+- Código: `features/manage-courses/ui/LessonPublishSwitch.tsx`.
+
+## 02/11/2026 — Panel: menú lateral
+
+- El menú hamburguesa del panel de administración se cambió por un **menú lateral siempre abierto** a la izquierda: Resumen, Alumnos, Pagos y Cursos con ícono; abajo, Ver el sitio, el correo y Cerrar sesión.
+- Una **flechita** lo minimiza a solo íconos y lo vuelve a abrir. El navegador recuerda cómo lo dejaste.
+- **En el teléfono** no cabe fijo: se abre con la hamburguesa, encima del contenido, y se cierra al elegir una sección, al tocar fuera o con Escape.
+- La flecha de volver del panel ahora va dentro de la columna, para no pisar el menú.
+- El menú de la web pública no cambia.
+- Código: `widgets/admin-shell/AdminShell.tsx` y `AdminTopBar.tsx`.
+
+## 02/11/2026 — Checkout: renovar o adelantar meses
+
+- El checkout ahora **comprueba la membresía real** del usuario. Quien ya tiene plan (activo o vencido) deja de ver los textos de primera compra.
+- **Con plan activo:** "Renueva o adelanta meses". Muestra la fecha de vencimiento, permite elegir **1, 2, 3, 6 o 12 meses** (sin descuento) y calcula la nueva fecha sumando a la actual.
+- **Con plan vencido:** "Renueva tu membresía". La nueva fecha se cuenta desde hoy.
+- **Sin plan o sin sesión:** todo sigue igual, como primera compra.
+- Resumen, Pagar, En verificación y Confirmado usan el total por los meses elegidos y hablan de renovación.
+- **Inicio y Mi cuenta** muestran la membresía real en lugar de la de ejemplo: activa, por vencer (3 días o menos), vencida o sin plan. "Cambiar de plan" pasa a ser "Renovar o adelantar meses".
+- **Pendiente:** el pago todavía no se guarda, así que la renovación aún no extiende el acceso (ver `TODO.md`).
+- Código: `features/renew-membership`, `entities/membership` y las páginas `checkout-*`.
+
+## 02/11/2026 — Mi cuenta: los datos personales ya se guardan
+
+- **Problema:** "Guardar cambios" solo actualizaba la pantalla, sin guardar nada, y al recargar los datos se perdían.
+- Ahora el nombre, la cédula/RIF y el teléfono se guardan en la cuenta y en la tabla `profiles`. El saludo de Inicio y el avatar se actualizan al momento.
+- El nombre es obligatorio (mínimo 3 letras). Si falla el guardado, el formulario sigue abierto con un aviso.
+- Cambiar correo y Cambiar contraseña (pestaña Seguridad) siguen sin guardar; están en `TODO.md`.
+- Código: `updateProfile` en `entities/session/model/AuthContext.tsx` y `pages/student-account/StudentAccountPage.tsx`.
+
+## 02/11/2026 — "Suscríbete ahora" lleva al checkout
+
+- Todos los botones **"Suscríbete ahora"** (barra superior, portada, precios y pie de página) abren ahora **Elegir plan** (`/suscripcion`) en la misma pestaña. Antes abrían una pestaña nueva con el enlace vacío `REPLACE_ME`.
+- Se eliminó el enlace antiguo a Whop, que ya no se usa.
+- Código: `features/subscribe-cta/ui/SubscribeButton.tsx`.
+
+## 27/10/2026 — Clase y curso: reproductor de Bunny Stream
+
+- La página de la **clase** y el **video de bienvenida** del curso ya muestran el reproductor real de Bunny Stream cuando tienen un ID de video; antes había un marcador "Video en preparación".
+- El ID del video se pega en Panel › Cursos, como siempre. La librería de Bunny (`792090`) está en `shared/config/bunny.ts`.
+- **Por ahora el video es público** (sin Token Authentication): cualquiera con el ID podría verlo. La protección con URL firmada llega con la Edge Function (ver `TODO.md`).
+
+## 27/10/2026 — Lista de pendientes
+
+- Nuevo archivo `TODO.md` en la raíz con todo lo que falta: videos (Bunny Stream), Supabase, pagos, área del alumno, panel, correos y el contenido que debe enviar Lorenzo.
+- Bunny queda a la espera del video de prueba.
+
+## 27/10/2026 — Inicio: textos de "¿Qué incluye?" justificados
+
+- La descripción de cada tarjeta de "¿Qué incluye?" (Educación continua, Ideas de inversión, Bonus: Copytrading…) ahora va **justificada**, con guiones automáticos en español para evitar espacios grandes entre palabras.
+- También se ve así mientras el admin la edita.
+- Código: `entities/benefit/ui/BenefitCard.tsx`.
+
 ## 22/10/2026 — Módulos y clases nuevos se crean publicados
 
 - Al crear un **módulo** o una **clase** en Panel › Cursos, ahora nace **publicado**: los alumnos lo ven en cuanto el curso está publicado.
