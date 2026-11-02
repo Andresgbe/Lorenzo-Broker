@@ -9,8 +9,7 @@ export interface PaymentMethod {
   payTo: { label: string; value: string }[];
 }
 
-// Los tiempos son estimaciones provisionales. Ajustar con lo que tarde Cobrix de verdad.
-// payTo son datos de ejemplo mientras no haya pasarela: reemplazar por las cuentas reales de Lorenzo.
+// payTo son datos de ejemplo: reemplazar por las cuentas reales de Lorenzo.
 export const PAYMENT_METHODS: PaymentMethod[] = [
   {
     id: 'pago-movil',

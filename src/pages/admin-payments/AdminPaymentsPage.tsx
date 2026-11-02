@@ -1,12 +1,11 @@
 import { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { DEMO_PAYMENTS, PAYMENT_STATUS_TONE, type Payment, type PaymentStatus } from '../../entities/payment';
-import { MAIN_PLAN, formatPrice } from '../../entities/plan';
+import { PAYMENT_STATUS_TONE, formatUsd, usePayments, type PaymentStatus } from '../../entities/payment';
 import { formatDate } from '../../entities/membership';
 import { adminPaymentPath } from '../../shared/config/routes';
 import { Button } from '../../shared/ui/Button';
-import { ConfirmDialog } from '../../shared/ui/ConfirmDialog';
-import { MenuButton, type MenuItem } from '../../shared/ui/MenuButton';
+import { FormAlert } from '../../shared/ui/FormAlert';
+import { MenuButton } from '../../shared/ui/MenuButton';
 import { StatusPill } from '../../shared/ui/StatusPill';
 import { AdminFilters, AdminPageHeading } from '../../widgets/admin-shell';
 
@@ -23,36 +22,32 @@ function DownloadIcon({ className }: { className?: string }) {
 const FILTERS = ['Todos', 'En verificación', 'Pagado', 'Rechazado'] as const;
 type Filter = (typeof FILTERS)[number];
 
+// Cada filtro agrupa estados parecidos, para no llenar la barra de botones.
+const FILTER_STATUSES: Record<Exclude<Filter, 'Todos'>, PaymentStatus[]> = {
+  'En verificación': ['En verificación', 'Monto por revisar'],
+  Pagado: ['Pagado'],
+  Rechazado: ['Rechazado', 'Expirado'],
+};
+
 const COLUMNS = ['Fecha', 'Alumno', 'Plan', 'Monto', 'Método', 'Estado'];
 
 export function AdminPaymentsPage() {
+  const { payments, isLoading, error } = usePayments();
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState<Filter>('Todos');
-  const [rejecting, setRejecting] = useState<Payment | null>(null);
   const navigate = useNavigate();
 
   const rows = useMemo(() => {
     const needle = query.trim().toLowerCase();
-    return DEMO_PAYMENTS.filter((payment) => {
-      const matchesFilter = filter === 'Todos' || payment.status === (filter as PaymentStatus);
+    return payments.filter((payment) => {
+      const matchesFilter = filter === 'Todos' || FILTER_STATUSES[filter].includes(payment.status);
       const matchesQuery =
         !needle ||
-        payment.studentName.toLowerCase().includes(needle) ||
-        payment.studentTaxId.toLowerCase().includes(needle);
+        payment.studentName?.toLowerCase().includes(needle) ||
+        payment.studentTaxId?.toLowerCase().includes(needle);
       return matchesFilter && matchesQuery;
     });
-  }, [query, filter]);
-
-  // Datos de ejemplo: confirmar y rechazar todavía no escriben nada.
-  function actionsFor(payment: Payment): MenuItem[] {
-    const detail: MenuItem = { label: 'Ver detalle', onSelect: () => navigate(adminPaymentPath(payment.id)) };
-    if (payment.status !== 'En verificación') return [detail];
-    return [
-      { label: 'Confirmar pago', onSelect: () => navigate(adminPaymentPath(payment.id)) },
-      detail,
-      { label: 'Rechazar pago', tone: 'danger', onSelect: () => setRejecting(payment) },
-    ];
-  }
+  }, [payments, query, filter]);
 
   return (
     <>
@@ -75,61 +70,70 @@ export function AdminPaymentsPage() {
         onActiveChange={setFilter}
       />
 
-      <div className="bg-panel border border-line rounded-[18px] overflow-x-auto">
-        <table className="w-full min-w-[820px] text-[13.5px]">
-          <thead>
-            <tr className="border-b border-line text-left">
-              {COLUMNS.map((column) => (
-                <th key={column} scope="col" className="px-5 py-3.5 text-[10.5px] font-bold uppercase tracking-[1.8px] text-muted">
-                  {column}
-                </th>
-              ))}
-              <th scope="col" className="px-5 py-3.5">
-                <span className="sr-only">Acciones</span>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((payment) => (
-              <tr key={payment.id} className="border-b border-line last:border-b-0 hover:bg-bg-2/40 transition-colors">
-                <td className="px-5 py-3 text-muted whitespace-nowrap">{formatDate(payment.date)}</td>
-                <td className="px-5 py-3">
-                  <Link to={adminPaymentPath(payment.id)} className="block text-ink hover:text-accent transition-colors">
-                    {payment.studentName}
-                  </Link>
-                  <span className="block text-[12px] text-muted">{payment.studentTaxId}</span>
-                </td>
-                <td className="px-5 py-3 text-muted">{payment.planName}</td>
-                <td className="px-5 py-3 text-ink whitespace-nowrap">{formatPrice(MAIN_PLAN.price)}</td>
-                <td className="px-5 py-3 text-muted whitespace-nowrap">{payment.method}</td>
-                <td className="px-5 py-3">
-                  <StatusPill tone={PAYMENT_STATUS_TONE[payment.status]}>{payment.status}</StatusPill>
-                </td>
-                <td className="px-5 py-3">
-                  <div className="flex justify-end">
-                    <MenuButton label={`Acciones del pago de ${payment.studentName}`} items={actionsFor(payment)} />
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      {error ? (
+        <FormAlert variant="error">{error}</FormAlert>
+      ) : isLoading ? (
+        <p className="text-muted text-[14px]">Cargando pagos…</p>
+      ) : (
+        <>
+          <div className="bg-panel border border-line rounded-[18px] overflow-x-auto">
+            <table className="w-full min-w-[820px] text-[13.5px]">
+              <thead>
+                <tr className="border-b border-line text-left">
+                  {COLUMNS.map((column) => (
+                    <th key={column} scope="col" className="px-5 py-3.5 text-[10.5px] font-bold uppercase tracking-[1.8px] text-muted">
+                      {column}
+                    </th>
+                  ))}
+                  <th scope="col" className="px-5 py-3.5">
+                    <span className="sr-only">Acciones</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((payment) => {
+                  const student = payment.studentName ?? 'Alumno sin datos';
+                  return (
+                    <tr key={payment.id} className="border-b border-line last:border-b-0 hover:bg-bg-2/40 transition-colors">
+                      <td className="px-5 py-3 text-muted whitespace-nowrap">{formatDate(payment.date)}</td>
+                      <td className="px-5 py-3">
+                        <Link to={adminPaymentPath(payment.id)} className="block text-ink hover:text-accent transition-colors">
+                          {student}
+                        </Link>
+                        <span className="block text-[12px] text-muted">{payment.studentTaxId ?? '—'}</span>
+                      </td>
+                      <td className="px-5 py-3 text-muted">{payment.planName}</td>
+                      <td className="px-5 py-3 text-ink whitespace-nowrap">{formatUsd(payment.amountUsdCents)}</td>
+                      <td className="px-5 py-3 text-muted whitespace-nowrap">{payment.method ?? '—'}</td>
+                      <td className="px-5 py-3">
+                        <StatusPill tone={PAYMENT_STATUS_TONE[payment.status]}>{payment.status}</StatusPill>
+                      </td>
+                      <td className="px-5 py-3">
+                        <div className="flex justify-end">
+                          <MenuButton
+                            label={`Acciones del pago de ${student}`}
+                            items={[{ label: 'Ver detalle', onSelect: () => navigate(adminPaymentPath(payment.id)) }]}
+                          />
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
 
-        {rows.length === 0 && <p className="px-5 py-8 text-[13.5px] text-muted text-center">Ningún pago coincide con la búsqueda.</p>}
-      </div>
+            {rows.length === 0 && (
+              <p className="px-5 py-8 text-[13.5px] text-muted text-center">
+                {payments.length === 0 ? 'Todavía no hay pagos registrados.' : 'Ningún pago coincide con la búsqueda.'}
+              </p>
+            )}
+          </div>
 
-      <p className="text-[12.5px] text-muted mt-4">
-        {rows.length} de {DEMO_PAYMENTS.length} pagos
-      </p>
-
-      <ConfirmDialog
-        open={rejecting !== null}
-        title={`¿Rechazar el pago de ${rejecting?.studentName ?? ''}?`}
-        description="El alumno no recibe acceso por este pago y se le avisa para que lo reintente. Solo rechaza si verificaste que el dinero no llegó."
-        confirmLabel="Rechazar pago"
-        onConfirm={() => setRejecting(null)}
-        onCancel={() => setRejecting(null)}
-      />
+          <p className="text-[12.5px] text-muted mt-4">
+            {rows.length} de {payments.length} pagos
+          </p>
+        </>
+      )}
     </>
   );
 }

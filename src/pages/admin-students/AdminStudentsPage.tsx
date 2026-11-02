@@ -1,9 +1,8 @@
 import { useMemo, useState } from 'react';
-import { DEMO_STUDENTS, STUDENT_STATUS_TONE, type Student, type StudentStatus } from '../../entities/student';
+import { STUDENT_STATUS_TONE, useStudents, type StudentStatus } from '../../entities/student';
 import { formatDate } from '../../entities/membership';
 import { Button } from '../../shared/ui/Button';
-import { ConfirmDialog } from '../../shared/ui/ConfirmDialog';
-import { MenuButton } from '../../shared/ui/MenuButton';
+import { FormAlert } from '../../shared/ui/FormAlert';
 import { StatusPill } from '../../shared/ui/StatusPill';
 import { AdminFilters, AdminPageHeading } from '../../widgets/admin-shell';
 
@@ -17,28 +16,36 @@ function DownloadIcon({ className }: { className?: string }) {
   );
 }
 
-const FILTERS = ['Todos', 'Activa', 'Por vencer', 'Vencida'] as const;
+const FILTERS = ['Todos', 'Activa', 'Por vencer', 'Vencida', 'Sin plan'] as const;
 type Filter = (typeof FILTERS)[number];
+
+// Cada filtro agrupa estados parecidos, para no llenar la barra de botones.
+const FILTER_STATUSES: Record<Exclude<Filter, 'Todos'>, StudentStatus[]> = {
+  Activa: ['Activa'],
+  'Por vencer': ['Por vencer'],
+  Vencida: ['En gracia', 'Vencida'],
+  'Sin plan': ['Sin plan', 'Acceso quitado'],
+};
 
 const COLUMNS = ['Alumno', 'Cédula', 'Plan', 'Vence', 'Estado'];
 
 export function AdminStudentsPage() {
+  const { students, isLoading, error } = useStudents();
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState<Filter>('Todos');
-  const [revoking, setRevoking] = useState<Student | null>(null);
 
   const rows = useMemo(() => {
     const needle = query.trim().toLowerCase();
-    return DEMO_STUDENTS.filter((student) => {
-      const matchesFilter = filter === 'Todos' || student.status === (filter as StudentStatus);
+    return students.filter((student) => {
+      const matchesFilter = filter === 'Todos' || FILTER_STATUSES[filter].includes(student.status);
       const matchesQuery =
         !needle ||
-        student.name.toLowerCase().includes(needle) ||
+        student.name?.toLowerCase().includes(needle) ||
         student.email.toLowerCase().includes(needle) ||
-        student.taxId.toLowerCase().includes(needle);
+        student.taxId?.toLowerCase().includes(needle);
       return matchesFilter && matchesQuery;
     });
-  }, [query, filter]);
+  }, [students, query, filter]);
 
   return (
     <>
@@ -61,66 +68,53 @@ export function AdminStudentsPage() {
         onActiveChange={setFilter}
       />
 
-      <div className="bg-panel border border-line rounded-[18px] overflow-x-auto">
-        <table className="w-full min-w-[720px] text-[13.5px]">
-          <thead>
-            <tr className="border-b border-line text-left">
-              {COLUMNS.map((column) => (
-                <th key={column} scope="col" className="px-5 py-3.5 text-[10.5px] font-bold uppercase tracking-[1.8px] text-muted">
-                  {column}
-                </th>
-              ))}
-              <th scope="col" className="px-5 py-3.5">
-                <span className="sr-only">Acciones</span>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((student) => (
-              <tr key={student.id} className="border-b border-line last:border-b-0 hover:bg-bg-2/40 transition-colors">
-                <td className="px-5 py-3">
-                  <span className="block text-ink">{student.name}</span>
-                  <span className="block text-[12px] text-muted">{student.email}</span>
-                </td>
-                <td className="px-5 py-3 text-muted whitespace-nowrap">{student.taxId}</td>
-                <td className="px-5 py-3 text-muted">{student.planName}</td>
-                <td className="px-5 py-3 text-muted whitespace-nowrap">{formatDate(student.expiresOn)}</td>
-                <td className="px-5 py-3">
-                  <StatusPill tone={STUDENT_STATUS_TONE[student.status]}>{student.status}</StatusPill>
-                </td>
-                <td className="px-5 py-3">
-                  <div className="flex justify-end">
-                    {/* Datos de ejemplo: las acciones todavía no escriben nada. */}
-                    <MenuButton
-                      label={`Acciones de ${student.name}`}
-                      items={[
-                        { label: 'Ver detalle', onSelect: () => {} },
-                        { label: 'Extender vencimiento', onSelect: () => {} },
-                        { label: 'Quitar acceso', tone: 'danger', onSelect: () => setRevoking(student) },
-                      ]}
-                    />
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      {error ? (
+        <FormAlert variant="error">{error}</FormAlert>
+      ) : isLoading ? (
+        <p className="text-muted text-[14px]">Cargando alumnos…</p>
+      ) : (
+        <>
+          <div className="bg-panel border border-line rounded-[18px] overflow-x-auto">
+            <table className="w-full min-w-[720px] text-[13.5px]">
+              <thead>
+                <tr className="border-b border-line text-left">
+                  {COLUMNS.map((column) => (
+                    <th key={column} scope="col" className="px-5 py-3.5 text-[10.5px] font-bold uppercase tracking-[1.8px] text-muted">
+                      {column}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((student) => (
+                  <tr key={student.id} className="border-b border-line last:border-b-0 hover:bg-bg-2/40 transition-colors">
+                    <td className="px-5 py-3">
+                      <span className={student.name ? 'block text-ink' : 'block text-muted italic'}>{student.name ?? 'Sin nombre'}</span>
+                      <span className="block text-[12px] text-muted">{student.email}</span>
+                    </td>
+                    <td className="px-5 py-3 text-muted whitespace-nowrap">{student.taxId ?? '—'}</td>
+                    <td className="px-5 py-3 text-muted">{student.planName ?? '—'}</td>
+                    <td className="px-5 py-3 text-muted whitespace-nowrap">{student.expiresOn ? formatDate(student.expiresOn) : '—'}</td>
+                    <td className="px-5 py-3">
+                      <StatusPill tone={STUDENT_STATUS_TONE[student.status]}>{student.status}</StatusPill>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
 
-        {rows.length === 0 && <p className="px-5 py-8 text-[13.5px] text-muted text-center">Ningún alumno coincide con la búsqueda.</p>}
-      </div>
+            {rows.length === 0 && (
+              <p className="px-5 py-8 text-[13.5px] text-muted text-center">
+                {students.length === 0 ? 'Todavía no hay cuentas registradas.' : 'Ningún alumno coincide con la búsqueda.'}
+              </p>
+            )}
+          </div>
 
-      <p className="text-[12.5px] text-muted mt-4">
-        {rows.length} de {DEMO_STUDENTS.length} alumnos
-      </p>
-
-      <ConfirmDialog
-        open={revoking !== null}
-        title={`¿Quitar el acceso a ${revoking?.name ?? ''}?`}
-        description="Deja de ver los cursos de inmediato, aunque su membresía no haya vencido. Su cuenta y su historial de pagos se mantienen."
-        confirmLabel="Quitar acceso"
-        onConfirm={() => setRevoking(null)}
-        onCancel={() => setRevoking(null)}
-      />
+          <p className="text-[12.5px] text-muted mt-4">
+            {rows.length} de {students.length} alumnos
+          </p>
+        </>
+      )}
     </>
   );
 }

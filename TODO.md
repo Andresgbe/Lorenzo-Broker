@@ -25,7 +25,7 @@ Lo que falta por hacer en la plataforma. Al terminar algo, se marca `[x]` (o se 
 ## Pagos
 
 - [ ] Cobrix (puesto en pausa el 22/10/2026): checkout, webhook verificado, idempotencia y conciliación cada 15 min.
-- [ ] Guardar los pagos y el flujo "Reporté mi pago" (comprobante ≤ 5 MB).
+- [ ] **Guardar los pagos**: hoy "Ya pagué" no escribe nada, así que Panel › Pagos sale vacío. Falta crear el pago (Edge Function, porque el navegador no puede escribir en `payments`) y el flujo "Reporté mi pago" (comprobante ≤ 5 MB).
 - [ ] Renovación y adelanto de meses: hoy solo cambian las pantallas. Falta guardar los meses en `payments` y que `apply_paid_payment` y `admin_review_payment_report` extiendan N meses (hoy extienden uno solo).
 - [ ] Datos reales de cobro (`payTo`) y tasa de cambio en `shared/config/payment-methods.ts` (hoy son demo).
 
@@ -40,7 +40,11 @@ Lo que falta por hacer en la plataforma. Al terminar algo, se marca `[x]` (o se 
 
 ## Panel de administración
 
-- [ ] Resumen, Alumnos y Pagos con datos reales (hoy son arrays demo).
+- [x] Lista de Alumnos con datos reales (02/11/2026, `useStudents`).
+- [ ] Alumnos: volver a poner el menú "⋯" con Ver detalle, Extender vencimiento y Quitar acceso, con motivo (RPC `admin_grant_access` y `admin_revoke_access`). Exportar CSV.
+- [x] Lista y detalle de Pagos con datos reales (02/11/2026, `usePayments`). Quedan vacíos hasta que se guarden pagos.
+- [ ] Pagos: confirmar y rechazar a mano, con motivo registrado. Falta una función en la BD para pagos sin reporte (`admin_review_payment_report` solo sirve para reportes). Exportar CSV.
+- [x] Resumen con datos reales (02/11/2026).
 - [ ] Acciones manuales con motivo registradas en `admin_actions` (dar/quitar acceso, extender días, confirmar/rechazar pagos).
 - [ ] Bandeja de mensajes de Contacto (`contact_messages`).
 

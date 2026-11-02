@@ -2,6 +2,36 @@
 
 Registro de los cambios pedidos sobre la plataforma, del más reciente al más antiguo.
 
+## 02/11/2026 — Panel: Resumen con datos reales y sin Cobrix
+
+- **Resumen** calcula ahora sus cifras con los alumnos y pagos reales, en lugar de los datos de ejemplo:
+  - **Alumnos activos:** todos los que tienen acceso (activos, por vencer y en gracia).
+  - **Cobrado este mes:** suma de los pagos confirmados este mes, en hora de Caracas.
+  - **Vencen pronto:** 3 días o menos.
+  - **Pagos en verificación:** incluye los de monto por revisar.
+- Por ahora Cobrado, Pagos en verificación y Últimos pagos salen en cero o vacíos, porque todavía no se guardan pagos.
+- **Se quitó Cobrix de las pantallas:** el detalle de un pago ya no muestra "Origen" ni menciona Cobrix.
+- Siguen en el proyecto, por si vuelve: `scripts/cobrix/` y la columna `cobrix_id` de la base de datos.
+- Código: `pages/admin-overview/AdminOverviewPage.tsx` y `entities/payment`.
+
+## 02/11/2026 — Panel: Pagos con datos reales
+
+- La lista de **Pagos** y su página de detalle leen ahora la tabla `payments` de Supabase, en lugar de los datos de ejemplo.
+- **La lista sale vacía por ahora:** el checkout todavía no guarda pagos, así que "Ya pagué" no crea ninguna fila.
+- Nuevos estados: **Monto por revisar** (el monto no coincide) y **Expirado**. El filtro En verificación incluye el primero y Rechazado, el segundo.
+- **Se quitaron Confirmar pago y Rechazar pago:** solo cambiaban la pantalla y no guardaban nada. Volverán cuando funcionen de verdad, con motivo registrado.
+- **Resumen** y el historial de Mi cuenta siguen con datos de ejemplo.
+- Código: `entities/payment`, `pages/admin-payments` y `pages/admin-payment`.
+
+## 02/11/2026 — Panel: Alumnos con datos reales
+
+- La lista de **Alumnos** muestra ahora todas las cuentas registradas en Supabase, las más recientes primero, en lugar de los datos de ejemplo. Incluye también las cuentas de admin.
+- Nuevos estados: **Sin plan** (se registró pero no tiene membresía), **En gracia** (venció, pero aún tiene acceso) y **Acceso quitado**. "Por vencer" significa 3 días o menos.
+- Se añadió el filtro **Sin plan**. El filtro Vencida incluye también a los que están en gracia.
+- **Se quitó el menú "⋯" de cada fila** (Ver detalle, Extender vencimiento, Quitar acceso): eran botones de demostración que no hacían nada. Volverán cuando funcionen de verdad, con motivo registrado.
+- **Resumen** sigue con datos de ejemplo.
+- Código: `entities/student` y `pages/admin-students/AdminStudentsPage.tsx`.
+
 ## 02/11/2026 — Panel: una clase no sale publicada si su módulo está en borrador
 
 - Con el **módulo en borrador**, el interruptor de sus clases se ve **apagado**, en la lista del curso y en la página de la clase.

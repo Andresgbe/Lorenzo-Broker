@@ -1,24 +1,14 @@
-import { DEMO_STUDENTS } from '../../entities/student';
-import { DEMO_PAYMENTS, PAYMENT_STATUS_TONE } from '../../entities/payment';
-import { MAIN_PLAN, formatPrice } from '../../entities/plan';
-import { formatDate } from '../../entities/membership';
+import type { ReactNode } from 'react';
+import { useStudents } from '../../entities/student';
+import { PAYMENT_STATUS_TONE, formatUsd, usePayments } from '../../entities/payment';
+import { caracasDay, formatDate } from '../../entities/membership';
 import { ROUTES } from '../../shared/config/routes';
 import { Button } from '../../shared/ui/Button';
+import { FormAlert } from '../../shared/ui/FormAlert';
 import { StatusPill } from '../../shared/ui/StatusPill';
 import { AdminPageHeading } from '../../widgets/admin-shell';
 
-const expiringSoon = DEMO_STUDENTS.filter((student) => student.status === 'Por vencer');
-const pendingPayments = DEMO_PAYMENTS.filter((payment) => payment.status === 'En verificación');
-const collected = DEMO_PAYMENTS.filter((payment) => payment.status === 'Pagado').length * MAIN_PLAN.price;
-
-const TILES = [
-  { label: 'Alumnos activos', value: String(DEMO_STUDENTS.filter((s) => s.status === 'Activa').length) },
-  { label: 'Cobrado este mes', value: formatPrice(collected) },
-  { label: 'Vencen pronto', value: String(expiringSoon.length) },
-  { label: 'Pagos en verificación', value: String(pendingPayments.length) },
-];
-
-function Panel({ title, action, children }: { title: string; action?: React.ReactNode; children: React.ReactNode }) {
+function Panel({ title, action, children }: { title: string; action?: ReactNode; children: ReactNode }) {
   return (
     <section className="bg-panel border border-line rounded-[18px] overflow-hidden">
       <div className="flex items-center justify-between gap-4 px-5 py-4 border-b border-line">
@@ -31,12 +21,49 @@ function Panel({ title, action, children }: { title: string; action?: React.Reac
 }
 
 export function AdminOverviewPage() {
+  const { students, isLoading: isLoadingStudents, error: studentsError } = useStudents();
+  const { payments, isLoading: isLoadingPayments, error: paymentsError } = usePayments();
+  const error = studentsError ?? paymentsError;
+
+  if (error) {
+    return (
+      <>
+        <AdminPageHeading title="Resumen" />
+        <FormAlert variant="error">No pudimos cargar el resumen. Intenta de nuevo en un momento.</FormAlert>
+      </>
+    );
+  }
+  if (isLoadingStudents || isLoadingPayments) {
+    return (
+      <>
+        <AdminPageHeading title="Resumen" />
+        <p className="text-muted text-[14px]">Cargando resumen…</p>
+      </>
+    );
+  }
+
+  const withAccess = students.filter((student) => ['Activa', 'Por vencer', 'En gracia'].includes(student.status));
+  const expiringSoon = students.filter((student) => student.status === 'Por vencer');
+  const pendingPayments = payments.filter((payment) => payment.status === 'En verificación' || payment.status === 'Monto por revisar');
+  // El mes se compara en hora de Caracas: YYYY-MM.
+  const thisMonth = caracasDay(new Date()).slice(0, 7);
+  const collectedCents = payments
+    .filter((payment) => payment.status === 'Pagado' && payment.paidAt && caracasDay(payment.paidAt).startsWith(thisMonth))
+    .reduce((total, payment) => total + payment.amountUsdCents, 0);
+
+  const tiles = [
+    { label: 'Alumnos activos', value: String(withAccess.length) },
+    { label: 'Cobrado este mes', value: formatUsd(collectedCents) },
+    { label: 'Vencen pronto', value: String(expiringSoon.length) },
+    { label: 'Pagos en verificación', value: String(pendingPayments.length) },
+  ];
+
   return (
     <>
       <AdminPageHeading title="Resumen" />
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4 mb-8">
-        {TILES.map((tile) => (
+        {tiles.map((tile) => (
           <div key={tile.label} className="bg-panel border border-line rounded-[18px] p-5">
             <p className="text-[11.5px] uppercase tracking-[1.6px] text-muted">{tile.label}</p>
             <p className="font-display font-bold text-[30px] text-ink mt-2 leading-none">{tile.value}</p>
@@ -53,22 +80,26 @@ export function AdminOverviewPage() {
             </Button>
           }
         >
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[420px] text-[13.5px]">
-              <tbody>
-                {DEMO_PAYMENTS.slice(0, 5).map((payment) => (
-                  <tr key={payment.id} className="border-b border-line last:border-b-0">
-                    <td className="px-5 py-3 text-ink">{payment.studentName}</td>
-                    <td className="px-5 py-3 text-muted whitespace-nowrap">{formatPrice(MAIN_PLAN.price)}</td>
-                    <td className="px-5 py-3 text-muted whitespace-nowrap">{formatDate(payment.date)}</td>
-                    <td className="px-5 py-3 text-right">
-                      <StatusPill tone={PAYMENT_STATUS_TONE[payment.status]}>{payment.status}</StatusPill>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          {payments.length === 0 ? (
+            <p className="px-5 py-6 text-[13.5px] text-muted">Todavía no hay pagos registrados.</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[420px] text-[13.5px]">
+                <tbody>
+                  {payments.slice(0, 5).map((payment) => (
+                    <tr key={payment.id} className="border-b border-line last:border-b-0">
+                      <td className="px-5 py-3 text-ink">{payment.studentName ?? 'Alumno sin datos'}</td>
+                      <td className="px-5 py-3 text-muted whitespace-nowrap">{formatUsd(payment.amountUsdCents)}</td>
+                      <td className="px-5 py-3 text-muted whitespace-nowrap">{formatDate(payment.date)}</td>
+                      <td className="px-5 py-3 text-right">
+                        <StatusPill tone={PAYMENT_STATUS_TONE[payment.status]}>{payment.status}</StatusPill>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </Panel>
 
         <Panel
@@ -87,10 +118,10 @@ export function AdminOverviewPage() {
                 <tbody>
                   {expiringSoon.map((student) => (
                     <tr key={student.id} className="border-b border-line last:border-b-0">
-                      <td className="px-5 py-3 text-ink">{student.name}</td>
+                      <td className="px-5 py-3 text-ink">{student.name ?? student.email}</td>
                       <td className="px-5 py-3 text-muted truncate max-w-[180px]">{student.email}</td>
                       <td className="px-5 py-3 text-gold whitespace-nowrap text-right">
-                        {formatDate(student.expiresOn)}
+                        {student.expiresOn && formatDate(student.expiresOn)}
                       </td>
                     </tr>
                   ))}
