@@ -15,6 +15,7 @@ interface EntitlementRow {
 
 function statusOf(entitlement: EntitlementRow): StudentStatus {
   if (entitlement.status === 'revoked') return 'Acceso quitado';
+  if (entitlement.status === 'ended') return 'Expirada';
   const expiry = new Date(entitlement.expires_at).getTime();
   const now = Date.now();
   if (now < expiry) return daysUntil(caracasDay(entitlement.expires_at)) <= EXPIRING_SOON_DAYS ? 'Por vencer' : 'Activa';
@@ -106,7 +107,7 @@ async function callRpc(name: string, args: Record<string, unknown>) {
   if (!supabase) throw new Error('Supabase no está configurado.');
   const { error } = await supabase.rpc(name, args);
   if (!error) return;
-  if (error.code === 'PGRST202') throw new Error('Falta aplicar la migración 0007 en Supabase.');
+  if (error.code === 'PGRST202') throw new Error('Falta aplicar una migración en Supabase (0007 o 0013).');
   if (error.code === 'P0001' || error.code === '42501') throw new Error(error.message);
   throw new Error('No se pudo guardar. Intenta de nuevo en un momento.');
 }
@@ -116,6 +117,9 @@ export const grantAccess = (userId: string, planId: string, days: number, reason
 
 export const revokeAccess = (userId: string, planId: string, reason: string) =>
   callRpc('admin_revoke_access', { p_user_id: userId, p_plan_id: planId, p_reason: reason });
+
+export const expireAccess = (userId: string, reason: string) =>
+  callRpc('admin_expire_access', { p_user_id: userId, p_reason: reason });
 
 export interface StudentDataInput {
   fullName: string;

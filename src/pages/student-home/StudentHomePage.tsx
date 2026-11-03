@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../entities/session';
-import { courseLessons, courseProgress, describeCourse, useCourseTree, useLessonProgress } from '../../entities/course';
+import { courseLessons, courseProgress, describeCourse, groupCoursesByLevel, useCourseLevels, useCourseTree, useLessonProgress } from '../../entities/course';
 import { caracasDay, daysUntil, describeMembership, useMembership } from '../../entities/membership';
 import { ROUTES, studentCoursePath, studentLessonPath } from '../../shared/config/routes';
 import { Button } from '../../shared/ui/Button';
@@ -10,6 +10,7 @@ import { cn } from '../../shared/lib/cn';
 export function StudentHomePage() {
   const { user, viewAsStudent } = useAuth();
   const { courses, isLoading } = useCourseTree({ publishedOnly: viewAsStudent });
+  const { levels } = useCourseLevels();
   const { completed } = useLessonProgress();
   const firstName = user?.fullName?.split(' ')[0] ?? 'de nuevo';
   const { membership, failed, isLoading: isMembershipLoading } = useMembership(user?.id);
@@ -77,8 +78,13 @@ export function StudentHomePage() {
       ) : courses.length === 0 ? (
         <p className="text-muted text-[14px]">Todavía no tienes cursos activos.</p>
       ) : (
+        groupCoursesByLevel(courses, levels).map((group) => (
+          <section key={group.level?.id ?? 'sin-nivel'} className="mb-8 last:mb-0">
+            {levels.length > 0 && (
+              <h3 className="text-[10.5px] font-bold uppercase tracking-[2.6px] text-accent mb-3">{group.level?.title ?? 'Otros cursos'}</h3>
+            )}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {courses.map((course) => {
+          {group.courses.map((course) => {
             const progress = courseProgress(course, completed);
             return (
               <Link
@@ -97,6 +103,8 @@ export function StudentHomePage() {
             );
           })}
         </div>
+          </section>
+        ))
       )}
     </Container>
   );

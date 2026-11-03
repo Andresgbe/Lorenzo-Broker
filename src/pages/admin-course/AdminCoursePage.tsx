@@ -13,8 +13,10 @@ import {
   updateCourse,
   updateLesson,
   updateModule,
+  useCourseLevels,
   useCourseTree,
   type Course,
+  type CourseLevel,
   type CourseModule,
 } from '../../entities/course';
 import { usePlanOptions, type PlanOption } from '../../entities/plan';
@@ -64,18 +66,20 @@ const sectionLabel = 'text-[10.5px] font-bold uppercase tracking-[2.6px] text-ac
 interface CourseDetailsProps {
   course: Course;
   plans: PlanOption[];
+  levels: CourseLevel[];
   isEditing: boolean;
   onEditingChange: (editing: boolean) => void;
   onChanged: () => Promise<void>;
 }
 
 /** Resumen del curso; con "Editar" de la barra se convierte en formulario en el mismo lugar. */
-function CourseDetails({ course, plans, isEditing, onEditingChange, onChanged }: CourseDetailsProps) {
+function CourseDetails({ course, plans, levels, isEditing, onEditingChange, onChanged }: CourseDetailsProps) {
   const [values, setValues] = useState<CourseFieldValues>({
     title: course.title,
     description: course.description,
     welcomeVideoId: course.welcomeVideoId ?? '',
     bunnyLibraryId: course.bunnyLibraryId ?? '',
+    levelId: course.levelId ?? '',
     planIds: course.planIds,
   });
   const [titleError, setTitleError] = useState<string>();
@@ -99,6 +103,7 @@ function CourseDetails({ course, plans, isEditing, onEditingChange, onChanged }:
         description: values.description.trim(),
         welcomeVideoId: values.welcomeVideoId.trim() || null,
         bunnyLibraryId: values.bunnyLibraryId.trim() || null,
+        levelId: values.levelId || null,
       });
       await setCoursePlans(course.id, values.planIds);
     });
@@ -122,6 +127,7 @@ function CourseDetails({ course, plans, isEditing, onEditingChange, onChanged }:
           autoFocus
           values={values}
           plans={plans}
+          levels={levels}
           titleError={titleError}
           libraryError={libraryError}
           onChange={(patch) => {
@@ -166,6 +172,9 @@ function CourseDetails({ course, plans, isEditing, onEditingChange, onChanged }:
         ) : (
           <span>sin video. Agrégalo con “Editar”.</span>
         )}
+      </p>
+      <p className="mt-4 text-[12.5px] text-muted">
+        Nivel: <span className="text-ink">{levels.find((level) => level.id === course.levelId)?.title ?? 'Sin nivel'}</span>
       </p>
       <p className="mt-2 text-[12.5px] text-muted">
         Librería de Bunny:{' '}
@@ -380,6 +389,7 @@ export function AdminCoursePage() {
   const navigate = useNavigate();
   const { courses, isLoading, error, reload } = useCourseTree();
   const plans = usePlanOptions();
+  const { levels } = useCourseLevels();
   const { run, isBusy, error: actionError } = useAdminAction();
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -458,9 +468,10 @@ export function AdminCoursePage() {
       )}
 
       <CourseDetails
-        key={`${course.id}-${course.title}-${course.description}-${course.planIds.join()}`}
+        key={`${course.id}-${course.title}-${course.description}-${course.levelId}-${course.planIds.join()}`}
         course={course}
         plans={plans}
+        levels={levels}
         isEditing={isEditing}
         onEditingChange={setIsEditing}
         onChanged={reload}

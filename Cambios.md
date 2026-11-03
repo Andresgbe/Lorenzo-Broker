@@ -2,6 +2,40 @@
 
 Registro de los cambios pedidos sobre la plataforma, del más reciente al más antiguo.
 
+## 02/11/2026 — Alumnos: modal "Administrar acceso"
+
+- **Dar o extender acceso**, **Expirar** y **Quitar** se reúnen en una sola opción, **Administrar acceso**, en el menú "⋯" y en el detalle del alumno.
+- El modal muestra el estado, el plan y el vencimiento actuales, y solo ofrece lo que se puede hacer: **Activar** (sin acceso) o **Extender** (con acceso), **Expirar** y **Quitar**.
+- Cada acción sigue pidiendo su motivo. **Registrar pago** y **Editar datos** siguen aparte.
+- Código: `features/manage-student/ui/StudentActionModal.tsx`.
+
+## 02/11/2026 — Alumnos: Expirar acceso en gris
+
+- En el menú "⋯" de Alumnos y en el detalle del alumno, **Expirar acceso** aparece en gris, como las demás opciones. Solo **Quitar acceso** sigue en rojo.
+
+## 02/11/2026 — Alumnos: elegir membresía y expirar acceso
+
+- **Dar o extender acceso** ahora pide el **tipo de membresía**, mensual o anual. Los días se rellenan solos (30 o 365) y se pueden cambiar.
+- Nueva acción **Expirar acceso**, con motivo obligatorio: la membresía termina en ese momento, sin días de gracia.
+- Nuevo estado **Expirada**, distinto de Vencida (se acabó por fecha), Acceso quitado y Sin plan. Aparece en el filtro Vencida.
+- El alumno expirado no ve los cursos y puede renovar. Al pagar o recibir acceso, cuenta desde ese día.
+- **Hay que ejecutar la migración** `0013_expire_access.sql`.
+- Código: `features/manage-student` y `entities/student`.
+
+## 02/11/2026 — Panel: minimizar niveles
+
+- En Panel › Cursos, cada nivel tiene una **flecha para minimizarlo** y expandirlo. El navegador recuerda cómo lo dejaste.
+- El título y el número de cursos siguen visibles al minimizar.
+- Código: `pages/admin-courses/AdminCoursesPage.tsx`.
+
+## 02/11/2026 — Cursos por niveles
+
+- Los cursos se agrupan por **nivel** en Panel › Cursos, en Cursos y en Inicio.
+- **El admin puede:** cambiar el título de un nivel escribiendo encima, ordenarlos arrastrando, crear y eliminar niveles. Al eliminar uno, sus cursos no se borran: quedan sin nivel.
+- Cada curso elige su nivel en su fila y en su formulario. Dentro de un nivel, los cursos se ordenan arrastrando.
+- **La migración `0012_course_levels.sql`** crea los niveles según los títulos actuales, mete cada curso en el suyo y quita "(Nivel X)" del título.
+- Código: `pages/admin-courses/AdminCoursesPage.tsx`, `entities/course` y las páginas del alumno.
+
 ## 02/11/2026 — Previsualización del video para el administrador
 
 - La página de cada clase en el panel tiene ahora su propia **previsualización**, distinta a la del alumno, junto al formulario de edición.

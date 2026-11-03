@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { courseProgress, describeCourse, useCourseTree, useLessonProgress } from '../../entities/course';
+import { courseProgress, describeCourse, groupCoursesByLevel, useCourseLevels, useCourseTree, useLessonProgress } from '../../entities/course';
 import { useAuth } from '../../entities/session';
 import { ROUTES, studentCoursePath } from '../../shared/config/routes';
 import { Button } from '../../shared/ui/Button';
@@ -9,7 +9,9 @@ import { FormAlert } from '../../shared/ui/FormAlert';
 export function StudentCoursesPage() {
   const { viewAsStudent } = useAuth();
   const { courses, isLoading, error } = useCourseTree({ publishedOnly: viewAsStudent });
+  const { levels } = useCourseLevels();
   const { completed } = useLessonProgress();
+  const groups = groupCoursesByLevel(courses, levels);
 
   return (
     <Container className="py-12 md:py-16">
@@ -34,8 +36,13 @@ export function StudentCoursesPage() {
         </div>
       )}
 
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 mt-9">
-        {courses.map((course, index) => {
+      {groups.map((group) => (
+        <section key={group.level?.id ?? 'sin-nivel'} className="mt-10">
+          {levels.length > 0 && (
+            <h2 className="font-display font-bold text-[22px] text-ink mb-5">{group.level?.title ?? 'Otros cursos'}</h2>
+          )}
+      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {group.courses.map((course, index) => {
           const progress = courseProgress(course, completed);
           return (
             <Link
@@ -63,6 +70,8 @@ export function StudentCoursesPage() {
           );
         })}
       </div>
+        </section>
+      ))}
     </Container>
   );
 }

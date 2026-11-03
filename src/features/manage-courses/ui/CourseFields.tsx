@@ -1,3 +1,4 @@
+import type { CourseLevel } from '../../../entities/course';
 import type { PlanOption } from '../../../entities/plan';
 import { TextField, inputClasses } from '../../../shared/ui/TextField';
 import { cn } from '../../../shared/lib/cn';
@@ -7,6 +8,8 @@ export interface CourseFieldValues {
   description: string;
   welcomeVideoId: string;
   bunnyLibraryId: string;
+  /** '' = sin nivel. */
+  levelId: string;
   planIds: string[];
 }
 
@@ -14,13 +17,14 @@ interface CourseFieldsProps {
   values: CourseFieldValues;
   onChange: (patch: Partial<CourseFieldValues>) => void;
   plans: PlanOption[];
+  levels: CourseLevel[];
   titleError?: string;
   libraryError?: string;
   autoFocus?: boolean;
 }
 
 /** Título, descripción, video de bienvenida y planes de un curso: los mismos campos al crearlo y al editarlo. */
-export function CourseFields({ values, onChange, plans, titleError, libraryError, autoFocus }: CourseFieldsProps) {
+export function CourseFields({ values, onChange, plans, levels, titleError, libraryError, autoFocus }: CourseFieldsProps) {
   function togglePlan(id: string) {
     onChange({
       planIds: values.planIds.includes(id) ? values.planIds.filter((planId) => planId !== id) : [...values.planIds, id],
@@ -51,6 +55,22 @@ export function CourseFields({ values, onChange, plans, titleError, libraryError
           className={cn(inputClasses, 'resize-y')}
         />
       </div>
+
+      {levels.length > 0 && (
+        <TextField
+          label="Nivel"
+          control={({ id }) => (
+            <select id={id} value={values.levelId} onChange={(event) => onChange({ levelId: event.target.value })} className={inputClasses}>
+              <option value="">Sin nivel</option>
+              {levels.map((level) => (
+                <option key={level.id} value={level.id}>
+                  {level.title}
+                </option>
+              ))}
+            </select>
+          )}
+        />
+      )}
 
       <TextField
         label="Librería de Bunny Stream (Video library ID)"

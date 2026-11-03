@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { createCourse, nextPosition, useCourseTree } from '../../entities/course';
+import { createCourse, nextPosition, useCourseLevels, useCourseTree } from '../../entities/course';
 import { usePlanOptions } from '../../entities/plan';
 import { CheckIcon, CloseButton, CourseFields, bunnyLibraryError, useAdminAction, type CourseFieldValues } from '../../features/manage-courses';
 import { AdminPageHeading, AdminTopBar } from '../../widgets/admin-shell';
@@ -13,12 +13,14 @@ export function AdminCourseNewPage() {
   const navigate = useNavigate();
   const { courses } = useCourseTree();
   const plans = usePlanOptions();
+  const { levels } = useCourseLevels();
   const { run, isBusy, error } = useAdminAction();
   const [values, setValues] = useState<CourseFieldValues>({
     title: '',
     description: '',
     welcomeVideoId: '',
     bunnyLibraryId: '',
+    levelId: '',
     planIds: [],
   });
   const [plansTouched, setPlansTouched] = useState(false);
@@ -47,6 +49,7 @@ export function AdminCourseNewPage() {
           description: shown.description.trim(),
           welcomeVideoId: shown.welcomeVideoId.trim() || null,
           bunnyLibraryId: shown.bunnyLibraryId.trim() || null,
+          levelId: shown.levelId || null,
           planIds: shown.planIds,
         },
         nextPosition(courses)
@@ -78,6 +81,7 @@ export function AdminCourseNewPage() {
           autoFocus
           values={shown}
           plans={plans}
+          levels={levels}
           titleError={titleError}
           libraryError={libraryError}
           onChange={(patch) => {

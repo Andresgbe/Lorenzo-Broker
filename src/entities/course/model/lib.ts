@@ -1,4 +1,4 @@
-import type { Course, CourseModule, Lesson } from './types';
+import type { Course, CourseModule, Lesson, CourseLevel } from './types';
 
 /** 750 → "12:30"; 3725 → "1:02:05". */
 export function formatDuration(seconds: number | null): string | null {
@@ -87,4 +87,21 @@ export function formatFileSize(bytes: number | null) {
   if (!bytes) return '';
   if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+export interface CourseGroup {
+  /** null = cursos sin nivel, siempre al final. */
+  level: CourseLevel | null;
+  courses: Course[];
+}
+
+/** Los cursos agrupados por nivel y en orden. Omite los niveles sin cursos. */
+export function groupCoursesByLevel(courses: Course[], levels: CourseLevel[]): CourseGroup[] {
+  const knownIds = new Set(levels.map((level) => level.id));
+  const groups: CourseGroup[] = levels.map((level) => ({
+    level,
+    courses: courses.filter((course) => course.levelId === level.id),
+  }));
+  groups.push({ level: null, courses: courses.filter((course) => !course.levelId || !knownIds.has(course.levelId)) });
+  return groups.filter((group) => group.courses.length > 0);
 }

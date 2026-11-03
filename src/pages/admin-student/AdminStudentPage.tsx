@@ -4,11 +4,10 @@ import { formatDate } from '../../entities/membership';
 import { PAYMENT_STATUS_TONE, formatDateTimeCaracas, formatUsd, usePayments } from '../../entities/payment';
 import { useAuth } from '../../entities/session';
 import { ROLE_LABEL, STUDENT_STATUS_TONE, useStudent, type StudentAction } from '../../entities/student';
-import { StudentActionModal, canManageStudent, canRevokeStudent, type StudentActionKind } from '../../features/manage-student';
+import { StudentActionModal, canManageStudent, type StudentActionKind } from '../../features/manage-student';
 import { ROUTES, adminPaymentPath } from '../../shared/config/routes';
 import { Button } from '../../shared/ui/Button';
 import { FormAlert } from '../../shared/ui/FormAlert';
-import { MenuButton } from '../../shared/ui/MenuButton';
 import { StatusPill } from '../../shared/ui/StatusPill';
 import { AdminTopBar } from '../../widgets/admin-shell';
 
@@ -32,6 +31,7 @@ function Field({ label, children }: { label: string; children: ReactNode }) {
 
 function describeAction({ action, details }: StudentAction) {
   if (action === 'grant_access') return `Dio ${details.days} días de acceso`;
+  if (action === 'expire_access') return 'Expiró el acceso';
   if (action === 'revoke_access') return 'Quitó el acceso';
   if (action === 'update_student') return 'Editó los datos';
   if (action === 'record_payment') {
@@ -88,15 +88,9 @@ export function AdminStudentPage() {
             <Button size="sm" variant="ghost" onClick={() => setAction('payment')}>
               Registrar pago
             </Button>
-            <Button size="sm" variant="primary" onClick={() => setAction('grant')}>
-              Dar o extender acceso
+            <Button size="sm" variant="primary" onClick={() => setAction('access')}>
+              Administrar acceso
             </Button>
-            {canRevokeStudent(student, user?.id) && (
-              <MenuButton
-                label={`Más acciones de ${name}`}
-                items={[{ label: 'Quitar acceso', tone: 'danger', onSelect: () => setAction('revoke') }]}
-              />
-            )}
           </>
         }
       />
@@ -122,7 +116,7 @@ export function AdminStudentPage() {
               <StatusPill tone={STUDENT_STATUS_TONE[student.status]}>{student.status}</StatusPill>
             </Field>
             <Field label="Plan">{student.planName ?? '—'}</Field>
-            <Field label={student.status === 'Vencida' || student.status === 'En gracia' ? 'Venció el' : 'Vence el'}>
+            <Field label={['Vencida', 'En gracia', 'Expirada'].includes(student.status) ? 'Venció el' : 'Vence el'}>
               {student.expiresOn ? formatDate(student.expiresOn) : '—'}
             </Field>
           </dl>

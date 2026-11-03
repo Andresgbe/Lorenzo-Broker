@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { ROLE_LABEL, STUDENT_STATUS_TONE, useStudents, type Student, type StudentStatus } from '../../entities/student';
 import { formatDate } from '../../entities/membership';
 import { useAuth } from '../../entities/session';
-import { StudentActionModal, canManageStudent, canRevokeStudent, type StudentActionKind } from '../../features/manage-student';
+import { StudentActionModal, canManageStudent, type StudentActionKind } from '../../features/manage-student';
 import { adminStudentPath } from '../../shared/config/routes';
 import { Button } from '../../shared/ui/Button';
 import { FormAlert } from '../../shared/ui/FormAlert';
@@ -28,7 +28,7 @@ type Filter = (typeof FILTERS)[number];
 const FILTER_STATUSES: Record<Exclude<Filter, 'Todos'>, StudentStatus[]> = {
   Activa: ['Activa'],
   'Por vencer': ['Por vencer'],
-  Vencida: ['En gracia', 'Vencida'],
+  Vencida: ['En gracia', 'Vencida', 'Expirada'],
   'Sin plan': ['Sin plan', 'Acceso quitado'],
 };
 
@@ -59,10 +59,9 @@ export function AdminStudentsPage() {
     const items: MenuItem[] = [{ label: 'Ver detalle', onSelect: () => navigate(adminStudentPath(student.id)) }];
     if (canManageStudent(student, user?.id)) items.push({ label: 'Editar datos', onSelect: () => setPending({ student, action: 'edit' }) });
     items.push(
-      { label: 'Dar o extender acceso', onSelect: () => setPending({ student, action: 'grant' }) },
+      { label: 'Administrar acceso', onSelect: () => setPending({ student, action: 'access' }) },
       { label: 'Registrar pago', onSelect: () => setPending({ student, action: 'payment' }) }
     );
-    if (canRevokeStudent(student, user?.id)) items.push({ label: 'Quitar acceso', tone: 'danger', onSelect: () => setPending({ student, action: 'revoke' }) });
     return items;
   }
 

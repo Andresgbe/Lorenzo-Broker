@@ -37,6 +37,12 @@ export interface CourseModule {
   lessons: Lesson[];
 }
 
+export interface CourseLevel {
+  id: string;
+  title: string;
+  position: number;
+}
+
 export interface Course {
   id: string;
   title: string;
@@ -45,6 +51,8 @@ export interface Course {
   welcomeVideoId: string | null;
   /** Video Library de Bunny Stream donde están los videos del curso. null = sin configurar: no se reproducen. */
   bunnyLibraryId: string | null;
+  /** Nivel al que pertenece. null = sin nivel. */
+  levelId: string | null;
   position: number;
   isPublished: boolean;
   /** Planes que incluyen este curso (plan_courses). */

@@ -1,6 +1,6 @@
 import type { StatusTone } from '../../../shared/ui/StatusPill';
 
-export type StudentStatus = 'Activa' | 'Por vencer' | 'En gracia' | 'Vencida' | 'Sin plan' | 'Acceso quitado';
+export type StudentStatus = 'Activa' | 'Por vencer' | 'En gracia' | 'Vencida' | 'Expirada' | 'Sin plan' | 'Acceso quitado';
 
 /** Copia de app_metadata en profiles (migración 0007). Para mostrar: los permisos los decide la BD. */
 export type StudentRole = 'student' | 'admin' | 'owner';
@@ -42,6 +42,7 @@ export const STUDENT_STATUS_TONE: Record<StudentStatus, StatusTone> = {
   'Por vencer': 'warning',
   'En gracia': 'warning',
   Vencida: 'danger',
+  Expirada: 'danger',
   'Sin plan': 'neutral',
   'Acceso quitado': 'danger',
 };

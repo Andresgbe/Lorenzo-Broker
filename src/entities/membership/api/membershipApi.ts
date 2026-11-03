@@ -12,7 +12,7 @@ export async function fetchMembership(userId: string): Promise<UserMembership | 
   if (!supabase) return null;
   const { data, error } = await supabase
     .from('entitlements')
-    .select('plan_id, expires_at, plans!inner(name, kind, duration_days, grace_days)')
+    .select('plan_id, status, expires_at, plans!inner(name, kind, duration_days, grace_days)')
     .eq('user_id', userId)
     .eq('plans.kind', 'subscription')
     .neq('status', 'revoked')
@@ -33,6 +33,7 @@ export async function fetchMembership(userId: string): Promise<UserMembership | 
     planName: plan.name,
     durationDays: plan.duration_days,
     expiresAt,
-    status: now < expiry ? 'active' : now < expiry + plan.grace_days * DAY_MS ? 'grace' : 'expired',
+    // Expirada por un admin: sin días de gracia, aunque por fecha aún los tendría.
+    status: row.status === 'ended' ? 'expired' : now < expiry ? 'active' : now < expiry + plan.grace_days * DAY_MS ? 'grace' : 'expired',
   };
 }

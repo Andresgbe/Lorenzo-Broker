@@ -1,5 +1,5 @@
 import { supabase } from '../../../shared/lib/supabaseClient';
-import type { Course, CourseModule, Lesson, LessonAttachment } from '../model/types';
+import type { Course, CourseLevel, CourseModule, Lesson, LessonAttachment } from '../model/types';
 
 const NOT_CONFIGURED = 'Supabase no está configurado en este entorno.';
 const LESSON_FILES_BUCKET = 'lesson-files';
@@ -55,6 +55,8 @@ interface CourseRow {
   welcome_video_id: string | null;
   /** Llega con la migración 0010. */
   bunny_library_id?: string | null;
+  /** Llega con la migración 0012. */
+  level_id?: string | null;
   position: number;
   is_published: boolean;
   plan_courses: { plan_id: string }[] | null;
@@ -121,6 +123,7 @@ function toCourse(row: CourseRow): Course {
     description: row.description,
     welcomeVideoId: row.welcome_video_id,
     bunnyLibraryId: row.bunny_library_id ?? null,
+    levelId: row.level_id ?? null,
     position: row.position,
     isPublished: row.is_published,
     planIds: (row.plan_courses ?? []).map((link) => link.plan_id),
@@ -135,15 +138,22 @@ export async function fetchCourseTree(): Promise<Course[]> {
   return ((data ?? []) as unknown as CourseRow[]).map(toCourse);
 }
 
+export async function fetchCourseLevels(): Promise<CourseLevel[]> {
+  const { data, error } = await client().from('course_levels').select('id, title, position').order('position');
+  fail(error);
+  return (data ?? []) as CourseLevel[];
+}
+
 // ------------------------------------------------------------------ escritura (admin; RLS lo exige)
 
-type Table = 'courses' | 'modules' | 'lessons';
+type Table = 'courses' | 'modules' | 'lessons' | 'course_levels';
 
 export interface CoursePatch {
   title?: string;
   description?: string;
   welcomeVideoId?: string | null;
   bunnyLibraryId?: string | null;
+  levelId?: string | null;
   isPublished?: boolean;
 }
 
@@ -171,6 +181,7 @@ function toColumns(patch: CoursePatch & LessonPatch) {
   if (patch.durationSeconds !== undefined) row.duration_seconds = patch.durationSeconds;
   if (patch.welcomeVideoId !== undefined) row.welcome_video_id = patch.welcomeVideoId;
   if (patch.bunnyLibraryId !== undefined) row.bunny_library_id = patch.bunnyLibraryId;
+  if (patch.levelId !== undefined) row.level_id = patch.levelId;
   return row;
 }
 
@@ -195,6 +206,7 @@ export interface NewCourse {
   description: string;
   welcomeVideoId: string | null;
   bunnyLibraryId: string | null;
+  levelId: string | null;
   planIds: string[];
 }
 
@@ -204,12 +216,17 @@ export async function createCourse(course: NewCourse, position: number): Promise
     description: course.description,
     welcome_video_id: course.welcomeVideoId,
     bunny_library_id: course.bunnyLibraryId,
+    level_id: course.levelId,
     position,
   });
   await setCoursePlans(id, course.planIds);
   return id;
 }
 export const updateCourse = (id: string, patch: CoursePatch) => updateRow('courses', id, toColumns(patch));
+
+export const createCourseLevel = (title: string, position: number) => insertRow('course_levels', { title, position });
+export const updateCourseLevel = (id: string, patch: { title: string }) => updateRow('course_levels', id, patch);
+export const deleteCourseLevel = (id: string) => deleteRow('course_levels', id);
 export const deleteCourse = (id: string) => deleteRow('courses', id);
 
 // Módulos y clases nacen publicados (decisión del usuario, 22/10/2026): el alumno los ve

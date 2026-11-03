@@ -1,2 +1,2 @@
 export { StudentActionModal, type StudentActionKind } from './ui/StudentActionModal';
-export { canManageStudent, canRevokeStudent } from './model/studentMenu';
+export { canManageStudent } from './model/studentMenu';

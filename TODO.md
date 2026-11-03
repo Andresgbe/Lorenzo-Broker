@@ -46,7 +46,7 @@ Lo que falta por hacer en la plataforma. Al terminar algo, se marca `[x]` (o se 
 
 - [x] Lista de Alumnos con datos reales (02/11/2026, `useStudents`).
 - [x] Alumnos: menú "⋯" y página de detalle con editar datos, dar o extender acceso, registrar pago y quitar acceso (02/11/2026).
-- [ ] **Ejecutar las migraciones 0007, 0008, 0009, 0010 y 0011, en ese orden,** en el SQL Editor de LBP: sin ellas, las acciones de Alumnos no funcionan, el plan anual no existe en la base de datos, el foro da error y no se puede guardar la librería de Bunny de cada curso.
+- [ ] **Ejecutar las migraciones 0007, 0008, 0009, 0010, 0011, 0012 y 0013, en ese orden,** en el SQL Editor de LBP: sin ellas, las acciones de Alumnos no funcionan, el plan anual no existe en la base de datos, el foro da error y no se puede guardar la librería de Bunny de cada curso.
 - [ ] Alumnos: cambiar el correo de un alumno (necesita una Edge Function con la Admin API). Exportar CSV.
 - [x] Lista y detalle de Pagos con datos reales (02/11/2026, `usePayments`). Quedan vacíos hasta que se guarden pagos.
 - [ ] Pagos: confirmar y rechazar a mano, con motivo registrado. Falta una función en la BD para pagos sin reporte (`admin_review_payment_report` solo sirve para reportes). Exportar CSV.
