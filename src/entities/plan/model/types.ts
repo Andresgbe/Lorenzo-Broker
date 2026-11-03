@@ -1,4 +1,4 @@
-export type PlanId = 'mensual';
+export type PlanId = 'mensual' | 'anual';
 
 export interface Plan {
   id: PlanId;
@@ -7,5 +7,8 @@ export interface Plan {
   price: number;
   /** Qué se cobra cada vez, p. ej. "cada mes". */
   billingNote: string;
+  period: 'month' | 'year';
+  /** Días de acceso por cada pago. Igual que plans.duration_days en la BD. */
+  durationDays: number;
   perks: string[];
 }

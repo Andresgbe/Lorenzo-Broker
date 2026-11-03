@@ -1,6 +1,6 @@
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { caracasDay, formatDate } from '../../entities/membership';
-import { MAIN_PLAN, PlanCard, formatPrice } from '../../entities/plan';
+import { ANNUAL_PLAN, MAIN_PLAN, PLANS, PlanCard, annualSavings, formatPrice, useSelectedPlan } from '../../entities/plan';
 import { MonthsPicker, useCheckoutOrder } from '../../features/renew-membership';
 import { ROUTES } from '../../shared/config/routes';
 import { PAYMENT_METHODS } from '../../shared/config/payment-methods';
@@ -10,7 +10,7 @@ import { CheckoutLoading, CheckoutShell } from '../../widgets/checkout-shell';
 
 export function CheckoutPlanPage() {
   const navigate = useNavigate();
-  const order = useCheckoutOrder(MAIN_PLAN.price);
+  const order = useCheckoutOrder(useSelectedPlan());
   const [, setParams] = useSearchParams();
 
   if (order.isLoading) return <CheckoutLoading step={1} />;
@@ -46,9 +46,14 @@ export function CheckoutPlanPage() {
           <section className="bg-panel border border-line rounded-[18px] p-6">
             <h2 className="text-[10.5px] font-bold uppercase tracking-[2.6px] text-accent mb-4">¿Cuántos meses quieres pagar?</h2>
             <MonthsPicker
-              value={order.months}
-              onChange={(months) => setParams(months > 1 ? { meses: String(months) } : {}, { replace: true })}
+              months={order.plan.period === 'year' ? null : order.months}
+              onChangeMonths={(months) =>
+                setParams(months > 1 ? { plan: MAIN_PLAN.id, meses: String(months) } : { plan: MAIN_PLAN.id }, { replace: true })
+              }
+              onChooseAnnual={() => setParams({ plan: ANNUAL_PLAN.id }, { replace: true })}
               priceFor={(months) => formatPrice(MAIN_PLAN.price * months)}
+              annualPrice={formatPrice(ANNUAL_PLAN.price)}
+              annualNote={`Ahorras ${formatPrice(annualSavings(ANNUAL_PLAN))}`}
             />
           </section>
 
@@ -67,7 +72,7 @@ export function CheckoutPlanPage() {
         <Button
           variant="primary"
           className="w-full mt-6"
-          onClick={() => navigate(`${ROUTES.checkoutSummary}?plan=${MAIN_PLAN.id}${order.monthsQuery}`)}
+          onClick={() => navigate(`${ROUTES.checkoutSummary}?plan=${order.plan.id}${order.monthsQuery}`)}
         >
           Continuar con la renovación
         </Button>
@@ -85,14 +90,24 @@ export function CheckoutPlanPage() {
       topBar={{ backTo: ROUTES.home, backLabel: 'Volver al inicio', crumbs: [{ label: 'Inicio', to: ROUTES.home }, { label: 'Plan' }] }}
       eyebrow="Suscripción"
       title="Tu membresía"
-      subtitle="Un solo plan con todo incluido. Sin permanencia: cancelas cuando quieras."
+      subtitle="Todo incluido: elige si pagas cada mes o una vez al año."
+      width="medium"
     >
-      <PlanCard plan={MAIN_PLAN} />
+      <div role="radiogroup" aria-label="Plan" className="grid gap-5 sm:grid-cols-2 items-start">
+        {PLANS.map((plan) => (
+          <PlanCard
+            key={plan.id}
+            plan={plan}
+            selected={order.plan.id === plan.id}
+            onSelect={() => setParams({ plan: plan.id }, { replace: true })}
+          />
+        ))}
+      </div>
 
       <Button
         variant="primary"
         className="w-full mt-6"
-        onClick={() => navigate(`${ROUTES.checkoutSummary}?plan=${MAIN_PLAN.id}`)}
+        onClick={() => navigate(`${ROUTES.checkoutSummary}?plan=${order.plan.id}`)}
       >
         Continuar al pago
       </Button>

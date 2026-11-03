@@ -1,0 +1,1 @@
+export { StudentForumThreadPage } from './StudentForumThreadPage';

@@ -22,6 +22,7 @@ import {
   CheckIcon,
   CloseButton,
   CourseFields,
+  bunnyLibraryError,
   EyeIcon,
   LessonPublishSwitch,
   PencilIcon,
@@ -29,7 +30,7 @@ import {
   type CourseFieldValues,
 } from '../../features/manage-courses';
 import { AdminTopBar } from '../../widgets/admin-shell';
-import { ROUTES, adminLessonPath, studentCoursePath } from '../../shared/config/routes';
+import { ROUTES, adminLessonPath, studentCourseForumPath, studentCoursePath } from '../../shared/config/routes';
 import { useDragReorder } from '../../shared/lib/useDragReorder';
 import { cn } from '../../shared/lib/cn';
 import { Button } from '../../shared/ui/Button';
@@ -74,9 +75,11 @@ function CourseDetails({ course, plans, isEditing, onEditingChange, onChanged }:
     title: course.title,
     description: course.description,
     welcomeVideoId: course.welcomeVideoId ?? '',
+    bunnyLibraryId: course.bunnyLibraryId ?? '',
     planIds: course.planIds,
   });
   const [titleError, setTitleError] = useState<string>();
+  const [libraryError, setLibraryError] = useState<string>();
   const { run, isBusy, error } = useAdminAction();
 
   const planNames = course.planIds.map((id) => plans.find((plan) => plan.id === id)?.name ?? id);
@@ -87,11 +90,15 @@ function CourseDetails({ course, plans, isEditing, onEditingChange, onChanged }:
       setTitleError('El curso necesita un título.');
       return;
     }
+    const libraryMessage = bunnyLibraryError(values.bunnyLibraryId);
+    setLibraryError(libraryMessage);
+    if (libraryMessage) return;
     const ok = await run(async () => {
       await updateCourse(course.id, {
         title,
         description: values.description.trim(),
         welcomeVideoId: values.welcomeVideoId.trim() || null,
+        bunnyLibraryId: values.bunnyLibraryId.trim() || null,
       });
       await setCoursePlans(course.id, values.planIds);
     });
@@ -116,8 +123,10 @@ function CourseDetails({ course, plans, isEditing, onEditingChange, onChanged }:
           values={values}
           plans={plans}
           titleError={titleError}
+          libraryError={libraryError}
           onChange={(patch) => {
             if (patch.title !== undefined) setTitleError(undefined);
+            if (patch.bunnyLibraryId !== undefined) setLibraryError(undefined);
             setValues((prev) => ({ ...prev, ...patch }));
           }}
         />
@@ -156,6 +165,14 @@ function CourseDetails({ course, plans, isEditing, onEditingChange, onChanged }:
           <span className="text-ink">cargado</span>
         ) : (
           <span>sin video. Agrégalo con “Editar”.</span>
+        )}
+      </p>
+      <p className="mt-2 text-[12.5px] text-muted">
+        Librería de Bunny:{' '}
+        {course.bunnyLibraryId ? (
+          <span className="text-ink">{course.bunnyLibraryId}</span>
+        ) : (
+          <span className="text-gold">sin configurar (los videos no se reproducen). Agrégala con “Editar”.</span>
         )}
       </p>
       <p className="mt-2 text-[12.5px] text-muted">
@@ -406,6 +423,9 @@ export function AdminCoursePage() {
             <Button to={studentCoursePath(course.id)} variant="ghost" size="sm">
               <EyeIcon className="w-4 h-4" />
               Vista previa
+            </Button>
+            <Button to={studentCourseForumPath(course.id)} variant="ghost" size="sm">
+              Foro
             </Button>
             <Button variant="ghost" size="sm" onClick={() => setIsEditing(true)} disabled={isEditing}>
               <PencilIcon className="w-4 h-4" />

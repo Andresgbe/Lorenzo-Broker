@@ -12,7 +12,7 @@ import {
 } from '../../entities/course';
 import { useAuth } from '../../entities/session';
 import { VideoPlayer } from '../../features/video-player';
-import { ROUTES, studentLessonPath } from '../../shared/config/routes';
+import { ROUTES, studentCourseForumPath, studentLessonPath } from '../../shared/config/routes';
 import { Button } from '../../shared/ui/Button';
 import { Container } from '../../shared/ui/Container';
 import { PageTopBar } from '../../shared/ui/PageTopBar';
@@ -94,6 +94,9 @@ export function StudentCoursePage() {
           <h1 className="font-display font-bold text-[clamp(26px,3.6vw,34px)] text-ink text-balance">{course.title}</h1>
           {course.description && <p className="text-muted text-[15px] leading-relaxed mt-3 text-pretty">{course.description}</p>}
           <p className="text-muted text-[13px] mt-3">{describeCourse(course)}</p>
+          <Button to={studentCourseForumPath(course.id)} variant="ghost" size="sm" className="mt-4">
+            Foro del curso
+          </Button>
         </div>
 
         <div className="w-full lg:w-[280px] bg-panel border border-line rounded-[18px] p-5">
@@ -112,14 +115,13 @@ export function StudentCoursePage() {
         </div>
       </div>
 
-      {course.welcomeVideoId && (
+      {course.welcomeVideoId && course.bunnyLibraryId && (
         <section aria-labelledby="welcome-video" className="mt-10">
           <h2 id="welcome-video" className="text-[10.5px] font-bold uppercase tracking-[2.6px] text-accent mb-4">
             Bienvenida al curso
           </h2>
-          {/* Igual que en la clase: embed público hasta tener la URL firmada del servidor. */}
           <VideoPlayer
-            source={{ type: 'bunny', videoId: course.welcomeVideoId }}
+            source={{ type: 'bunny', libraryId: course.bunnyLibraryId, videoId: course.welcomeVideoId, access: { courseId: course.id } }}
             title={`Bienvenida a ${course.title}`}
             className="w-full max-w-4xl rounded-[18px] border border-line"
           />

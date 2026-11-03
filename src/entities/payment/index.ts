@@ -1,5 +1,4 @@
 export {
-  DEMO_PAYMENTS,
   PAYMENT_STATUS_TONE,
   formatBs,
   formatDateTimeCaracas,

@@ -24,7 +24,7 @@ function CheckIcon({ className }: { className?: string }) {
 
 export function CheckoutConfirmedPage() {
   const plan = useSelectedPlan();
-  const order = useCheckoutOrder(plan?.price ?? 0);
+  const order = useCheckoutOrder(plan);
 
   if (!plan) {
     return <Navigate to={ROUTES.checkoutPlan} replace />;

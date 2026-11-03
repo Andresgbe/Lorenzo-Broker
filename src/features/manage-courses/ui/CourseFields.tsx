@@ -6,6 +6,7 @@ export interface CourseFieldValues {
   title: string;
   description: string;
   welcomeVideoId: string;
+  bunnyLibraryId: string;
   planIds: string[];
 }
 
@@ -14,11 +15,12 @@ interface CourseFieldsProps {
   onChange: (patch: Partial<CourseFieldValues>) => void;
   plans: PlanOption[];
   titleError?: string;
+  libraryError?: string;
   autoFocus?: boolean;
 }
 
 /** Título, descripción, video de bienvenida y planes de un curso: los mismos campos al crearlo y al editarlo. */
-export function CourseFields({ values, onChange, plans, titleError, autoFocus }: CourseFieldsProps) {
+export function CourseFields({ values, onChange, plans, titleError, libraryError, autoFocus }: CourseFieldsProps) {
   function togglePlan(id: string) {
     onChange({
       planIds: values.planIds.includes(id) ? values.planIds.filter((planId) => planId !== id) : [...values.planIds, id],
@@ -51,10 +53,20 @@ export function CourseFields({ values, onChange, plans, titleError, autoFocus }:
       </div>
 
       <TextField
+        label="Librería de Bunny Stream (Video library ID)"
+        inputMode="numeric"
+        value={values.bunnyLibraryId}
+        error={libraryError}
+        placeholder="p. ej. 123456"
+        hint="En Bunny: Stream, la librería de este curso, pestaña API. Sin ella, los videos del curso no se reproducen."
+        onChange={(event) => onChange({ bunnyLibraryId: event.target.value })}
+      />
+
+      <TextField
         label="Video de bienvenida (ID en Bunny Stream)"
         value={values.welcomeVideoId}
         placeholder="p. ej. 3f2a9c1e-…"
-        hint="Se muestra arriba de la página del curso, antes de los módulos. Vacío = sin video de bienvenida."
+        hint="Debe estar en la misma librería. Se muestra arriba de la página del curso. Vacío = sin video de bienvenida."
         onChange={(event) => onChange({ welcomeVideoId: event.target.value })}
       />
 

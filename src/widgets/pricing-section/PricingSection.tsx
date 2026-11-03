@@ -17,13 +17,18 @@ interface PriceItem {
 interface PricingContent {
   planName: string;
   price: string;
+  /** Opcional: lo guardado antes del plan anual no lo trae. */
+  annualPrice?: string;
   billingNote: string;
   items: PriceItem[];
 }
 
+const DEFAULT_ANNUAL_PRICE = '297';
+
 const DEFAULT_PRICING: PricingContent = {
   planName: 'Comunidad Lorenzo Broker',
   price: '29',
+  annualPrice: DEFAULT_ANNUAL_PRICE,
   billingNote: 'Sin permanencia. Cancela cuando quieras.',
   items: [
     { id: '1', label: 'Trading en vivo 2 días a la semana (grabado)' },
@@ -76,6 +81,10 @@ export function PricingSection() {
     setContent(stored);
   }
 
+  const annualPrice = content.annualPrice ?? DEFAULT_ANNUAL_PRICE;
+  const annualSavings = Number(content.price) * 12 - Number(annualPrice);
+  const annualPerMonth = (Number(annualPrice) / 12).toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
   function saveContent(next: PricingContent = content) {
     persistContent(next);
   }
@@ -118,15 +127,15 @@ export function PricingSection() {
   return (
     <section id={HOME_SECTIONS.pricing} className="py-24 bg-bg-2 border-y border-line">
       <Container>
-        <SectionHeading eyebrow="Suscripción" title={<>Un solo plan. <span className="text-accent">Todo incluido.</span></>} />
+        <SectionHeading eyebrow="Suscripción" title={<>Todo incluido. <span className="text-accent">Mensual o anual.</span></>} />
 
-        <div className="mt-16 flex justify-center">
+        <div className="mt-16 grid gap-6 md:grid-cols-2 items-start max-w-[960px] mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-80px' }}
             transition={{ duration: 0.5 }}
-            className="w-full max-w-[460px] bg-panel border border-accent/40 rounded-[22px] px-6 sm:px-10 py-11 text-center shadow-[0_0_60px_rgba(0,176,154,0.08)]"
+            className="w-full bg-panel border border-line rounded-[22px] px-6 sm:px-10 py-11 text-center"
           >
             {isAdmin ? (
               <input
@@ -213,7 +222,52 @@ export function PricingSection() {
               )}
             </div>
 
-            <SubscribeButton label="Suscríbete ahora" className="w-full" />
+            <SubscribeButton label="Suscríbete ahora" className="w-full" planId="mensual" />
+          </motion.div>
+
+          {/* Mismos beneficios que el mensual: se editan en esa tarjeta. Aquí solo cambia el precio. */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-80px' }}
+            transition={{ duration: 0.5, delay: 0.08 }}
+            className="relative w-full bg-panel border border-accent/40 rounded-[22px] px-6 sm:px-10 py-11 text-center shadow-[0_0_60px_rgba(0,176,154,0.08)]"
+          >
+            {annualSavings > 0 && (
+              <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-accent px-4 py-1.5 text-[12px] font-bold text-ink-inverse">
+                Ahorras ${annualSavings}
+              </span>
+            )}
+            <div className="text-xs font-bold tracking-[3px] uppercase text-accent">Membresía anual</div>
+
+            <div className="font-display font-bold text-[56px] mt-4 mb-1 text-ink flex items-baseline justify-center gap-0.5">
+              $
+              {isAdmin ? (
+                <input
+                  aria-label="Precio anual"
+                  value={annualPrice}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) => updateField({ annualPrice: e.target.value })}
+                  onBlur={() => saveContent()}
+                  className="w-28 text-center bg-transparent outline-none border-b border-dashed border-line focus:border-accent"
+                />
+              ) : (
+                annualPrice
+              )}
+              <small className="text-lg text-muted font-body font-medium">/año</small>
+            </div>
+
+            <div className="text-muted text-[13.5px] mb-7">Un solo pago al año. Equivale a ${annualPerMonth} al mes.</div>
+
+            <div className="text-left grid gap-3 mb-8">
+              {content.items.map((item) => (
+                <div key={item.id} className="flex gap-3 items-start text-[14.5px] text-ink-soft">
+                  <CheckIcon bonus={item.bonus} />
+                  {item.label}
+                </div>
+              ))}
+            </div>
+
+            <SubscribeButton label="Suscríbete al año" className="w-full" planId="anual" />
           </motion.div>
         </div>
       </Container>

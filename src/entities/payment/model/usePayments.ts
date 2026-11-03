@@ -1,18 +1,22 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { fetchPaymentDetail, fetchPayments } from '../api/paymentApi';
 import type { Payment, PaymentDetail } from './payments';
 
-/** Todos los pagos, para el panel de admin. */
-export function usePayments() {
+/** Los pagos: todos para el panel de admin, o solo los de userId si se pasa. */
+export function usePayments(userId?: string) {
   const [payments, setPayments] = useState<Payment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [version, setVersion] = useState(0);
 
   useEffect(() => {
     let isCurrent = true;
-    fetchPayments()
+    fetchPayments(userId)
       .then((rows) => {
-        if (isCurrent) setPayments(rows);
+        if (isCurrent) {
+          setPayments(rows);
+          setError(null);
+        }
       })
       .catch(() => {
         if (isCurrent) setError('No pudimos cargar los pagos. Intenta de nuevo en un momento.');
@@ -23,9 +27,10 @@ export function usePayments() {
     return () => {
       isCurrent = false;
     };
-  }, []);
+  }, [userId, version]);
 
-  return { payments, isLoading, error };
+  const reload = useCallback(() => setVersion((value) => value + 1), []);
+  return { payments, isLoading, error, reload };
 }
 
 interface LoadedDetail {

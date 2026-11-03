@@ -11,7 +11,7 @@ import {
 } from '../../entities/course';
 import { useAuth } from '../../entities/session';
 import { VideoPlayer } from '../../features/video-player';
-import { ROUTES, studentCoursePath, studentLessonPath } from '../../shared/config/routes';
+import { ROUTES, adminLessonPath, studentCoursePath, studentLessonPath } from '../../shared/config/routes';
 import { Button } from '../../shared/ui/Button';
 import { Container } from '../../shared/ui/Container';
 import { FormAlert } from '../../shared/ui/FormAlert';
@@ -80,7 +80,7 @@ function DownloadButton({ attachment }: { attachment: LessonAttachment }) {
 
 export function StudentLessonPage() {
   const { lessonId } = useParams();
-  const { viewAsStudent } = useAuth();
+  const { isAdmin, viewAsStudent } = useAuth();
   const { courses, isLoading, error } = useCourseTree({ publishedOnly: viewAsStudent });
   const { completed, toggle } = useLessonProgress();
 
@@ -103,6 +103,7 @@ export function StudentLessonPage() {
   if (!location) return <Navigate to={ROUTES.studentCourses} replace />;
   const { course, module, lesson, previous, next } = location;
   const isDone = completed.has(lesson.id);
+  const libraryId = lesson.bunnyLibraryId ?? course.bunnyLibraryId;
 
   return (
     <Container className="py-10 md:py-14">
@@ -115,23 +116,28 @@ export function StudentLessonPage() {
           { label: module.title, to: studentCoursePath(course.id) },
           { label: lesson.title },
         ]}
+        actions={
+          isAdmin ? (
+            <Button to={adminLessonPath(course.id, lesson.id)} variant="ghost" size="sm">
+              Editar clase
+            </Button>
+          ) : undefined
+        }
       />
 
       <div className="grid gap-8 lg:grid-cols-[1fr_320px] items-start">
         <div>
-          {/* Embed público de Bunny por ahora. Con Token Authentication la URL firmada la
-              emitirá la Edge Function tras validar el acceso (pendiente, ver TODO.md). */}
-          {lesson.bunnyVideoId ? (
+          {lesson.bunnyVideoId && libraryId ? (
             <VideoPlayer
               key={lesson.id}
-              source={{ type: 'bunny', videoId: lesson.bunnyVideoId }}
+              source={{ type: 'bunny', libraryId, videoId: lesson.bunnyVideoId, access: { lessonId: lesson.id } }}
               title={lesson.title}
               className="w-full rounded-[18px]"
             />
           ) : (
             <MediaPlaceholder
               icon={<PlayIcon className="w-6 h-6 fill-ink-inverse translate-x-[1px]" />}
-              label="Esta clase no tiene video"
+              label={lesson.bunnyVideoId ? 'Video en preparación' : 'Esta clase no tiene video'}
               className="aspect-video w-full rounded-[18px]"
             />
           )}

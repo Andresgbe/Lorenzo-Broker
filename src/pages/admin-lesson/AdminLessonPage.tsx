@@ -17,8 +17,9 @@ import {
   type Lesson,
   type LessonAttachment,
 } from '../../entities/course';
-import { CheckIcon, DeleteButton, EyeIcon, LessonPublishSwitch, useAdminAction } from '../../features/manage-courses';
+import { CheckIcon, DeleteButton, EyeIcon, LessonPublishSwitch, bunnyLibraryError, useAdminAction } from '../../features/manage-courses';
 import { AdminTopBar } from '../../widgets/admin-shell';
+import { LessonVideoPreview } from './LessonVideoPreview';
 import { ROUTES, adminCoursePath, adminLessonPath, studentLessonPath } from '../../shared/config/routes';
 import { cn } from '../../shared/lib/cn';
 import { Button } from '../../shared/ui/Button';
@@ -35,16 +36,18 @@ const MAX_PDF_BYTES = 50 * 1024 * 1024;
 interface LessonFormProps {
   lesson: Lesson;
   module: CourseModule;
+  courseLibraryId: string | null;
   onSaved: () => Promise<void>;
 }
 
-function LessonForm({ lesson, module, onSaved }: LessonFormProps) {
+function LessonForm({ lesson, module, courseLibraryId, onSaved }: LessonFormProps) {
   const [title, setTitle] = useState(lesson.title);
   const [description, setDescription] = useState(lesson.description);
   const [videoId, setVideoId] = useState(lesson.bunnyVideoId ?? '');
+  const [libraryId, setLibraryId] = useState(lesson.bunnyLibraryId ?? '');
   const [duration, setDuration] = useState(formatDuration(lesson.durationSeconds) ?? '');
   const [isPublished, setIsPublished] = useState(lesson.isPublished);
-  const [errors, setErrors] = useState<{ title?: string; duration?: string }>({});
+  const [errors, setErrors] = useState<{ title?: string; duration?: string; library?: string }>({});
   const [saved, setSaved] = useState(false);
   const { run, isBusy, error } = useAdminAction();
 
@@ -57,15 +60,17 @@ function LessonForm({ lesson, module, onSaved }: LessonFormProps) {
     const nextErrors = {
       title: title.trim() ? undefined : 'La clase necesita un título.',
       duration: durationSeconds === undefined ? 'Usa minutos:segundos, por ejemplo 12:30.' : undefined,
+      library: bunnyLibraryError(libraryId),
     };
     setErrors(nextErrors);
-    if (nextErrors.title || nextErrors.duration) return;
+    if (nextErrors.title || nextErrors.duration || nextErrors.library) return;
 
     const ok = await run(() =>
       updateLesson(lesson.id, {
         title: title.trim(),
         description: description.trim(),
         bunnyVideoId: videoId.trim() || null,
+        bunnyLibraryId: libraryId.trim() || null,
         durationSeconds: durationSeconds ?? null,
         isPublished,
       })
@@ -76,7 +81,18 @@ function LessonForm({ lesson, module, onSaved }: LessonFormProps) {
     }
   }
 
+  const hasUnsavedVideo =
+    videoId.trim() !== (lesson.bunnyVideoId ?? '') || libraryId.trim() !== (lesson.bunnyLibraryId ?? '');
+
   return (
+    <div className="grid gap-6 xl:grid-cols-[1.15fr_1fr] items-start">
+      <LessonVideoPreview
+        lesson={lesson}
+        isModulePublished={module.isPublished}
+        courseLibraryId={courseLibraryId}
+        hasUnsavedVideo={hasUnsavedVideo}
+      />
+
     <section className="bg-panel border border-line rounded-[18px] p-6 sm:p-7">
       <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
         <h2 className={sectionLabel}>Datos de la clase</h2>
@@ -145,6 +161,24 @@ function LessonForm({ lesson, module, onSaved }: LessonFormProps) {
           />
         </div>
 
+        <TextField
+          label="Librería de Bunny de este video (opcional)"
+          inputMode="numeric"
+          value={libraryId}
+          error={errors.library}
+          placeholder={courseLibraryId ?? 'p. ej. 123456'}
+          hint={
+            courseLibraryId
+              ? `Solo si el video está en otra librería. Vacío = la del curso (${courseLibraryId}).`
+              : 'El curso aún no tiene librería: ponla en sus datos, o aquí solo para esta clase.'
+          }
+          onChange={(event) => {
+            setLibraryId(event.target.value);
+            setErrors((prev) => ({ ...prev, library: undefined }));
+            touch();
+          }}
+        />
+
         <p className="text-[12px] text-muted">
           {!module.isPublished
             ? 'Su módulo está en borrador: los alumnos no la ven hasta publicarlo.'
@@ -164,6 +198,7 @@ function LessonForm({ lesson, module, onSaved }: LessonFormProps) {
         </div>
       </div>
     </section>
+    </div>
   );
 }
 
@@ -302,7 +337,7 @@ export function AdminLessonPage() {
           <>
             <Button to={studentLessonPath(lesson.id)} variant="ghost" size="sm">
               <EyeIcon className="w-4 h-4" />
-              Vista previa
+              Ver como alumno
             </Button>
             <MenuButton
               label="Más acciones de la clase"
@@ -320,11 +355,12 @@ export function AdminLessonPage() {
         </div>
       )}
 
-      <div className="grid gap-6 xl:grid-cols-[1fr_400px] items-start">
+      <div className="flex flex-col gap-6">
         <LessonForm
-          key={`${lesson.id}-${lesson.title}-${lesson.isPublished}-${lesson.bunnyVideoId}-${lesson.durationSeconds}`}
+          key={`${lesson.id}-${lesson.title}-${lesson.isPublished}-${lesson.bunnyVideoId}-${lesson.bunnyLibraryId}-${lesson.durationSeconds}`}
           lesson={lesson}
           module={module}
+          courseLibraryId={course.bunnyLibraryId}
           onSaved={reload}
         />
         <AttachmentsSection lesson={lesson} onChanged={reload} />

@@ -2,7 +2,7 @@ import { useCallback, useState, type FormEvent, type ReactNode } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../entities/session';
 import { describeMembership, formatDate, useMembership } from '../../entities/membership';
-import { DEMO_PAYMENTS, PAYMENT_STATUS_TONE } from '../../entities/payment';
+import { PAYMENT_STATUS_TONE, usePayments } from '../../entities/payment';
 import { ACCOUNT_SECTIONS, ROUTES, studentAccountPath, type AccountSection, type BackLinkState } from '../../shared/config/routes';
 import { cn } from '../../shared/lib/cn';
 import { Button } from '../../shared/ui/Button';
@@ -12,9 +12,6 @@ import { Modal } from '../../shared/ui/Modal';
 import { PasswordField } from '../../shared/ui/PasswordField';
 import { TextField } from '../../shared/ui/TextField';
 import { StatusPill } from '../../shared/ui/StatusPill';
-
-// Solo los pagos de este alumno. Con datos reales esto lo filtra la consulta, no el cliente.
-const myPayments = DEMO_PAYMENTS.filter((payment) => payment.studentName === 'María Pérez');
 
 const TABS: { section: AccountSection; label: string }[] = [
   { section: ACCOUNT_SECTIONS.profile, label: 'Datos personales' },
@@ -203,6 +200,7 @@ function MembershipSection() {
   const { user } = useAuth();
   const { membership, failed, isLoading } = useMembership(user?.id);
   const isActive = membership?.status === 'active';
+  const { payments, isLoading: isLoadingPayments, error: paymentsError } = usePayments(user?.id);
 
   return (
     <div className="flex flex-col gap-5">
@@ -258,11 +256,11 @@ function MembershipSection() {
               </tr>
             </thead>
             <tbody>
-              {myPayments.map((payment) => (
+              {payments.map((payment) => (
                 <tr key={payment.id} className="border-b border-line last:border-b-0">
                   <td className="px-6 sm:pl-8 py-3.5 text-ink-soft">{formatDate(payment.date)}</td>
                   <td className="px-6 py-3.5 text-ink-soft">{payment.planName}</td>
-                  <td className="px-6 py-3.5 text-ink-soft">{payment.method}</td>
+                  <td className="px-6 py-3.5 text-ink-soft">{payment.method ?? '—'}</td>
                   <td className="px-6 py-3.5">
                     <StatusPill tone={PAYMENT_STATUS_TONE[payment.status]}>{payment.status}</StatusPill>
                   </td>
@@ -270,6 +268,11 @@ function MembershipSection() {
               ))}
             </tbody>
           </table>
+          {payments.length === 0 && (
+            <p className="px-6 sm:px-8 py-6 text-[13.5px] text-muted">
+              {isLoadingPayments ? 'Cargando…' : (paymentsError ?? 'Todavía no tienes pagos registrados.')}
+            </p>
+          )}
         </section>
       )}
     </div>

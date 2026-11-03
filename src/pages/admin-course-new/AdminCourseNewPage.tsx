@@ -2,7 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createCourse, nextPosition, useCourseTree } from '../../entities/course';
 import { usePlanOptions } from '../../entities/plan';
-import { CheckIcon, CloseButton, CourseFields, useAdminAction, type CourseFieldValues } from '../../features/manage-courses';
+import { CheckIcon, CloseButton, CourseFields, bunnyLibraryError, useAdminAction, type CourseFieldValues } from '../../features/manage-courses';
 import { AdminPageHeading, AdminTopBar } from '../../widgets/admin-shell';
 import { ROUTES, adminCoursePath } from '../../shared/config/routes';
 import { Button } from '../../shared/ui/Button';
@@ -18,10 +18,12 @@ export function AdminCourseNewPage() {
     title: '',
     description: '',
     welcomeVideoId: '',
+    bunnyLibraryId: '',
     planIds: [],
   });
   const [plansTouched, setPlansTouched] = useState(false);
   const [titleError, setTitleError] = useState<string>();
+  const [libraryError, setLibraryError] = useState<string>();
 
   // Hasta que el admin elija, el curso va en los planes de suscripción activos.
   const defaultPlanIds = plans.filter((plan) => plan.kind === 'subscription' && plan.isActive).map((plan) => plan.id);
@@ -34,6 +36,9 @@ export function AdminCourseNewPage() {
       setTitleError('Escribe el título del curso.');
       return;
     }
+    const libraryMessage = bunnyLibraryError(shown.bunnyLibraryId);
+    setLibraryError(libraryMessage);
+    if (libraryMessage) return;
     let courseId = '';
     const ok = await run(async () => {
       courseId = await createCourse(
@@ -41,6 +46,7 @@ export function AdminCourseNewPage() {
           title,
           description: shown.description.trim(),
           welcomeVideoId: shown.welcomeVideoId.trim() || null,
+          bunnyLibraryId: shown.bunnyLibraryId.trim() || null,
           planIds: shown.planIds,
         },
         nextPosition(courses)
@@ -73,9 +79,11 @@ export function AdminCourseNewPage() {
           values={shown}
           plans={plans}
           titleError={titleError}
+          libraryError={libraryError}
           onChange={(patch) => {
             if (patch.planIds) setPlansTouched(true);
             if (patch.title !== undefined) setTitleError(undefined);
+            if (patch.bunnyLibraryId !== undefined) setLibraryError(undefined);
             setValues({ ...shown, ...patch });
           }}
         />

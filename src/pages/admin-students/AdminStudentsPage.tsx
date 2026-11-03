@@ -1,8 +1,13 @@
 import { useMemo, useState } from 'react';
-import { STUDENT_STATUS_TONE, useStudents, type StudentStatus } from '../../entities/student';
+import { Link, useNavigate } from 'react-router-dom';
+import { ROLE_LABEL, STUDENT_STATUS_TONE, useStudents, type Student, type StudentStatus } from '../../entities/student';
 import { formatDate } from '../../entities/membership';
+import { useAuth } from '../../entities/session';
+import { StudentActionModal, canManageStudent, canRevokeStudent, type StudentActionKind } from '../../features/manage-student';
+import { adminStudentPath } from '../../shared/config/routes';
 import { Button } from '../../shared/ui/Button';
 import { FormAlert } from '../../shared/ui/FormAlert';
+import { MenuButton, type MenuItem } from '../../shared/ui/MenuButton';
 import { StatusPill } from '../../shared/ui/StatusPill';
 import { AdminFilters, AdminPageHeading } from '../../widgets/admin-shell';
 
@@ -30,9 +35,12 @@ const FILTER_STATUSES: Record<Exclude<Filter, 'Todos'>, StudentStatus[]> = {
 const COLUMNS = ['Alumno', 'Cédula', 'Plan', 'Vence', 'Estado'];
 
 export function AdminStudentsPage() {
-  const { students, isLoading, error } = useStudents();
+  const { user } = useAuth();
+  const { students, isLoading, error, reload } = useStudents();
+  const navigate = useNavigate();
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState<Filter>('Todos');
+  const [pending, setPending] = useState<{ student: Student; action: StudentActionKind } | null>(null);
 
   const rows = useMemo(() => {
     const needle = query.trim().toLowerCase();
@@ -46,6 +54,17 @@ export function AdminStudentsPage() {
       return matchesFilter && matchesQuery;
     });
   }, [students, query, filter]);
+
+  function actionsFor(student: Student): MenuItem[] {
+    const items: MenuItem[] = [{ label: 'Ver detalle', onSelect: () => navigate(adminStudentPath(student.id)) }];
+    if (canManageStudent(student, user?.id)) items.push({ label: 'Editar datos', onSelect: () => setPending({ student, action: 'edit' }) });
+    items.push(
+      { label: 'Dar o extender acceso', onSelect: () => setPending({ student, action: 'grant' }) },
+      { label: 'Registrar pago', onSelect: () => setPending({ student, action: 'payment' }) }
+    );
+    if (canRevokeStudent(student, user?.id)) items.push({ label: 'Quitar acceso', tone: 'danger', onSelect: () => setPending({ student, action: 'revoke' }) });
+    return items;
+  }
 
   return (
     <>
@@ -83,13 +102,24 @@ export function AdminStudentsPage() {
                       {column}
                     </th>
                   ))}
+                  <th scope="col" className="px-5 py-3.5">
+                    <span className="sr-only">Acciones</span>
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {rows.map((student) => (
                   <tr key={student.id} className="border-b border-line last:border-b-0 hover:bg-bg-2/40 transition-colors">
                     <td className="px-5 py-3">
-                      <span className={student.name ? 'block text-ink' : 'block text-muted italic'}>{student.name ?? 'Sin nombre'}</span>
+                      <span className="flex flex-wrap items-center gap-2">
+                        <Link
+                          to={adminStudentPath(student.id)}
+                          className={`${student.name ? 'text-ink' : 'text-muted italic'} hover:text-accent transition-colors`}
+                        >
+                          {student.name ?? 'Sin nombre'}
+                        </Link>
+                        {ROLE_LABEL[student.role] && <StatusPill tone="neutral">{ROLE_LABEL[student.role]}</StatusPill>}
+                      </span>
                       <span className="block text-[12px] text-muted">{student.email}</span>
                     </td>
                     <td className="px-5 py-3 text-muted whitespace-nowrap">{student.taxId ?? '—'}</td>
@@ -97,6 +127,11 @@ export function AdminStudentsPage() {
                     <td className="px-5 py-3 text-muted whitespace-nowrap">{student.expiresOn ? formatDate(student.expiresOn) : '—'}</td>
                     <td className="px-5 py-3">
                       <StatusPill tone={STUDENT_STATUS_TONE[student.status]}>{student.status}</StatusPill>
+                    </td>
+                    <td className="px-5 py-3">
+                      <div className="flex justify-end">
+                        <MenuButton label={`Acciones de ${student.name ?? student.email}`} items={actionsFor(student)} />
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -114,6 +149,18 @@ export function AdminStudentsPage() {
             {rows.length} de {students.length} alumnos
           </p>
         </>
+      )}
+
+      {pending && (
+        <StudentActionModal
+          student={pending.student}
+          action={pending.action}
+          onClose={() => setPending(null)}
+          onDone={() => {
+            setPending(null);
+            reload();
+          }}
+        />
       )}
     </>
   );

@@ -1,0 +1,1 @@
+export { StudentForumPage } from './StudentForumPage';

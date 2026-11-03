@@ -32,13 +32,18 @@ async function fetchProfiles(userIds: string[]): Promise<Map<string, ProfileRow>
   return new Map(((data ?? []) as ProfileRow[]).map((profile) => [profile.id, profile]));
 }
 
-/** Todos los pagos, los más recientes primero. Solo un admin los recibe todos: lo garantiza RLS. */
-export async function fetchPayments(): Promise<Payment[]> {
+/**
+ * Los pagos, los más recientes primero; solo los de userId si se pasa. Solo un admin recibe los de
+ * todos: RLS le devuelve a cualquier otro únicamente los suyos.
+ */
+export async function fetchPayments(userId?: string): Promise<Payment[]> {
   if (!supabase) return [];
-  const { data, error } = await supabase
+  let query = supabase
     .from('payments')
     .select('id, user_id, status, amount_usd_cents, method, paid_at, created_at, plans(name)')
     .order('created_at', { ascending: false });
+  if (userId) query = query.eq('user_id', userId);
+  const { data, error } = await query;
   if (error) throw new Error(error.message);
 
   const rows = data ?? [];

@@ -23,6 +23,8 @@ export const ROUTES = {
   student: '/alumno',
   studentCourses: '/alumno/cursos',
   studentCourse: '/alumno/cursos/:courseId',
+  studentCourseForum: '/alumno/cursos/:courseId/foro',
+  studentForumThread: '/alumno/cursos/:courseId/foro/:threadId',
   studentLesson: '/alumno/clase/:lessonId',
   studentAccount: '/alumno/cuenta',
   studentExpired: '/alumno/membresia-vencida',
@@ -32,6 +34,7 @@ export const ROUTES = {
   admin: '/admin',
   adminOverview: '/admin/resumen',
   adminStudents: '/admin/alumnos',
+  adminStudent: '/admin/alumnos/:studentId',
   adminPayments: '/admin/pagos',
   adminPayment: '/admin/pagos/:paymentId',
   // Módulo de cursos: el admin edita cursos, módulos y clases fuera de la vista del alumno.
@@ -61,6 +64,14 @@ export function studentLessonPath(lessonId: string) {
   return ROUTES.studentLesson.replace(':lessonId', lessonId);
 }
 
+export function studentCourseForumPath(courseId: string) {
+  return ROUTES.studentCourseForum.replace(':courseId', courseId);
+}
+
+export function studentForumThreadPath(courseId: string, threadId: string) {
+  return ROUTES.studentForumThread.replace(':courseId', courseId).replace(':threadId', threadId);
+}
+
 export function studentCoursePath(courseId: string) {
   return ROUTES.studentCourse.replace(':courseId', courseId);
 }
@@ -86,6 +97,10 @@ export type AccountSection = (typeof ACCOUNT_SECTIONS)[keyof typeof ACCOUNT_SECT
 
 export function studentAccountPath(section: AccountSection = ACCOUNT_SECTIONS.profile) {
   return section === ACCOUNT_SECTIONS.profile ? ROUTES.studentAccount : `${ROUTES.studentAccount}?seccion=${section}`;
+}
+
+export function adminStudentPath(studentId: string) {
+  return ROUTES.adminStudent.replace(':studentId', studentId);
 }
 
 export function adminPaymentPath(paymentId: string) {

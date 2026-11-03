@@ -13,7 +13,10 @@ Lo que falta por hacer en la plataforma. Al terminar algo, se marca `[x]` (o se 
 - [ ] Security → Allowed Domains: `localhost` y el dominio de GitHub Pages (después, el dominio final).
 - [x] Conectar el reproductor real (Library ID `792090` en `shared/config/bunny.ts`; embed público) en la clase y en el video de bienvenida del curso.
 - [x] Probarlo (27/10/2026): funciona en PLAN DE AHORRO (Nivel 1) › Módulo 1 › "Nueva clase", con el `.mp3` de prueba (solo audio). Falta verlo con un `.mp4`.
-- [ ] Edge Function de URL firmada: comprobar acceso del alumno, firmar con token auth (≤ 2 h, solo nuestro dominio). Luego activar Token Authentication en Bunny. La API Key y la Token Key van en los secretos de Supabase, nunca en el código ni en el chat.
+- [ ] Poner en cada curso su librería de Bunny (Panel › Cursos › Editar › "Librería de Bunny Stream"). Cuenta nueva, con una librería por curso.
+- [ ] En cada librería: color `#00b09a`, idioma Español y Allowed Domains.
+- [x] Programar la Edge Function de URL firmada (`supabase/functions/bunny-video-url`, 02/11/2026).
+- [ ] **Poner los videos privados:** guardar el secreto `BUNNY_TOKEN_KEYS`, publicar la función, probarla y activar Token Authentication en cada librería, en ese orden. Añadir el dominio final a `ALLOWED_ORIGINS` cuando exista.
 - [ ] Decidir con Lorenzo quién es el titular de la cuenta definitiva (su correo y su tarjeta) **antes de que acabe la prueba** (≈ 10/11/2026).
 - [ ] Más adelante (Fase 2): marca de agua con el correo del alumno.
 
@@ -32,8 +35,9 @@ Lo que falta por hacer en la plataforma. Al terminar algo, se marca `[x]` (o se 
 ## Área del alumno
 
 - [x] Membresía real en Inicio, Mi cuenta y checkout (02/11/2026, `useMembership` lee `entitlements`).
-- [ ] Historial de pagos de Mi cuenta con datos reales (hoy son pagos de ejemplo de "María Pérez").
+- [x] Historial de pagos de Mi cuenta con datos reales (02/11/2026).
 - [ ] Pantalla de membresía vencida (`/alumno/membresia-vencida`) con la fecha real: hoy usa una de ejemplo.
+- [ ] Foro: avisar por correo o Telegram cuando responden un hilo, buscar, y límite de mensajes contra spam.
 - [ ] Bloquear el contenido con la membresía vencida (pantalla "Renovar"), no solo con la sesión.
 - [x] Mi cuenta › Datos personales guarda de verdad (02/11/2026).
 - [ ] Mi cuenta › Seguridad: que Cambiar correo y Cambiar contraseña guarden de verdad.
@@ -41,7 +45,9 @@ Lo que falta por hacer en la plataforma. Al terminar algo, se marca `[x]` (o se 
 ## Panel de administración
 
 - [x] Lista de Alumnos con datos reales (02/11/2026, `useStudents`).
-- [ ] Alumnos: volver a poner el menú "⋯" con Ver detalle, Extender vencimiento y Quitar acceso, con motivo (RPC `admin_grant_access` y `admin_revoke_access`). Exportar CSV.
+- [x] Alumnos: menú "⋯" y página de detalle con editar datos, dar o extender acceso, registrar pago y quitar acceso (02/11/2026).
+- [ ] **Ejecutar las migraciones 0007, 0008, 0009, 0010 y 0011, en ese orden,** en el SQL Editor de LBP: sin ellas, las acciones de Alumnos no funcionan, el plan anual no existe en la base de datos, el foro da error y no se puede guardar la librería de Bunny de cada curso.
+- [ ] Alumnos: cambiar el correo de un alumno (necesita una Edge Function con la Admin API). Exportar CSV.
 - [x] Lista y detalle de Pagos con datos reales (02/11/2026, `usePayments`). Quedan vacíos hasta que se guarden pagos.
 - [ ] Pagos: confirmar y rechazar a mano, con motivo registrado. Falta una función en la BD para pagos sin reporte (`admin_review_payment_report` solo sirve para reportes). Exportar CSV.
 - [x] Resumen con datos reales (02/11/2026).

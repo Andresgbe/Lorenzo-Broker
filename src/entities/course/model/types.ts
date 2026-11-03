@@ -19,6 +19,8 @@ export interface Lesson {
   description: string;
   /** ID del video en Bunny Stream. null = clase sin video (solo material). */
   bunnyVideoId: string | null;
+  /** Librería de Bunny de este video, si no es la del curso. null = la del curso. */
+  bunnyLibraryId: string | null;
   durationSeconds: number | null;
   position: number;
   isPublished: boolean;
@@ -41,6 +43,8 @@ export interface Course {
   description: string;
   /** ID en Bunny Stream del video de bienvenida, arriba de la página del curso. null = sin video. */
   welcomeVideoId: string | null;
+  /** Video Library de Bunny Stream donde están los videos del curso. null = sin configurar: no se reproducen. */
+  bunnyLibraryId: string | null;
   position: number;
   isPublished: boolean;
   /** Planes que incluyen este curso (plan_courses). */

@@ -3,7 +3,7 @@ import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../entities/session';
 import { caracasDay, formatDate } from '../../entities/membership';
 import { formatPrice, useSelectedPlan } from '../../entities/plan';
-import { monthsLabel, useCheckoutOrder } from '../../features/renew-membership';
+import { useCheckoutOrder } from '../../features/renew-membership';
 import { ROUTES } from '../../shared/config/routes';
 import { PAYMENT_METHODS } from '../../shared/config/payment-methods';
 import { Button } from '../../shared/ui/Button';
@@ -28,15 +28,15 @@ export function CheckoutSummaryPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [method, setMethod] = useState(PAYMENT_METHODS[0].id);
-  const order = useCheckoutOrder(plan?.price ?? 0);
+  const order = useCheckoutOrder(plan);
 
   if (!plan) {
     return <Navigate to={ROUTES.checkoutPlan} replace />;
   }
   if (order.isLoading) return <CheckoutLoading step={2} />;
 
-  const { membership, isRenewal, months, monthsQuery } = order;
-  const planPath = monthsQuery ? `${ROUTES.checkoutPlan}?${monthsQuery.slice(1)}` : ROUTES.checkoutPlan;
+  const { membership, isRenewal, periodLabel, monthsQuery } = order;
+  const planPath = `${ROUTES.checkoutPlan}?plan=${plan.id}${monthsQuery}`;
 
   return (
     <CheckoutShell
@@ -71,7 +71,7 @@ export function CheckoutSummaryPage() {
             {membership ? (
               <div className="flex flex-col gap-3">
                 <Row label="Plan" value={membership.planName} />
-                <Row label="Vas a pagar" value={monthsLabel(months)} />
+                <Row label="Vas a pagar" value={periodLabel} />
                 <Row
                   label={membership.status === 'active' ? 'Vence el' : 'Venció el'}
                   value={formatDate(caracasDay(membership.expiresAt))}
@@ -86,7 +86,7 @@ export function CheckoutSummaryPage() {
               </div>
             )}
             <Link to={planPath} className="inline-block mt-5 text-[13px] text-accent hover:underline">
-              {isRenewal ? 'Cambiar los meses' : 'Cambiar de plan'}
+              {isRenewal ? 'Cambiar la renovación' : 'Cambiar de plan'}
             </Link>
           </div>
         </div>
@@ -123,7 +123,7 @@ export function CheckoutSummaryPage() {
           <div>
             <span className="block text-[12.5px] text-muted">Total a pagar</span>
             <span className="font-display font-bold text-[34px] leading-none text-ink">{formatPrice(order.total)}</span>
-            <span className="text-[13px] text-muted ml-2">{isRenewal ? `por ${monthsLabel(months)}` : plan.billingNote.toLowerCase()}</span>
+            <span className="text-[13px] text-muted ml-2">{isRenewal ? `por ${periodLabel}` : plan.billingNote.toLowerCase()}</span>
           </div>
           <Button
             variant="primary"

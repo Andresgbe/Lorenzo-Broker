@@ -15,7 +15,7 @@ export interface Payment {
   /** Dinero siempre en céntimos enteros. */
   amountUsdCents: number;
   /** ISO en UTC. null mientras no esté confirmado. */
-  paidAt?: string | null;
+  paidAt: string | null;
 }
 
 export const PAYMENT_STATUS_TONE: Record<PaymentStatus, StatusTone> = {
@@ -25,18 +25,6 @@ export const PAYMENT_STATUS_TONE: Record<PaymentStatus, StatusTone> = {
   Rechazado: 'danger',
   Expirado: 'neutral',
 };
-
-/** Datos de ejemplo que todavía usa el historial de Mi cuenta. El panel ya usa usePayments(). */
-export const DEMO_PAYMENTS: Payment[] = [
-  { id: 'pg-108', date: '2026-10-11', studentName: 'María Pérez', studentTaxId: 'V-12345678', planName: 'Mensual', method: 'PagoMóvil', status: 'En verificación', amountUsdCents: 2900 },
-  { id: 'pg-107', date: '2026-10-11', studentName: 'José Rodríguez', studentTaxId: 'V-20811223', planName: 'Mensual', method: 'Transferencia', status: 'En verificación', amountUsdCents: 2900 },
-  { id: 'pg-106', date: '2026-10-10', studentName: 'Andrea Molina', studentTaxId: 'V-18992341', planName: 'Mensual', method: 'Zelle', status: 'Pagado', amountUsdCents: 2900 },
-  { id: 'pg-105', date: '2026-10-09', studentName: 'Carlos Lugo', studentTaxId: 'V-15340982', planName: 'Mensual', method: 'Binance Pay', status: 'Pagado', amountUsdCents: 2900 },
-  { id: 'pg-104', date: '2026-10-08', studentName: 'Daniela Ruiz', studentTaxId: 'V-22104567', planName: 'Mensual', method: 'PagoMóvil', status: 'Pagado', amountUsdCents: 2900 },
-  { id: 'pg-103', date: '2026-10-07', studentName: 'Luis Hernández', studentTaxId: 'V-17883420', planName: 'Mensual', method: 'Transferencia', status: 'Rechazado', amountUsdCents: 2900 },
-  { id: 'pg-102', date: '2026-10-06', studentName: 'Patricia Gómez', studentTaxId: 'V-13550871', planName: 'Mensual', method: 'Zelle', status: 'Pagado', amountUsdCents: 2900 },
-  { id: 'pg-101', date: '2026-10-05', studentName: 'Rafael Mendoza', studentTaxId: 'V-19220045', planName: 'Mensual', method: 'PagoMóvil', status: 'Pagado', amountUsdCents: 2900 },
-];
 
 export interface PaymentEvent {
   /** ISO en UTC; se muestra en hora de Caracas. */

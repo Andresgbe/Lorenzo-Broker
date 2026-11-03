@@ -2,6 +2,71 @@
 
 Registro de los cambios pedidos sobre la plataforma, del más reciente al más antiguo.
 
+## 02/11/2026 — Previsualización del video para el administrador
+
+- La página de cada clase en el panel tiene ahora su propia **previsualización**, distinta a la del alumno, junto al formulario de edición.
+- Muestra el video guardado, si está visible u oculta para los alumnos, el Video ID, la librería, la duración, los PDF y si falta algo para reproducirse.
+- Si cambias el video o la librería, avisa que debes guardar para verlo.
+- "Vista previa" pasó a llamarse **"Ver como alumno"**. Desde esa vista, un admin tiene un botón **"Editar clase"** para volver.
+- Código: `pages/admin-lesson/LessonVideoPreview.tsx`.
+
+## 02/11/2026 — Cada clase puede usar otra librería de Bunny
+
+- Cada clase tiene un campo opcional, **"Librería de Bunny de este video"**. Vacío usa la librería del curso; con un número, usa esa solo para esa clase.
+- Sirve para videos que están en otra librería, como los de Apertura de cuenta o Bonos y Acciones Preferidas, sin tener que moverlos.
+- **Hay que ejecutar la migración** `0011_lesson_bunny_library.sql` y volver a publicar la función `bunny-video-url`.
+- Código: `pages/admin-lesson/AdminLessonPage.tsx`, `entities/course` y `supabase/functions/bunny-video-url`.
+
+## 02/11/2026 — Videos privados con enlace firmado
+
+- Nueva función de servidor `bunny-video-url`: comprueba que el alumno tiene acceso y genera un enlace del video válido por **2 horas**.
+- La clase y el video de bienvenida piden ese enlace antes de reproducir. Sin acceso, se ve "No tienes acceso a este video".
+- **Todavía no están privados:** falta guardar las claves, publicar la función y activar Token Authentication en cada librería de Bunny.
+- Mientras la función no esté publicada, los videos siguen viéndose con el enlace público.
+- Código: `supabase/functions/bunny-video-url` y `features/video-player`.
+
+## 02/11/2026 — Cada curso con su librería de Bunny
+
+- **Problema:** los videos daban 404 porque el código apuntaba a una sola librería de Bunny (`792090`, de otra cuenta), y los videos reales están en una librería por curso.
+- Ahora **cada curso tiene su campo "Librería de Bunny Stream"** en Panel › Cursos › Editar datos. El resumen del curso avisa si falta.
+- Sin librería configurada, las clases con video muestran "Video en preparación" en lugar de un error.
+- **Hay que ejecutar la migración** `0010_course_bunny_library.sql` y poner el número de la librería en cada curso.
+- Código: `shared/config/bunny.ts`, `features/manage-courses/ui/CourseFields.tsx` y `entities/course`.
+
+## 02/11/2026 — Foro por curso
+
+- Cada curso tiene su **foro**, con el botón "Foro del curso" en la página del curso y "Foro" en Panel › Cursos.
+- **Alumnos con acceso al curso:** abren hilos, responden, y editan o eliminan sus propias respuestas. Pueden editar sus hilos y eliminarlos mientras nadie haya respondido.
+- **Administrador:** edita o elimina cualquier mensaje, fija hilos arriba y los cierra o reabre. En un hilo cerrado, los alumnos ya no responden ni editan.
+- Sin acceso al curso o con la membresía vencida no se puede leer ni escribir.
+- Se muestra solo el nombre del autor, nunca su correo. Si no tiene nombre guardado, sale "Alumno".
+- **Hay que ejecutar la migración** `0009_course_forums.sql`.
+- Código: `entities/forum`, `pages/student-forum` y `pages/student-forum-thread`.
+
+## 02/11/2026 — Plan anual de $297
+
+- Nueva **Membresía anual: $297 al año**, 365 días de acceso. Frente a 12 meses a $29 ($348), ahorra **$51**.
+- **Portada:** la sección de precios muestra dos tarjetas, Mensual y Anual, con la etiqueta "Ahorras $51". Los beneficios se editan en la tarjeta mensual y el admin puede cambiar el precio anual.
+- **Checkout, primera compra:** se elige entre las dos tarjetas.
+- **Checkout, renovación:** se elige 1, 2, 3 o 6 meses, o 1 año. Se quitó "12 meses" porque costaba más que el plan anual.
+- **Panel › Alumnos › Registrar pago:** ahora permite elegir el plan.
+- **Base de datos (migración 0008):** crea el plan con los mismos cursos que el mensual. Al pasar de mensual a anual se conservan los días ya pagados, y "Quitar acceso" quita todas las membresías del alumno.
+- **Hay que ejecutar la migración** `0008_annual_plan.sql` después de la `0007`.
+- Código: `entities/plan`, `features/renew-membership`, `widgets/pricing-section` y las páginas `checkout-*`.
+
+## 02/11/2026 — Panel: acciones sobre los alumnos y Lorenzo como dueño
+
+- **Cada alumno tiene menú "⋯" y página de detalle** (`/admin/alumnos/...`) con sus datos, membresía, pagos e historial.
+- **Acciones**, todas con motivo obligatorio que queda en el historial:
+  - **Editar datos:** nombre, cédula y teléfono. El correo no.
+  - **Dar o extender acceso:** por el número de días que se indique.
+  - **Registrar pago:** para un pago ya recibido. Queda como pagado, aparece en Pagos y Resumen y extiende el acceso por los meses pagados.
+  - **Quitar acceso.**
+- **Roles:** toda cuenta nueva es alumno. Lorenzo queda marcado como **dueño**: otros admins no pueden editarlo ni quitarle el acceso. La lista muestra una etiqueta Dueño o Admin.
+- **Mi cuenta:** el historial de pagos muestra ahora los pagos reales del alumno.
+- **Hay que ejecutar la migración** `supabase/migrations/0007_owner_and_student_actions.sql` en Supabase. Sin ella, la lista carga pero las acciones dan error.
+- Código: `features/manage-student`, `pages/admin-student` y `entities/student`.
+
 ## 02/11/2026 — Panel: Resumen con datos reales y sin Cobrix
 
 - **Resumen** calcula ahora sus cifras con los alumnos y pagos reales, en lugar de los datos de ejemplo:

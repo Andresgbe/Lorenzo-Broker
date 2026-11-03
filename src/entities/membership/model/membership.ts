@@ -44,9 +44,9 @@ export function daysUntil(iso: string) {
  * Hasta cuándo llegaría el acceso al pagar hoy. Misma regla que extend_entitlement en la BD:
  * si sigue vigente se suma a su vencimiento; si ya venció, desde hoy.
  */
-export function renewalExpiresOn(membership: UserMembership, months: number) {
+export function renewalExpiresOn(membership: UserMembership, days: number) {
   const base = membership.status === 'active' ? new Date(membership.expiresAt).getTime() : Date.now();
-  return caracasDay(new Date(base + months * membership.durationDays * 86_400_000));
+  return caracasDay(new Date(base + days * 86_400_000));
 }
 
 /** "Vence el 08/11/2026 · 6 días restantes" y equivalentes, para Inicio y Mi cuenta. */

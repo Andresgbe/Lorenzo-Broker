@@ -30,6 +30,8 @@ interface LessonRow {
   title: string;
   description: string;
   bunny_video_id: string | null;
+  /** Llega con la migración 0011. */
+  bunny_library_id?: string | null;
   duration_seconds: number | null;
   position: number;
   is_published: boolean;
@@ -51,19 +53,22 @@ interface CourseRow {
   title: string;
   description: string;
   welcome_video_id: string | null;
+  /** Llega con la migración 0010. */
+  bunny_library_id?: string | null;
   position: number;
   is_published: boolean;
   plan_courses: { plan_id: string }[] | null;
   modules: ModuleRow[] | null;
 }
 
+// courses y lessons con '*': bunny_library_id llega con las migraciones 0010 y 0011, y sin ellas deben seguir cargando.
 const COURSE_TREE_SELECT = `
-  id, title, description, welcome_video_id, position, is_published,
+  *,
   plan_courses ( plan_id ),
   modules (
     id, course_id, title, description, position, is_published,
     lessons (
-      id, module_id, title, description, bunny_video_id, duration_seconds, position, is_published,
+      *,
       lesson_attachments ( id, lesson_id, title, storage_path, size_bytes, position )
     )
   )
@@ -89,6 +94,7 @@ function toLesson(row: LessonRow): Lesson {
     title: row.title,
     description: row.description,
     bunnyVideoId: row.bunny_video_id,
+    bunnyLibraryId: row.bunny_library_id ?? null,
     durationSeconds: row.duration_seconds,
     position: row.position,
     isPublished: row.is_published,
@@ -114,6 +120,7 @@ function toCourse(row: CourseRow): Course {
     title: row.title,
     description: row.description,
     welcomeVideoId: row.welcome_video_id,
+    bunnyLibraryId: row.bunny_library_id ?? null,
     position: row.position,
     isPublished: row.is_published,
     planIds: (row.plan_courses ?? []).map((link) => link.plan_id),
@@ -136,6 +143,7 @@ export interface CoursePatch {
   title?: string;
   description?: string;
   welcomeVideoId?: string | null;
+  bunnyLibraryId?: string | null;
   isPublished?: boolean;
 }
 
@@ -149,6 +157,7 @@ export interface LessonPatch {
   title?: string;
   description?: string;
   bunnyVideoId?: string | null;
+  bunnyLibraryId?: string | null;
   durationSeconds?: number | null;
   isPublished?: boolean;
 }
@@ -161,6 +170,7 @@ function toColumns(patch: CoursePatch & LessonPatch) {
   if (patch.bunnyVideoId !== undefined) row.bunny_video_id = patch.bunnyVideoId;
   if (patch.durationSeconds !== undefined) row.duration_seconds = patch.durationSeconds;
   if (patch.welcomeVideoId !== undefined) row.welcome_video_id = patch.welcomeVideoId;
+  if (patch.bunnyLibraryId !== undefined) row.bunny_library_id = patch.bunnyLibraryId;
   return row;
 }
 
@@ -184,6 +194,7 @@ export interface NewCourse {
   title: string;
   description: string;
   welcomeVideoId: string | null;
+  bunnyLibraryId: string | null;
   planIds: string[];
 }
 
@@ -192,6 +203,7 @@ export async function createCourse(course: NewCourse, position: number): Promise
     title: course.title,
     description: course.description,
     welcome_video_id: course.welcomeVideoId,
+    bunny_library_id: course.bunnyLibraryId,
     position,
   });
   await setCoursePlans(id, course.planIds);

@@ -2,7 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import { formatBs } from '../../entities/payment';
 import { formatPrice, useSelectedPlan } from '../../entities/plan';
-import { monthsLabel, useCheckoutOrder } from '../../features/renew-membership';
+import { useCheckoutOrder } from '../../features/renew-membership';
 import { DEMO_EXCHANGE_RATE, findPaymentMethod } from '../../shared/config/payment-methods';
 import { ROUTES } from '../../shared/config/routes';
 import { Button } from '../../shared/ui/Button';
@@ -58,15 +58,15 @@ export function CheckoutPayPage() {
   const navigate = useNavigate();
   const [reference, setReference] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const order = useCheckoutOrder(plan?.price ?? 0);
+  const order = useCheckoutOrder(plan);
 
   if (!plan) return <Navigate to={ROUTES.checkoutPlan} replace />;
   if (order.isLoading) return <CheckoutLoading step={2} />;
-  const { isRenewal, months, monthsQuery, total } = order;
+  const { isRenewal, periodLabel, monthsQuery, total } = order;
   const summaryPath = `${ROUTES.checkoutSummary}?plan=${plan.id}${monthsQuery}`;
   if (!method) return <Navigate to={summaryPath} replace />;
 
-  const planPath = monthsQuery ? `${ROUTES.checkoutPlan}?${monthsQuery.slice(1)}` : ROUTES.checkoutPlan;
+  const planPath = `${ROUTES.checkoutPlan}?plan=${plan.id}${monthsQuery}`;
   const amount =
     method.currency === 'VES' ? formatBs(Math.round(total * 100 * DEMO_EXCHANGE_RATE)) : `${formatPrice(total)} USD`;
 
@@ -110,7 +110,7 @@ export function CheckoutPayPage() {
           {method.payTo.map((row) => (
             <Row key={row.label} label={row.label} value={row.value} copy />
           ))}
-          <Row label="Concepto" value={isRenewal ? `Renovación · ${plan.name} · ${monthsLabel(months)}` : plan.name} />
+          <Row label="Concepto" value={isRenewal ? `Renovación · ${plan.name} · ${periodLabel}` : plan.name} />
         </div>
 
         <div className="bg-panel border border-line rounded-[18px] p-6">

@@ -1,7 +1,7 @@
 import { Navigate, useSearchParams } from 'react-router-dom';
 import { formatDate } from '../../entities/membership';
 import { formatPrice, useSelectedPlan } from '../../entities/plan';
-import { monthsLabel, useCheckoutOrder } from '../../features/renew-membership';
+import { useCheckoutOrder } from '../../features/renew-membership';
 import { ROUTES } from '../../shared/config/routes';
 import { EXTERNAL_LINKS } from '../../shared/config/external-links';
 import { findPaymentMethod } from '../../shared/config/payment-methods';
@@ -30,7 +30,7 @@ export function CheckoutPendingPage() {
   const plan = useSelectedPlan();
   const [params] = useSearchParams();
   const method = findPaymentMethod(params.get('metodo'));
-  const order = useCheckoutOrder(plan?.price ?? 0);
+  const order = useCheckoutOrder(plan);
 
   if (!plan) {
     return <Navigate to={ROUTES.checkoutPlan} replace />;
@@ -56,7 +56,7 @@ export function CheckoutPendingPage() {
           {order.isRenewal && (
             <div className="flex items-baseline justify-between gap-4 text-[14px]">
               <span className="text-muted">Renovación</span>
-              <span className="text-ink">{monthsLabel(order.months)}</span>
+              <span className="text-ink">{order.periodLabel}</span>
             </div>
           )}
           <div className="flex items-baseline justify-between gap-4 text-[14px]">

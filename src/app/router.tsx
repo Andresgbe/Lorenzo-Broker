@@ -19,6 +19,8 @@ import { StudentNav } from '../widgets/student-nav';
 import { StudentHomePage } from '../pages/student-home';
 import { StudentCoursesPage } from '../pages/student-courses';
 import { StudentCoursePage } from '../pages/student-course';
+import { StudentForumPage } from '../pages/student-forum';
+import { StudentForumThreadPage } from '../pages/student-forum-thread';
 import { StudentLessonPage } from '../pages/student-lesson';
 import { StudentAccountPage } from '../pages/student-account';
 import { StudentExpiredPage } from '../pages/student-expired';
@@ -26,6 +28,7 @@ import { RequireAdmin, RequireAuth } from '../entities/session';
 import { AdminShell } from '../widgets/admin-shell';
 import { AdminOverviewPage } from '../pages/admin-overview';
 import { AdminStudentsPage } from '../pages/admin-students';
+import { AdminStudentPage } from '../pages/admin-student';
 import { AdminPaymentsPage } from '../pages/admin-payments';
 import { AdminPaymentPage } from '../pages/admin-payment';
 import { AdminCoursesPage } from '../pages/admin-courses';
@@ -72,6 +75,8 @@ export const router = createBrowserRouter(
         { path: ROUTES.student, element: <StudentHomePage /> },
         { path: ROUTES.studentCourses, element: <StudentCoursesPage /> },
         { path: ROUTES.studentCourse, element: <StudentCoursePage /> },
+        { path: ROUTES.studentCourseForum, element: <StudentForumPage /> },
+        { path: ROUTES.studentForumThread, element: <StudentForumThreadPage /> },
         { path: ROUTES.studentLesson, element: <StudentLessonPage /> },
         { path: ROUTES.studentAccount, element: <StudentAccountPage /> },
         { path: ROUTES.studentExpired, element: <StudentExpiredPage /> },
@@ -90,6 +95,7 @@ export const router = createBrowserRouter(
       children: [
         { path: ROUTES.adminOverview, element: <AdminOverviewPage /> },
         { path: ROUTES.adminStudents, element: <AdminStudentsPage /> },
+        { path: ROUTES.adminStudent, element: <AdminStudentPage /> },
         { path: ROUTES.adminPayments, element: <AdminPaymentsPage /> },
         { path: ROUTES.adminPayment, element: <AdminPaymentPage /> },
         { path: ROUTES.adminCourses, element: <AdminCoursesPage /> },
