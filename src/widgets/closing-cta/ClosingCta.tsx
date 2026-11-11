@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { HOME_SECTIONS } from '../../shared/config/routes';
+import { telegramBotLink } from '../../shared/config/telegram';
 import { Container } from '../../shared/ui/Container';
 import { Button } from '../../shared/ui/Button';
 
@@ -19,7 +19,7 @@ export function ClosingCta() {
           Aprende con <span className="text-accent">alguien que opera</span>.
         </motion.h2>
 
-        <Button href={`#${HOME_SECTIONS.pricing}`} variant="primary" className="mt-9">
+        <Button href={telegramBotLink()} variant="primary" className="mt-9">
           Únete a la comunidad
         </Button>
 

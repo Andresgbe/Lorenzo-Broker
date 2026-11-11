@@ -18,6 +18,7 @@ function toSessionUser(user: User | null | undefined): SessionUser | null {
     fullName: user.user_metadata?.full_name ?? null,
     taxId: user.user_metadata?.tax_id ?? null,
     phone: user.user_metadata?.phone ?? null,
+    needsPassword: user.user_metadata?.needs_password === true,
   };
 }
 
@@ -113,6 +114,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error: profileError ? profileError.message : null };
   }, []);
 
+  const changePassword = useCallback(
+    async ({ current, next }: { current?: string; next: string }) => {
+      if (!supabase) return { error: NOT_CONFIGURED };
+      const email = user?.email;
+      if (!email) return { error: 'NO_SESSION' };
+      // Una cuenta con contraseña debe confirmar la actual; la que creó el bot aún no tiene.
+      if (!user?.needsPassword) {
+        const { error } = await supabase.auth.signInWithPassword({ email, password: current ?? '' });
+        if (error) return { error: 'WRONG_PASSWORD' };
+      }
+      const { data, error } = await supabase.auth.updateUser({ password: next, data: { needs_password: false } });
+      if (error) return { error: error.message };
+      setUser(toSessionUser(data.user));
+      return { error: null };
+    },
+    [user]
+  );
+
   const logout = useCallback(async () => {
     setViewAsStudent(false);
     if (!supabase) return;
@@ -137,9 +156,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       requestPasswordReset,
       updatePassword,
       updateProfile,
+      changePassword,
       logout,
     }),
-    [user, isLoading, isAdminAccount, viewAsStudent, setViewAsStudent, login, register, requestPasswordReset, updatePassword, updateProfile, logout]
+    [user, isLoading, isAdminAccount, viewAsStudent, setViewAsStudent, login, register, requestPasswordReset, updatePassword, updateProfile, changePassword, logout]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

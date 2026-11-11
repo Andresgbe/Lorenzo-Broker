@@ -88,13 +88,16 @@ export function AccountMenu() {
         onClick={() => setOpen((value) => !value)}
         aria-haspopup="menu"
         aria-expanded={open}
-        aria-label={open ? 'Cerrar menú de tu cuenta' : 'Abrir menú de tu cuenta'}
+        aria-label={user ? (open ? 'Cerrar menú de tu cuenta' : 'Abrir menú de tu cuenta') : 'Iniciar sesión o registrarte'}
         className={cn(
-          'flex items-center justify-center w-10 h-10 rounded-full border text-[13px] font-bold transition-colors cursor-pointer',
+          'flex items-center justify-center h-10 rounded-full border text-[13px] font-bold transition-colors cursor-pointer',
+          // Sin sesión lleva el texto al lado, para que se entienda qué es; en el teléfono solo el ícono.
+          user ? 'w-10' : 'w-10 md:w-auto md:gap-2 md:pl-3 md:pr-4',
           open ? 'border-accent bg-accent/10 text-accent' : 'border-line-strong bg-panel-2 text-ink hover:border-accent'
         )}
       >
         {initials ?? <UserIcon className="w-5 h-5" />}
+        {!user && <span className="hidden md:inline whitespace-nowrap font-semibold">Iniciar sesión / Registrarte</span>}
       </button>
 
       {open && (

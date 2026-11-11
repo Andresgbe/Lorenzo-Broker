@@ -2,6 +2,43 @@
 
 Registro de los cambios pedidos sobre la plataforma, del más reciente al más antiguo.
 
+## 10/11/2026 — Quien paga en el bot de Telegram entra a los cursos de la web
+
+- **Decisión de Lorenzo:** quien paga la membresía en el bot de Telegram tiene acceso completo a la plataforma web.
+- Nueva función de servidor `bot-access` y migración `0014_telegram_bot_access.sql`:
+  - Cuando el bot confirma un pago, la web registra el pago y extiende la membresía, una sola vez por pago.
+  - Si la persona no tiene cuenta, el bot le pide el correo, se le crea la cuenta y recibe en Telegram un enlace de un solo uso para entrar.
+  - Si el correo ya tenía cuenta, la membresía se aplica a esa cuenta, pero el bot no da enlace de entrada: entra con su contraseña. Así nadie entra a una cuenta ajena escribiendo su correo.
+- **Mi cuenta › Seguridad › Cambiar contraseña ahora guarda de verdad.** Pide la contraseña actual. Las cuentas creadas por el bot ven **"Crear contraseña"**, sin contraseña actual.
+- **Inicio** muestra un aviso **"Crea tu contraseña"** a esas cuentas hasta que la creen.
+- Los pagos del bot aparecen en Panel › Pagos con el método `crypto-pay` o `manual`.
+- **Activado y probado el 10/11/2026:**
+  - En Supabase: migración 0014 ejecutada, secretos `BOT_ACCESS_SECRET` y `SITE_URL`, función `bot-access` publicada y dirección de entrada añadida en Auth.
+  - En el bot: `WEB_ACCESS_URL` y `WEB_ACCESS_SECRET` puestos, y bot reiniciado.
+  - **Prueba:** con `/aprobar @usuario mensual` a una cuenta de prueba, el bot pidió el correo, se creó la cuenta y el enlace de Telegram entró a la web con la membresía activa.
+- **Lo que hay que saber:**
+  - El bot solo lee su `.env` al arrancar: tras cambiarlo, hay que reiniciarlo.
+  - `/aprobar` sirve para probar sin pagar, porque pasa por el mismo camino que un pago real.
+  - Los pagos hechos en el bot **antes** de la integración no llegaron a la web: esas personas necesitan un `/aprobar` o acceso desde el panel.
+  - `/sacar` en el bot todavía no quita el acceso a la web.
+- Código: `supabase/functions/bot-access`, `entities/session` y `pages/student-account`. En el repo del bot: `bot.py`.
+- **Supabase desde Claude Code:** se añadió un servidor MCP local llamado `supabase`, limitado al proyecto LBP con un token de acceso del usuario. Así se pueden aplicar migraciones y publicar funciones desde aquí.
+
+## 05/11/2026 — Los botones de pago abren el bot de Telegram
+
+- El cobro lo hace ahora el **bot de Telegram de Lorenzo** (Crypto Pay, en USDT). Todos los botones de pago del sitio público abren `https://t.me/BrokerLorenzoBot?start=web` en una pestaña nueva: "Suscríbete ahora" (barra, portada, precios y pie de página), "Suscríbete al año" y "Únete a la comunidad".
+- El enlace está en una sola constante, `TELEGRAM_BOT_URL`, con el helper `telegramBotLink()` en `shared/config/telegram.ts`.
+- **Precios de la portada en USDT:** 27.77 USDT/mes y 297 USDT/año, con la nota "Pago con Crypto Pay en Telegram". El ahorro anual se calcula solo y da **36.24 USDT**; equivale a 24.75 USDT al mes.
+- **Lorenzo debe cambiar el precio mensual a 27.77** desde la propia portada (con sesión de admin): el precio guardado (29) tiene prioridad sobre el del código.
+- Las pantallas de checkout **no se borraron**; la web pública ya no enlaza a ellas.
+- Código: `shared/config/telegram.ts`, `features/subscribe-cta`, `widgets/pricing-section` y `widgets/closing-cta`.
+
+## 05/11/2026 — Barra: "Iniciar sesión / Registrarte"
+
+- Sin sesión, el botón de la cuenta (arriba a la derecha) muestra ahora el texto **"Iniciar sesión / Registrarte"** junto al ícono de persona, para que se entienda qué es. Al tocarlo se abre el mismo menú con ambas opciones.
+- En el teléfono sigue mostrando solo el ícono, porque no cabe.
+- Código: `features/account-menu/ui/AccountMenu.tsx`.
+
 ## 02/11/2026 — Alumnos: modal "Administrar acceso"
 
 - **Dar o extender acceso**, **Expirar** y **Quitar** se reúnen en una sola opción, **Administrar acceso**, en el menú "⋯" y en el detalle del alumno.

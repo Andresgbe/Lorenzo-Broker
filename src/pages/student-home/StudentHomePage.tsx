@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../../entities/session';
 import { courseLessons, courseProgress, describeCourse, groupCoursesByLevel, useCourseLevels, useCourseTree, useLessonProgress } from '../../entities/course';
 import { caracasDay, daysUntil, describeMembership, useMembership } from '../../entities/membership';
-import { ROUTES, studentCoursePath, studentLessonPath } from '../../shared/config/routes';
+import { ACCOUNT_SECTIONS, ROUTES, studentAccountPath, studentCoursePath, studentLessonPath } from '../../shared/config/routes';
 import { Button } from '../../shared/ui/Button';
 import { Container } from '../../shared/ui/Container';
 import { cn } from '../../shared/lib/cn';
@@ -24,6 +24,18 @@ export function StudentHomePage() {
     <Container className="py-12 md:py-16">
       <h1 className="font-display font-bold text-[clamp(26px,3.6vw,34px)] text-ink">Hola, {firstName}</h1>
       <p className="text-muted text-[15px] mt-2">Qué bueno verte. Sigue aprendiendo a tu ritmo.</p>
+
+      {/* Cuentas creadas por el bot de Telegram: entran con enlace hasta que creen su contraseña. */}
+      {user?.needsPassword && (
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-[14px] border border-gold/30 bg-gold/10 px-5 py-4">
+          <p className="text-[14px] text-ink-soft">
+            Crea tu contraseña para entrar después con tu correo, sin pedirle un enlace al bot.
+          </p>
+          <Button to={studentAccountPath(ACCOUNT_SECTIONS.security)} size="sm" variant="primary">
+            Crear contraseña
+          </Button>
+        </div>
+      )}
 
       <div className="grid gap-5 lg:grid-cols-2 mt-9">
         <section className="bg-panel border border-accent/40 rounded-[18px] p-6 shadow-[0_0_50px_rgba(0,176,154,0.08)]">

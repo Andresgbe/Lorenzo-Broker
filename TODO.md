@@ -20,10 +20,27 @@ Lo que falta por hacer en la plataforma. Al terminar algo, se marca `[x]` (o se 
 - [ ] Decidir con Lorenzo quién es el titular de la cuenta definitiva (su correo y su tarjeta) **antes de que acabe la prueba** (≈ 10/11/2026).
 - [ ] Más adelante (Fase 2): marca de agua con el correo del alumno.
 
+## Bot de Telegram → web (10/11/2026)
+
+- [x] Programar la integración: migración 0014, función `bot-access`, cambios en el bot y en Mi cuenta.
+- [x] Ejecutar `0014_telegram_bot_access.sql` en el SQL Editor de LBP.
+- [x] Crear los secretos `BOT_ACCESS_SECRET` y `SITE_URL` en Edge Functions → Secrets.
+- [x] Publicar la función `bot-access` (sin verificación de JWT).
+- [x] Añadir la dirección de `SITE_URL` en Supabase → Authentication → URL Configuration → Redirect URLs.
+- [x] En el bot: poner `WEB_ACCESS_URL` y `WEB_ACCESS_SECRET` y reiniciarlo.
+- [x] Probarlo de punta a punta (10/11/2026, con `/aprobar`): funciona.
+- [ ] Publicar la web con estos cambios (aviso y formulario "Crear contraseña").
+- [ ] Probarlo también con un pago real de 1 USDT.
+- [ ] `/sacar` en el bot: que también quite el acceso a la web.
+- [ ] Miembros que pagaron en el bot antes de la integración: que `/web` mande su membresía vigente, o darles acceso a mano.
+- [ ] Igualar la gracia: el bot da 3 días y la web 2.
+- [ ] Antes del lanzamiento: volver a los precios reales en el `.env` del bot (quitar `PRICE_MENSUAL` y `PRICE_ANUAL`), usar otra base de datos (`DB_PATH`) y subir el bot a Railway.
+
 ## Supabase
 
 - [ ] Confirmar si se aplicaron las migraciones 0003, 0004, 0005 y 0006 en el proyecto LBP.
-- [ ] Opcional: reautorizar el conector de Supabase de claude.ai con la organización "PROJECTS ENVIROMENT" para poder aplicar migraciones desde aquí.
+- [x] Acceso a LBP desde Claude Code: servidor MCP local `supabase`, limitado a LBP (10/11/2026).
+- [ ] Cambiar el token de acceso de Supabase de ese servidor, porque se vio en una captura, y reinstalar el servidor con el token nuevo.
 
 ## Pagos
 

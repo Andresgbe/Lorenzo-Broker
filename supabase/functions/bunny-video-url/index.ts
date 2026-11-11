@@ -55,8 +55,8 @@ Deno.serve(async (request) => {
     auth: { persistSession: false },
   });
 
-  let videoId: string | null = null;
-  let libraryId: string | null = null;
+  let videoId: string | null;
+  let libraryId: string | null;
 
   if ('lessonId' in parsed.data) {
     const { data, error } = await supabase

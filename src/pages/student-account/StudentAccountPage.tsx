@@ -5,6 +5,7 @@ import { describeMembership, formatDate, useMembership } from '../../entities/me
 import { PAYMENT_STATUS_TONE, usePayments } from '../../entities/payment';
 import { ACCOUNT_SECTIONS, ROUTES, studentAccountPath, type AccountSection, type BackLinkState } from '../../shared/config/routes';
 import { cn } from '../../shared/lib/cn';
+import { MIN_PASSWORD_LENGTH } from '../../shared/lib/validation';
 import { Button } from '../../shared/ui/Button';
 import { Container } from '../../shared/ui/Container';
 import { FormAlert } from '../../shared/ui/FormAlert';
@@ -282,9 +283,10 @@ function MembershipSection() {
 type SecurityOption = 'password' | 'email';
 
 // Seguridad de la cuenta: correo y contraseña. Cada opción abre su formulario en un
-// modal, no dentro de la tarjeta. Todavía no se guarda en Supabase.
+// modal, no dentro de la tarjeta. La contraseña se guarda; el correo todavía no.
 function SecuritySection() {
   const { user } = useAuth();
+  const needsPassword = user?.needsPassword ?? false;
   const [open, setOpen] = useState<SecurityOption | null>(null);
   const close = useCallback(() => setOpen(null), []);
 
@@ -299,8 +301,12 @@ function SecuritySection() {
         />
         <SecurityRow
           title="Contraseña"
-          description="La que usas para entrar a tu cuenta."
-          actionLabel="Cambiar contraseña"
+          description={
+            needsPassword
+              ? 'Todavía no tienes. Créala para entrar sin pedirle un enlace al bot.'
+              : 'La que usas para entrar a tu cuenta.'
+          }
+          actionLabel={needsPassword ? 'Crear contraseña' : 'Cambiar contraseña'}
           onAction={() => setOpen('password')}
         />
       </div>
@@ -327,28 +333,116 @@ function SecuritySection() {
         </form>
       </Modal>
 
-      <Modal open={open === 'password'} title="Cambiar contraseña" onClose={close}>
-        <form noValidate onSubmit={(event) => event.preventDefault()} className="flex flex-col gap-4">
-          <PasswordField
-            label="Contraseña actual"
-            autoComplete="current-password"
-            placeholder="Tu contraseña"
-            labelAside={
-              <Link
-                to={ROUTES.forgotPassword}
-                state={{ from: studentAccountPath(ACCOUNT_SECTIONS.security), fromTitle: 'Mi cuenta' } satisfies BackLinkState}
-                className="text-[12.5px] text-accent hover:underline"
-              >
-                ¿La olvidaste?
-              </Link>
-            }
-          />
-          <PasswordField label="Contraseña nueva" autoComplete="new-password" placeholder="Mínimo 8 caracteres" />
-          <PasswordField label="Confirmar contraseña nueva" autoComplete="new-password" placeholder="Repite la contraseña nueva" />
-          <ModalActions submitLabel="Actualizar contraseña" />
-        </form>
+      <Modal open={open === 'password'} title={needsPassword ? 'Crear contraseña' : 'Cambiar contraseña'} onClose={close}>
+        {open === 'password' && <PasswordForm needsPassword={needsPassword} onDone={close} />}
       </Modal>
     </Card>
+  );
+}
+
+/** Crear o cambiar la contraseña. Se monta al abrir el modal, así empieza vacío cada vez. */
+function PasswordForm({ needsPassword, onDone }: { needsPassword: boolean; onDone: () => void }) {
+  const { changePassword } = useAuth();
+  const [current, setCurrent] = useState('');
+  const [next, setNext] = useState('');
+  const [confirm, setConfirm] = useState('');
+  const [errors, setErrors] = useState<{ current?: string; next?: string; confirm?: string }>({});
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  async function handleSubmit(event: FormEvent) {
+    event.preventDefault();
+    const nextErrors = {
+      current: !needsPassword && !current ? 'Escribe tu contraseña actual.' : undefined,
+      next: next.length < MIN_PASSWORD_LENGTH ? `Mínimo ${MIN_PASSWORD_LENGTH} caracteres.` : undefined,
+      confirm: confirm !== next ? 'Las contraseñas no coinciden.' : undefined,
+    };
+    setErrors(nextErrors);
+    if (nextErrors.current || nextErrors.next || nextErrors.confirm) return;
+    setIsSaving(true);
+    setSaveError(null);
+    const { error } = await changePassword({ current: needsPassword ? undefined : current, next });
+    setIsSaving(false);
+    if (error === 'WRONG_PASSWORD') {
+      setErrors({ current: 'La contraseña actual no es correcta.' });
+      return;
+    }
+    if (error) {
+      setSaveError('No pudimos guardar la contraseña. Intenta de nuevo en un momento.');
+      return;
+    }
+    setSaved(true);
+  }
+
+  if (saved) {
+    return (
+      <div className="flex flex-col gap-4">
+        <FormAlert variant="success">
+          {needsPassword ? 'Listo: ya puedes entrar con tu correo y esta contraseña.' : 'Tu contraseña se actualizó.'}
+        </FormAlert>
+        <div className="flex justify-end">
+          <Button size="sm" variant="primary" onClick={onDone}>
+            Cerrar
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <form noValidate onSubmit={(event) => void handleSubmit(event)} className="flex flex-col gap-4">
+      {saveError && <FormAlert variant="error">{saveError}</FormAlert>}
+      {!needsPassword && (
+        <PasswordField
+          label="Contraseña actual"
+          autoComplete="current-password"
+          placeholder="Tu contraseña"
+          value={current}
+          error={errors.current}
+          onChange={(event) => {
+            setCurrent(event.target.value);
+            setErrors((prev) => ({ ...prev, current: undefined }));
+          }}
+          labelAside={
+            <Link
+              to={ROUTES.forgotPassword}
+              state={{ from: studentAccountPath(ACCOUNT_SECTIONS.security), fromTitle: 'Mi cuenta' } satisfies BackLinkState}
+              className="text-[12.5px] text-accent hover:underline"
+            >
+              ¿La olvidaste?
+            </Link>
+          }
+        />
+      )}
+      <PasswordField
+        label={needsPassword ? 'Contraseña' : 'Contraseña nueva'}
+        autoComplete="new-password"
+        placeholder={`Mínimo ${MIN_PASSWORD_LENGTH} caracteres`}
+        value={next}
+        error={errors.next}
+        onChange={(event) => {
+          setNext(event.target.value);
+          setErrors((prev) => ({ ...prev, next: undefined }));
+        }}
+      />
+      <PasswordField
+        label={needsPassword ? 'Confirmar contraseña' : 'Confirmar contraseña nueva'}
+        autoComplete="new-password"
+        placeholder="Repite la contraseña"
+        value={confirm}
+        error={errors.confirm}
+        onChange={(event) => {
+          setConfirm(event.target.value);
+          setErrors((prev) => ({ ...prev, confirm: undefined }));
+        }}
+      />
+      <div className="flex justify-end mt-2">
+        <Button type="submit" size="sm" variant="primary" disabled={isSaving}>
+          {isSaving ? 'Guardando…' : needsPassword ? 'Crear contraseña' : 'Actualizar contraseña'}
+        </Button>
+      </div>
+    </form>
   );
 }
 

@@ -10,4 +10,6 @@ export interface SessionUser {
   taxId: string | null;
   /** WhatsApp del alumno, editable en Mi cuenta. */
   phone: string | null;
+  /** La cuenta la creó el bot de Telegram y todavía no tiene contraseña (entra con enlace). */
+  needsPassword: boolean;
 }

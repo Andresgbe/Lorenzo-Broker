@@ -45,6 +45,11 @@ export interface AuthContextValue {
   /** Cambia la contraseña de la sesión abierta (la de recuperación, al volver del correo). */
   updatePassword: (password: string) => Promise<AuthResult>;
   updateProfile: (input: ProfileInput) => Promise<AuthResult>;
+  /**
+   * Cambia la contraseña desde Mi cuenta. `current` se comprueba antes; se omite solo si la
+   * cuenta aún no tiene contraseña (la creó el bot de Telegram).
+   */
+  changePassword: (input: { current?: string; next: string }) => Promise<AuthResult>;
   logout: () => Promise<void>;
 }
 

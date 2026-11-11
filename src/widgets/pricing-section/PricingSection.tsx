@@ -25,9 +25,14 @@ interface PricingContent {
 
 const DEFAULT_ANNUAL_PRICE = '297';
 
+/** 36.24, 24.75 o 297: con punto decimal, como el bot muestra los montos en USDT. */
+function formatUsdt(amount: number) {
+  return Number.isInteger(amount) ? String(amount) : amount.toFixed(2);
+}
+
 const DEFAULT_PRICING: PricingContent = {
   planName: 'Comunidad Lorenzo Broker',
-  price: '29',
+  price: '27.77',
   annualPrice: DEFAULT_ANNUAL_PRICE,
   billingNote: 'Sin permanencia. Cancela cuando quieras.',
   items: [
@@ -82,8 +87,9 @@ export function PricingSection() {
   }
 
   const annualPrice = content.annualPrice ?? DEFAULT_ANNUAL_PRICE;
-  const annualSavings = Number(content.price) * 12 - Number(annualPrice);
-  const annualPerMonth = (Number(annualPrice) / 12).toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  // Redondeado a centavos: 12 × 27.77 en coma flotante no da 333.24 exacto.
+  const annualSavings = Math.round((Number(content.price) * 12 - Number(annualPrice)) * 100) / 100;
+  const annualPerMonth = formatUsdt(Number(annualPrice) / 12);
 
   function saveContent(next: PricingContent = content) {
     persistContent(next);
@@ -149,18 +155,18 @@ export function PricingSection() {
             )}
 
             <div className="font-display font-bold text-[56px] mt-4 mb-1 text-ink flex items-baseline justify-center gap-0.5">
-              $
               {isAdmin ? (
                 <input
+                  aria-label="Precio mensual"
                   value={content.price}
                   onChange={(e: ChangeEvent<HTMLInputElement>) => updateField({ price: e.target.value })}
                   onBlur={() => saveContent()}
-                  className="w-20 text-center bg-transparent outline-none border-b border-dashed border-line focus:border-accent"
+                  className="w-36 text-center bg-transparent outline-none border-b border-dashed border-line focus:border-accent"
                 />
               ) : (
                 content.price
               )}
-              <small className="text-lg text-muted font-body font-medium">/mes</small>
+              <small className="text-lg text-muted font-body font-medium">USDT/mes</small>
             </div>
 
             {isAdmin ? (
@@ -173,6 +179,7 @@ export function PricingSection() {
             ) : (
               <div className="text-muted text-[13.5px] mb-7">{content.billingNote}</div>
             )}
+            <p className="-mt-4 mb-7 text-[12.5px] text-muted">Pago con Crypto Pay en Telegram</p>
 
             <div className="text-left grid gap-3 mb-8">
               {content.items.map((item) => (
@@ -222,7 +229,7 @@ export function PricingSection() {
               )}
             </div>
 
-            <SubscribeButton label="Suscríbete ahora" className="w-full" planId="mensual" />
+            <SubscribeButton label="Suscríbete ahora" className="w-full" />
           </motion.div>
 
           {/* Mismos beneficios que el mensual: se editan en esa tarjeta. Aquí solo cambia el precio. */}
@@ -235,13 +242,12 @@ export function PricingSection() {
           >
             {annualSavings > 0 && (
               <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-accent px-4 py-1.5 text-[12px] font-bold text-ink-inverse">
-                Ahorras ${annualSavings}
+                Ahorras {formatUsdt(annualSavings)} USDT
               </span>
             )}
             <div className="text-xs font-bold tracking-[3px] uppercase text-accent">Membresía anual</div>
 
             <div className="font-display font-bold text-[56px] mt-4 mb-1 text-ink flex items-baseline justify-center gap-0.5">
-              $
               {isAdmin ? (
                 <input
                   aria-label="Precio anual"
@@ -253,10 +259,11 @@ export function PricingSection() {
               ) : (
                 annualPrice
               )}
-              <small className="text-lg text-muted font-body font-medium">/año</small>
+              <small className="text-lg text-muted font-body font-medium">USDT/año</small>
             </div>
 
-            <div className="text-muted text-[13.5px] mb-7">Un solo pago al año. Equivale a ${annualPerMonth} al mes.</div>
+            <div className="text-muted text-[13.5px] mb-3">Un solo pago al año. Equivale a {annualPerMonth} USDT al mes.</div>
+            <p className="mb-7 text-[12.5px] text-muted">Pago con Crypto Pay en Telegram</p>
 
             <div className="text-left grid gap-3 mb-8">
               {content.items.map((item) => (
@@ -267,7 +274,7 @@ export function PricingSection() {
               ))}
             </div>
 
-            <SubscribeButton label="Suscríbete al año" className="w-full" planId="anual" />
+            <SubscribeButton label="Suscríbete al año" className="w-full" />
           </motion.div>
         </div>
       </Container>
