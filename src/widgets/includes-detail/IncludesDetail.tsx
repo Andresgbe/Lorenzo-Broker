@@ -1,9 +1,30 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { HOME_SECTIONS } from '../../shared/config/routes';
 import { cn } from '../../shared/lib/cn';
 import { Container } from '../../shared/ui/Container';
 import { MediaPlaceholder } from '../../shared/ui/MediaPlaceholder';
 import { SectionHeading } from '../../shared/ui/SectionHeading';
+import educacionCursos from '../../shared/assets/images/includes/educacion-cursos.webp';
+import educacionClaseGrabada from '../../shared/assets/images/includes/educacion-clase-grabada.webp';
+import educacionClasePresencial from '../../shared/assets/images/includes/educacion-clase-presencial.webp';
+import educacionEscritorio from '../../shared/assets/images/includes/educacion-escritorio.webp';
+import ideasAlertaNvda from '../../shared/assets/images/includes/ideas-alerta-nvda.webp';
+import ideasMicron from '../../shared/assets/images/includes/ideas-micron.webp';
+import ideasResumenMercado from '../../shared/assets/images/includes/ideas-resumen-mercado.webp';
+import ideasZcashAntes from '../../shared/assets/images/includes/ideas-zcash-antes.webp';
+import ideasZcashDespues from '../../shared/assets/images/includes/ideas-zcash-despues.webp';
+import ideasHyperliquid from '../../shared/assets/images/includes/ideas-hyperliquid.webp';
+import copytradingCartera from '../../shared/assets/images/includes/copytrading-cartera.webp';
+import copytradingResumen from '../../shared/assets/images/includes/copytrading-resumen.webp';
+import copytradingGrafico from '../../shared/assets/images/includes/copytrading-grafico.webp';
+
+interface Shot {
+  src: string;
+  alt: string;
+  /** Texto bajo la captura: qué se ve en ella. */
+  caption: string;
+}
 
 interface IncludeDetail {
   id: string;
@@ -12,12 +33,13 @@ interface IncludeDetail {
   title: string;
   intro: string;
   points: string[];
-  /** Texto bajo la captura: qué se ve en ella. */
-  caption: string;
+  /** Capturas de esa parte; con más de una, se pasan con los puntos de abajo. */
+  shots: Shot[];
   bonus?: boolean;
 }
 
-// Textos de ejemplo para diseñar: Lorenzo los va a reescribir y mandará las capturas reales.
+// Los textos siguen siendo de ejemplo: Lorenzo los va a reescribir. Las capturas son las que
+// mandó el 12 y el 13/11/2026 (originales en `resources/`).
 // Siguen el orden de las tarjetas de "¿Qué incluye?" (IncludesSection).
 const DEFAULT_INCLUDE_DETAILS: IncludeDetail[] = [
   {
@@ -32,7 +54,12 @@ const DEFAULT_INCLUDE_DETAILS: IncludeDetail[] = [
       'Biblioteca de libros en PDF para descargar',
       'Todas las clases quedan grabadas en tu área de alumno',
     ],
-    caption: 'Así se ve tu área de alumno con los cursos y tu progreso.',
+    shots: [
+      { src: educacionCursos, alt: 'Portadas de los cursos: acciones preferidas, REITs, bonos, futuros, opciones y estrategias', caption: 'Los cursos de la academia.' },
+      { src: educacionClaseGrabada, alt: 'Lorenzo explica un contrato de futuros en una clase grabada', caption: 'Una clase grabada: así se explica cada tema.' },
+      { src: educacionClasePresencial, alt: 'Lorenzo da una clase en la pizarra a un grupo de alumnos', caption: 'Clase en vivo con alumnos.' },
+      { src: educacionEscritorio, alt: 'Lorenzo en su escritorio de trading, rodeado de monitores', caption: 'Desde aquí se graban las clases y los eventos en vivo.' },
+    ],
   },
   {
     id: 'ideas',
@@ -46,7 +73,14 @@ const DEFAULT_INCLUDE_DETAILS: IncludeDetail[] = [
       'Entrada, salida y stop de cada operación',
       'Un grupo privado solo para miembros',
     ],
-    caption: 'Ejemplo de una alerta en el chat privado.',
+    shots: [
+      { src: ideasAlertaNvda, alt: 'Alerta en el chat: comprando NVDA en 160 dólares, stop en 149, objetivo en 178', caption: 'Una alerta en el chat privado: entrada, stop y objetivo.' },
+      { src: ideasMicron, alt: 'Idea de inversión sobre Micron (MU) antes de sus resultados', caption: 'Una idea de inversión con su porqué.' },
+      { src: ideasResumenMercado, alt: 'Reporte "Resumen del mercado" del jueves 12 de noviembre', caption: 'El resumen diario del mercado.' },
+      { src: ideasZcashAntes, alt: 'Zcash a 147 dólares el 3 de octubre de 2025', caption: 'Zcash el 3 de octubre de 2025: 147 dólares.' },
+      { src: ideasZcashDespues, alt: 'Zcash a 513 dólares el 27 de diciembre de 2025', caption: 'Y el 27 de diciembre: 513 dólares.' },
+      { src: ideasHyperliquid, alt: 'Publicación sobre Hyperliquid: acción PURR y cripto HYPE-USDT', caption: 'Ideas en acciones y en cripto.' },
+    ],
   },
   {
     id: 'copytrading',
@@ -60,7 +94,11 @@ const DEFAULT_INCLUDE_DETAILS: IncludeDetail[] = [
       'Puedes dejar de copiar cuando quieras',
       'Alto riesgo: los resultados pasados no garantizan resultados futuros',
     ],
-    caption: 'Mi perfil de Lead Trader en Binance.',
+    shots: [
+      { src: copytradingCartera, alt: 'Cartera de copy trading LORENZOBROKER en Binance, con apalancamiento de 10x a 20x', caption: 'Mi cartera de Lead Trader en Binance.' },
+      { src: copytradingResumen, alt: 'Resumen del trader principal y activos preferidos: Apple, ARM, Micron, Microsoft, Nvidia y otros', caption: 'Resumen de la cartera y los activos que más opero.' },
+      { src: copytradingGrafico, alt: 'Gráfico de TSLAUSDT en Binance Futures', caption: 'Operando futuros en Binance.' },
+    ],
     bonus: true,
   },
 ];
@@ -84,8 +122,14 @@ function ImageIcon({ className }: { className?: string }) {
   );
 }
 
-/** Marco de la captura: ventana con su barra, a la espera de la imagen real. */
-function ScreenshotFrame({ caption }: { caption: string }) {
+/**
+ * Marco de la captura: ventana con su barra. Con varias capturas, los puntos de abajo
+ * cambian cuál se ve. Cada imagen se muestra entera (las hay verticales y apaisadas).
+ */
+function ScreenshotFrame({ shots, bonus }: { shots: Shot[]; bonus?: boolean }) {
+  const [active, setActive] = useState(0);
+  const shot = shots[active];
+
   return (
     <figure className="w-full">
       <div className="rounded-[20px] border border-line bg-panel p-2.5 shadow-[0_30px_80px_rgba(0,0,0,0.5)]">
@@ -94,13 +138,47 @@ function ScreenshotFrame({ caption }: { caption: string }) {
           <span className="w-2.5 h-2.5 rounded-full bg-line-strong" />
           <span className="w-2.5 h-2.5 rounded-full bg-line-strong" />
         </div>
-        <MediaPlaceholder
-          icon={<ImageIcon className="w-7 h-7 text-ink-inverse" />}
-          label="Captura de pantalla"
-          className="aspect-[16/10] rounded-[14px]"
-        />
+        {shot ? (
+          <div className="aspect-[16/10] rounded-[14px] bg-bg overflow-hidden flex items-center justify-center">
+            <img
+              key={shot.src}
+              src={shot.src}
+              alt={shot.alt}
+              loading="lazy"
+              decoding="async"
+              className="max-w-full max-h-full object-contain"
+            />
+          </div>
+        ) : (
+          <MediaPlaceholder
+            icon={<ImageIcon className="w-7 h-7 text-ink-inverse" />}
+            label="Captura de pantalla"
+            className="aspect-[16/10] rounded-[14px]"
+          />
+        )}
       </div>
-      <figcaption className="text-[12.5px] text-muted text-center mt-3">{caption}</figcaption>
+      {shot && <figcaption className="text-[12.5px] text-muted text-center mt-3">{shot.caption}</figcaption>}
+      {shots.length > 1 && (
+        <div className="flex justify-center gap-2 mt-3">
+          {shots.map((item, i) => (
+            <button
+              key={item.src}
+              type="button"
+              onClick={() => setActive(i)}
+              aria-label={`Ver captura ${i + 1} de ${shots.length}`}
+              aria-current={i === active}
+              className="p-1.5 rounded-full focus-visible:outline-2 focus-visible:outline-accent"
+            >
+              <span
+                className={cn(
+                  'block h-2 rounded-full transition-all',
+                  i === active ? cn('w-6', bonus ? 'bg-highlight' : 'bg-accent') : 'w-2 bg-line-strong hover:bg-faint'
+                )}
+              />
+            </button>
+          ))}
+        </div>
+      )}
     </figure>
   );
 }
@@ -160,7 +238,7 @@ export function IncludesDetail() {
                 </div>
 
                 <div className={cn(imageFirst && 'lg:order-1')}>
-                  <ScreenshotFrame caption={detail.caption} />
+                  <ScreenshotFrame shots={detail.shots} bonus={detail.bonus} />
                 </div>
               </motion.article>
             );

@@ -2,6 +2,18 @@
 
 Registro de los cambios pedidos sobre la plataforma, del más reciente al más antiguo.
 
+## 16/11/2026 — "Así funciona cada parte" con las capturas reales
+
+- Cada parte de la portada muestra ahora las fotos y capturas que mandó Lorenzo, en vez del recuadro "Captura de pantalla":
+  - **1. Educación continua:** portadas de los cursos, una clase grabada, una clase en vivo con alumnos y su escritorio.
+  - **2. Ideas de inversión:** la alerta de NVDA en el chat, la idea de Micron, el resumen diario del mercado, Zcash antes y después, y Hyperliquid.
+  - **3. Copytrading:** su cartera de Lead Trader en Binance, el resumen con los activos preferidos y un gráfico de futuros.
+- Con varias capturas, unos puntos debajo del marco permiten pasar de una a otra. Cada una tiene su texto debajo.
+- Cada imagen se ve entera dentro del marco, sea vertical o apaisada.
+- Las imágenes se comprimieron a WebP (13 archivos, unos 700 KB en total). Los originales siguen en `resources/`.
+- Los textos de cada parte siguen siendo de ejemplo, hasta que Lorenzo los reescriba.
+- Código: `widgets/includes-detail` y `shared/assets/images/includes/`.
+
 ## 10/11/2026 — Quien paga en el bot de Telegram entra a los cursos de la web
 
 - **Decisión de Lorenzo:** quien paga la membresía en el bot de Telegram tiene acceso completo a la plataforma web.

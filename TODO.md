@@ -77,7 +77,14 @@ Lo que falta por hacer en la plataforma. Al terminar algo, se marca `[x]` (o se 
 
 ## Contenido que debe enviar Lorenzo
 
-- [ ] Textos e imágenes de "Así funciona cada parte" (`widgets/includes-detail`).
+- [x] Imágenes de "Así funciona cada parte" (16/11/2026).
+- [ ] Textos definitivos de "Así funciona cada parte" (`widgets/includes-detail`): hoy son de ejemplo.
+- [x] Capturas de su contenido para la portada (15/11/2026, en `resources/capturas-portada/`). Falta decidir dónde y cómo se muestran.
+- [x] Fotos para "Educación continua" (correo del 13/11/2026; 5 de 6 en `resources/educacion-continua/`).
+- [ ] Guardar el sexto adjunto de ese correo, la segunda gráfica "Nuestros cursos", y decidir dónde va la sección.
+- [x] Fotos para "Copy trading" (correo "3" del 13/11/2026, en `resources/copy-trading/`).
+- [ ] Portadas de los 12 cursos (Apertura de cuenta, Opciones Pro, Bonos, Plan de ahorro, Plan de inversión, Mentalidad & Psicología, Estrategias, Trading like a pro, Futuros Pro, REITs, Bonos y acciones preferidas, Crypto): solo llegaron como captura del chat. Hay que guardar cada imagen original en `resources/cursos/` y después subirla como portada de su curso en la plataforma.
+- [ ] Correo "2": no ha llegado. La gráfica de servicios (Plan de inversión, Plan de ahorro, Cursos…) está en `resources/por-clasificar/`.
 - [ ] Teléfono de contacto (`CONTACT_PHONE` en `shared/config/contact.ts`).
 - [ ] Enlaces pendientes en `shared/config/external-links.ts`: postulación a la mentoría y WhatsApp de soporte (hoy `REPLACE_ME`).
 - [ ] Dominio final del sitio.

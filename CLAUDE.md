@@ -153,7 +153,7 @@ The client edits the marketing copy himself; this is a core feature, not an admi
 3. Everything lands in one JSON row: `site_content` where `id = 'site'`, one key per section. The stored value overrides the widget's default array.
 
 Known gaps — ask before assuming they are wanted, but keep them in mind:
-- Still hardcoded: the Hero, the closing CTA, the footer, "Así funciona cada parte" (`widgets/includes-detail`, below `PricingSection` on the home, added 22 Oct 2026: one row per "¿Qué incluye?" card with intro, points and a screenshot frame; placeholder copy and no images yet, Lorenzo will send both), the About photos, and the mentorship application URL (`EXTERNAL_LINKS.mentorshipApplication`, still `REPLACE_ME`).
+- Still hardcoded: the Hero, the closing CTA, the footer, "Así funciona cada parte" (`widgets/includes-detail`, below `PricingSection` on the home, added 22 Oct 2026: one row per "¿Qué incluye?" card with intro, points and a screenshot frame. Since 16 Nov 2026 each frame shows Lorenzo's real images (`shared/assets/images/includes/*.webp`, compressed from `resources/`), with dots to switch between them. The copy is still placeholder), the About photos, and the mentorship application URL (`EXTERNAL_LINKS.mentorshipApplication`, still `REPLACE_ME`).
 - **Contacto** (`/contacto`, `pages/contact` + `features/contact-form`, added 22 Oct 2026): the form inserts into `contact_messages` without reading back. The phone shown there is `CONTACT_PHONE` in `shared/config/contact.ts`, `null` until Lorenzo confirms the number (the row is hidden while null). There is no admin inbox for these messages yet.
 
 ## Supabase project
