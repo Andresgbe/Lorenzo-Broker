@@ -3,7 +3,10 @@ import { HOME_SECTIONS } from '../../shared/config/routes';
 import { Container } from '../../shared/ui/Container';
 import { Button } from '../../shared/ui/Button';
 import { SubscribeButton } from '../../features/subscribe-cta';
-import { VideoPlayer } from '../../features/video-player';
+import { VideoPlayer, type VideoSource } from '../../features/video-player';
+import { useAuth } from '../../entities/session';
+import { useSiteContentField } from '../../entities/site-content';
+import { HeroVideoEditor, type HeroVideo } from './HeroVideoEditor';
 
 const STATS = [
   { value: '2×', label: 'sesiones en vivo\npor semana' },
@@ -11,7 +14,16 @@ const STATS = [
   { value: '24/7', label: 'clases grabadas\nsiempre disponibles' },
 ];
 
+const DEFAULT_YOUTUBE_ID = 'lO-V1CVdbcY';
+
 export function Hero() {
+  const { isAdmin } = useAuth();
+  // 'hero.video' en site_content: null mientras nadie haya puesto un video de Bunny.
+  const { value: video, setValue: saveVideo } = useSiteContentField<HeroVideo | null>('hero.video', null);
+  const source: VideoSource = video
+    ? { type: 'bunny-public', libraryId: video.libraryId, videoId: video.videoId }
+    : { type: 'youtube', videoId: DEFAULT_YOUTUBE_ID };
+
   return (
     <section
       id={HOME_SECTIONS.hero}
@@ -25,10 +37,12 @@ export function Hero() {
           className="w-full max-w-5xl bg-panel border border-line rounded-[20px] p-4 sm:p-7 shadow-[0_30px_80px_rgba(0,0,0,0.5)]"
         >
           <VideoPlayer
-            source={{ type: 'youtube', videoId: 'lO-V1CVdbcY' }}
+            key={video ? `${video.libraryId}/${video.videoId}` : 'youtube'}
+            source={source}
             title="Video de bienvenida"
             className="w-full rounded-xl overflow-hidden"
           />
+          {isAdmin && <HeroVideoEditor video={video} onSave={saveVideo} />}
         </motion.div>
 
         <motion.div

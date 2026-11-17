@@ -1,0 +1,15 @@
+# Despliegue en Netlify. Las variables VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY se configuran
+# en el panel de Netlify (Site configuration → Environment variables), no en este archivo.
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# El sitio es una SPA: cualquier ruta (/alumno, /admin/...) debe devolver index.html
+# para que el router de React la resuelva al recargar.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
