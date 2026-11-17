@@ -2,6 +2,17 @@
 
 Lo que falta por hacer en la plataforma. Al terminar algo, se marca `[x]` (o se borra) y se anota en `Cambios.md`.
 
+## Dominio lorenzobroker.com (17/11/2026)
+
+- [x] DNS en Route 53 y dominio en GitHub Pages.
+- [x] Código: base `/`, `public/CNAME`, orígenes de `bunny-video-url`.
+- [ ] Publicar los cambios (commit y push) y activar Enforce HTTPS en GitHub Pages cuando salga el certificado.
+- [ ] Volver a publicar la función `bunny-video-url` (`npx supabase functions deploy bunny-video-url --project-ref vwqivhvhlrzjiqvwnhno`).
+- [ ] Supabase Auth: Site URL `https://lorenzobroker.com` y Redirect URLs `https://lorenzobroker.com/**`.
+- [ ] Cambiar el secreto `SITE_URL` de `bot-access` a `https://lorenzobroker.com/alumno`.
+- [ ] Bunny: añadir `lorenzobroker.com` en Allowed Domains de cada librería.
+- [ ] Más adelante: quitar `andresgbe.github.io` de `ALLOWED_ORIGINS`.
+
 ## Videos (Bunny Stream)
 
 - [x] Crear la cuenta de Bunny Stream (prueba de 14 días, creada el 27/10/2026; reactivada tras el bloqueo antifraude).
@@ -16,7 +27,7 @@ Lo que falta por hacer en la plataforma. Al terminar algo, se marca `[x]` (o se 
 - [ ] Poner en cada curso su librería de Bunny (Panel › Cursos › Editar › "Librería de Bunny Stream"). Cuenta nueva, con una librería por curso.
 - [ ] En cada librería: color `#00b09a`, idioma Español y Allowed Domains.
 - [x] Programar la Edge Function de URL firmada (`supabase/functions/bunny-video-url`, 02/11/2026).
-- [ ] **Poner los videos privados:** guardar el secreto `BUNNY_TOKEN_KEYS`, publicar la función, probarla y activar Token Authentication en cada librería, en ese orden. Añadir el dominio final a `ALLOWED_ORIGINS` cuando exista.
+- [ ] **Poner los videos privados:** guardar el secreto `BUNNY_TOKEN_KEYS`, publicar la función, probarla y activar Token Authentication en cada librería, en ese orden.
 - [ ] Decidir con Lorenzo quién es el titular de la cuenta definitiva (su correo y su tarjeta) **antes de que acabe la prueba** (≈ 10/11/2026).
 - [ ] Más adelante (Fase 2): marca de agua con el correo del alumno.
 

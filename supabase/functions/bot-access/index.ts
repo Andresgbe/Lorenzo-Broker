@@ -14,7 +14,7 @@
 // from Telegram: whoever types its email in the bot is not proven to own it.
 //
 // Secrets: BOT_ACCESS_SECRET, SITE_URL (where the login link lands, e.g.
-// https://andresgbe.github.io/Lorenzo-Broker/alumno). SUPABASE_URL and
+// https://lorenzobroker.com/alumno). SUPABASE_URL and
 // SUPABASE_SERVICE_ROLE_KEY come with every Edge Function.
 import { createClient } from 'npm:@supabase/supabase-js@2.45.0';
 import { z } from 'npm:zod@3.23.8';

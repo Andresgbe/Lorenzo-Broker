@@ -10,7 +10,12 @@ import { z } from 'npm:zod@3.23.8';
 
 const LINK_LIFETIME_SECONDS = 2 * 60 * 60;
 
-const ALLOWED_ORIGINS = ['https://andresgbe.github.io', 'http://localhost:5173'];
+const ALLOWED_ORIGINS = [
+  'https://lorenzobroker.com',
+  'https://www.lorenzobroker.com',
+  'https://andresgbe.github.io', // old address, kept while it redirects to the domain
+  'http://localhost:5173',
+];
 
 const Body = z.union([
   z.object({ lessonId: z.string().uuid() }).strict(),

@@ -2,6 +2,20 @@
 
 Registro de los cambios pedidos sobre la plataforma, del más reciente al más antiguo.
 
+## 17/11/2026 — La web pasa al dominio lorenzobroker.com
+
+- Dominio raíz `lorenzobroker.com` configurado en AWS Route 53 (registros A hacia GitHub Pages y CNAME `www`) y en GitHub Pages.
+- **`vite.config.ts`:** la base ahora es siempre `/`. Ya no se usa `/Lorenzo-Broker/`. El router y `absoluteUrl` siguen leyendo `import.meta.env.BASE_URL`, que ahora vale `/`.
+- **`public/CNAME`:** nuevo, con `lorenzobroker.com`. Vite lo copia a `dist/CNAME` en cada deploy; sin él, GitHub Pages pierde el dominio en cada publicación.
+- **Rutas de la web (SPA):** sin cambios. `npm run build:gh-pages` copia `index.html` a `404.html`, y como los recursos van con ruta absoluta `/assets/...`, funciona en la raíz. Verificado con el build.
+- **`bunny-video-url`:** `ALLOWED_ORIGINS` ahora incluye `https://lorenzobroker.com` y `https://www.lorenzobroker.com`; se dejó `andresgbe.github.io` mientras la dirección vieja redirige. **Requiere volver a publicar la función.**
+- **`bot-access`:** solo se actualizó el ejemplo del comentario. No requiere redespliegue.
+- **Pasos manuales:**
+  - Supabase Auth: Site URL `https://lorenzobroker.com` y añadir `https://lorenzobroker.com/**` en Redirect URLs.
+  - Secreto `SITE_URL` de `bot-access`: `https://lorenzobroker.com/alumno`.
+  - Bunny: añadir el dominio en Allowed Domains de cada librería.
+  - Reiniciar la función `bunny-video-url` publicándola de nuevo.
+
 ## 16/11/2026 — "Así funciona cada parte" con las capturas reales
 
 - Cada parte de la portada muestra ahora las fotos y capturas que mandó Lorenzo, en vez del recuadro "Captura de pantalla":
