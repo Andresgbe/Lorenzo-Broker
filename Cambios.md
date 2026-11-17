@@ -2,6 +2,15 @@
 
 Registro de los cambios pedidos sobre la plataforma, del más reciente al más antiguo.
 
+## 17/11/2026 — Plan anual a 277.77 USDT
+
+- **Decisión del usuario:** el anual cuesta **277.77 USDT** (antes 297). El mensual sigue en 27.77.
+- **Portada:** la tarjeta Anual muestra 277.77 USDT, "Ahorras 55.47 USDT" y "Equivale a 23.15 USDT al mes" (se calculan solos).
+- Si el precio anual ya estaba guardado desde la portada, el guardado manda: Lorenzo debe cambiarlo a 277.77 desde la propia tarjeta, con sesión de admin.
+- **Bot (`lorenzo-bot`):** el mismo cambio en `bot.py`. Hay que subirlo al repo del bot (Claude no tiene permiso de push ahí).
+- Sin cambios en el checkout web en USD ni en la tabla `plans` (siguen en $297): ese checkout no está enlazado desde el sitio público.
+- Código: `widgets/pricing-section/PricingSection.tsx`.
+
 ## 17/11/2026 — La web pasa al dominio lorenzobroker.com
 
 - Dominio raíz `lorenzobroker.com` configurado en AWS Route 53 (registros A hacia GitHub Pages y CNAME `www`) y en GitHub Pages.

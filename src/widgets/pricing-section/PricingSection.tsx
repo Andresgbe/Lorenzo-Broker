@@ -23,9 +23,9 @@ interface PricingContent {
   items: PriceItem[];
 }
 
-const DEFAULT_ANNUAL_PRICE = '297';
+const DEFAULT_ANNUAL_PRICE = '277.77';
 
-/** 36.24, 24.75 o 297: con punto decimal, como el bot muestra los montos en USDT. */
+/** 55.47, 23.15 o 277.77: con punto decimal, como el bot muestra los montos en USDT. */
 function formatUsdt(amount: number) {
   return Number.isInteger(amount) ? String(amount) : amount.toFixed(2);
 }
