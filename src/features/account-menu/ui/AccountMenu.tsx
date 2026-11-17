@@ -97,18 +97,17 @@ export function AccountMenu() {
           role="menu"
           className="absolute right-0 top-[calc(100%+10px)] w-[min(260px,calc(100vw-32px))] p-2 bg-panel-2 border border-line-strong rounded-[14px] shadow-[0_30px_80px_rgba(0,0,0,0.5)]"
         >
-          {user ? (
-            <div className="px-3.5 pt-2 pb-3">
-              <p className="text-[14px] font-semibold text-ink truncate">{user.fullName || 'Tu cuenta'}</p>
-              <p className="text-[12px] text-muted truncate" title={user.email ?? undefined}>
-                {user.email}
-              </p>
-            </div>
-          ) : (
-            <p className="px-3.5 pt-2 pb-3 text-[13px] text-muted">No has iniciado sesión.</p>
+          {user && (
+            <>
+              <div className="px-3.5 pt-2 pb-3">
+                <p className="text-[14px] font-semibold text-ink truncate">{user.fullName || 'Tu cuenta'}</p>
+                <p className="text-[12px] text-muted truncate" title={user.email ?? undefined}>
+                  {user.email}
+                </p>
+              </div>
+              <div className="h-px bg-line mx-2 mb-1.5" />
+            </>
           )}
-
-          <div className="h-px bg-line mx-2 mb-1.5" />
 
           {user ? (
             <>
