@@ -22,6 +22,8 @@ export function VideoPlayer({ source, title, className }: VideoPlayerProps) {
           controls
           className="h-full w-full object-cover bg-black"
         />
+      ) : source.type === 'bunny' ? (
+        <BunnyFrame libraryId={source.libraryId} videoId={source.videoId} access={source.access} title={title} />
       ) : source.type === 'bunny-public' ? (
         <iframe
           src={bunnyEmbedUrl(source.libraryId, source.videoId)}
@@ -30,8 +32,6 @@ export function VideoPlayer({ source, title, className }: VideoPlayerProps) {
           allowFullScreen
           className="absolute inset-0 h-full w-full border-0 bg-black"
         />
-      ) : source.type === 'bunny' ? (
-        <BunnyFrame libraryId={source.libraryId} videoId={source.videoId} access={source.access} title={title} />
       ) : (
         <MediaPlaceholder
           icon={

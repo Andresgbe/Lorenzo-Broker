@@ -9,13 +9,13 @@ export function bunnyEmbedUrl(libraryId: string, videoId: string): string {
 }
 
 /**
- * Saca la librería y el video de un enlace de Bunny Stream, p. ej.
- * https://iframe.mediadelivery.net/embed/123456/xxxxxxxx-xxxx-… (también player.mediadelivery.net,
- * /play/ y con parámetros). null si no es un enlace de Bunny.
+ * Saca la librería y el video de un enlace de Bunny Stream (embed, play o directo), por ejemplo
+ * https://iframe.mediadelivery.net/embed/123456/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx. Devuelve null
+ * si el texto no es un enlace de Bunny.
  */
-export function parseBunnyLink(link: string): { libraryId: string; videoId: string } | null {
-  const match = link
+export function parseBunnyUrl(input: string): { libraryId: string; videoId: string } | null {
+  const match = input
     .trim()
-    .match(/^https:\/\/(?:iframe|player)\.mediadelivery\.net\/(?:embed|play)\/(\d+)\/([0-9a-fA-F-]{8,})(?:[/?#].*)?$/);
+    .match(/^https?:\/\/(?:[\w-]+\.)?mediadelivery\.net\/(?:embed|play|)\/?(\d+)\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/i);
   return match ? { libraryId: match[1], videoId: match[2] } : null;
 }

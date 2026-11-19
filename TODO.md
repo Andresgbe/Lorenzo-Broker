@@ -45,6 +45,9 @@ Lo que falta por hacer en la plataforma. Al terminar algo, se marca `[x]` (o se 
 - [ ] `/sacar` en el bot: que también quite el acceso a la web.
 - [ ] Miembros que pagaron en el bot antes de la integración: que `/web` mande su membresía vigente, o darles acceso a mano.
 - [ ] Igualar la gracia: el bot da 3 días y la web 2.
+- [x] Plan anual a 277.77 USDT en el bot y en la portada (17/11/2026).
+- [ ] Revisar en `site_content` si hay un `annualPrice` guardado en `pricing.plan` y, si lo hay, ponerlo en 277.77 (SQL en `Cambios.md`, 17/11/2026).
+- [ ] Llevar la rama `claude/great-goodall-hij44l` a `main` para que el precio anual nuevo salga en lorenzobroker.com.
 - [ ] Antes del lanzamiento: volver a los precios reales en el `.env` del bot (quitar `PRICE_MENSUAL` y `PRICE_ANUAL`), usar otra base de datos (`DB_PATH`) y subir el bot a Railway.
 
 ## Supabase

@@ -1,17 +1,15 @@
-import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { HOME_SECTIONS } from '../../shared/config/routes';
-import { parseBunnyLink } from '../../shared/config/bunny';
 import { Container } from '../../shared/ui/Container';
 import { Button } from '../../shared/ui/Button';
-import { TextField } from '../../shared/ui/TextField';
 import { EditableText } from '../../shared/ui/EditableText';
 import { RichText } from '../../shared/ui/RichText';
 import { SubscribeButton } from '../../features/subscribe-cta';
-import { VideoPlayer, type VideoSource } from '../../features/video-player';
+import { VideoPlayer } from '../../features/video-player';
 import { useEditMode } from '../../features/edit-mode';
-import { useSiteContentDraft } from '../../entities/site-content';
+import { useSiteContentDraft, useSiteContentField } from '../../entities/site-content';
 import logoNegativo from '../../shared/assets/images/logo-lorenzo-broker-negativo.png';
+import { HeroVideoEditor, type HeroVideo } from './HeroVideoEditor';
 
 interface HeroStat {
   value: string;
@@ -23,8 +21,6 @@ interface HeroContent {
   title: string;
   subtitle: string;
   stats: HeroStat[];
-  /** Enlace de Bunny Stream del video de bienvenida. Vacío = se muestra la tarjeta con el logo. */
-  videoUrl: string;
 }
 
 // Valores por defecto: en cuanto el admin guarda, manda lo que está en site_content ('hero.content').
@@ -37,46 +33,13 @@ const DEFAULT_HERO: HeroContent = {
     { value: '100%', label: 'en español,\ndesde LatAm' },
     { value: '24/7', label: 'clases grabadas\nsiempre disponibles' },
   ],
-  videoUrl: '',
 };
-
-function VideoLinkEditor({ saved, onSave }: { saved: string; onSave: (url: string) => void }) {
-  const [url, setUrl] = useState(saved);
-  const trimmed = url.trim();
-  const invalid = trimmed !== '' && !parseBunnyLink(trimmed);
-
-  return (
-    <form
-      className="mt-5 flex flex-col gap-3 border-t border-line pt-5 text-left"
-      onSubmit={(event) => {
-        event.preventDefault();
-        if (!invalid) onSave(trimmed);
-      }}
-    >
-      <TextField
-        label="Video de bienvenida (enlace de Bunny Stream)"
-        type="url"
-        value={url}
-        onChange={(event) => setUrl(event.target.value)}
-        placeholder="https://iframe.mediadelivery.net/embed/123456/xxxxxxxx-xxxx-…"
-        hint="Pega el enlace Embed del video. Vacío = se muestra la tarjeta con el logo. La librería de este video debe tener Token Authentication apagada."
-        error={invalid ? 'No parece un enlace de Bunny Stream. Copia el de "Embed" del video.' : undefined}
-      />
-      <div>
-        <Button type="submit" size="sm" disabled={invalid}>
-          Guardar video
-        </Button>
-      </div>
-    </form>
-  );
-}
 
 export function Hero() {
   const { isEditing } = useEditMode();
-  const { draft, update, commit, replace } = useSiteContentDraft('hero.content', DEFAULT_HERO);
-
-  const bunny = parseBunnyLink(draft.videoUrl);
-  const video: VideoSource | null = bunny ? { type: 'bunny-public', ...bunny } : null;
+  const { draft, update, commit } = useSiteContentDraft('hero.content', DEFAULT_HERO);
+  // 'hero.video' en site_content: null mientras nadie haya puesto un video de Bunny.
+  const { value: video, setValue: saveVideo } = useSiteContentField<HeroVideo | null>('hero.video', null);
 
   const updateStat = (index: number, patch: Partial<HeroStat>) =>
     update({ stats: draft.stats.map((stat, i) => (i === index ? { ...stat, ...patch } : stat)) });
@@ -94,20 +57,19 @@ export function Hero() {
           className="w-full max-w-5xl bg-panel border border-line rounded-[20px] p-4 sm:p-7 shadow-[0_30px_80px_rgba(0,0,0,0.5)]"
         >
           {video ? (
-            <VideoPlayer source={video} title="Video de bienvenida" className="w-full rounded-xl overflow-hidden" />
+            <VideoPlayer
+              key={`${video.libraryId}/${video.videoId}`}
+              source={{ type: 'bunny-public', libraryId: video.libraryId, videoId: video.videoId }}
+              title="Video de bienvenida"
+              className="w-full rounded-xl overflow-hidden"
+            />
           ) : (
             // Mientras no haya video de Bunny: tarjeta de marca (luego, la foto de Lorenzo).
             <div className="aspect-video w-full rounded-xl flex items-center justify-center bg-[radial-gradient(600px_300px_at_70%_0%,rgba(0,110,150,0.35),transparent_65%),radial-gradient(500px_300px_at_20%_110%,rgba(40,51,128,0.45),transparent_65%)] bg-panel-2">
               <img src={logoNegativo} alt="Lorenzo Broker" className="h-auto w-[55%] max-w-[420px] object-contain" />
             </div>
           )}
-          {isEditing && (
-            <VideoLinkEditor
-              key={draft.videoUrl}
-              saved={draft.videoUrl}
-              onSave={(videoUrl) => replace({ ...draft, videoUrl })}
-            />
-          )}
+          {isEditing && <HeroVideoEditor video={video} onSave={saveVideo} />}
         </motion.div>
 
         <motion.div

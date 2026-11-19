@@ -15,8 +15,18 @@ Registro de los cambios pedidos sobre la plataforma, del más reciente al más a
 
 - **Hero:** ya no muestra el video de YouTube. En su lugar hay una tarjeta con el logo (fondo con los degradados de la marca). Falta la foto de Lorenzo.
 - **Botón "Editar" (solo admin):** nuevo botón flotante abajo a la derecha en las páginas públicas (`features/edit-mode`). Los textos editables de la web (precios, FAQ, "¿Qué incluye?", Sobre mí, Mentoría y la portada) ya no se editan siempre que el admin entra: solo al pulsar "Editar", y "Listo" lo apaga. Empieza apagado. En "Vista de alumno" el botón desaparece.
-- **Portada editable:** título (con `**palabra**` en verde), descripción y las tres cifras se editan en sitio (`site_content` clave `hero.content`). En modo edición aparece "Video de bienvenida (enlace de Bunny Stream)" con "Guardar video": al pegar el enlace Embed, el video reemplaza a la tarjeta del logo. Vacío = vuelve la tarjeta.
-- **`VideoPlayer`:** se eliminó el tipo `youtube` y la dependencia `react-lite-youtube-embed`. Se agregó `bunny-public` (video público de la portada, sin comprobar acceso: la librería debe tener Token Authentication apagada). Quedan `local`, `bunny`, `bunny-public` y el aviso "Video próximamente".
+- **Portada editable:** título (con `**palabra**` en verde), descripción y las tres cifras se editan en sitio (`site_content` clave `hero.content`). En modo edición aparece "Video de bienvenida (enlace de Bunny Stream)" con "Guardar video": al pegar el enlace Embed, el video reemplaza a la tarjeta del logo. "Quitar el video" vuelve a la tarjeta. El video se guarda en `site_content` clave `hero.video` (`HeroVideoEditor`), que ahora solo aparece en modo edición.
+- **`VideoPlayer`:** se eliminó el tipo `youtube` y la dependencia `react-lite-youtube-embed`. Quedan `local`, `bunny`, `bunny-public` (video público de la portada, sin comprobar acceso: la librería debe tener Token Authentication apagada) y el aviso "Video próximamente".
+- Se unió con la rama de Netlify y del video de Bunny (`claude/hola-4d1zw7`, `claude/great-goodall-hij44l`): el editor del video de Bunny que traía esa rama se conserva, sin el video de YouTube por defecto.
+
+## 17/11/2026 — Plan anual a 277.77 USDT
+
+- **Decisión del usuario:** el anual cuesta **277.77 USDT** (antes 297). El mensual sigue en 27.77.
+- **Portada:** la tarjeta Anual muestra 277.77 USDT, "Ahorras 55.47 USDT" y "Equivale a 23.15 USDT al mes" (se calculan solos).
+- Si el precio anual ya estaba guardado desde la portada, el guardado manda: Lorenzo debe cambiarlo a 277.77 desde la propia tarjeta, con sesión de admin.
+- **Bot (`lorenzo-bot`):** el mismo cambio en `bot.py`. Hay que subirlo al repo del bot (Claude no tiene permiso de push ahí).
+- Sin cambios en el checkout web en USD ni en la tabla `plans` (siguen en $297): ese checkout no está enlazado desde el sitio público.
+- Código: `widgets/pricing-section/PricingSection.tsx`.
 
 ## 17/11/2026 — La web pasa al dominio lorenzobroker.com
 
