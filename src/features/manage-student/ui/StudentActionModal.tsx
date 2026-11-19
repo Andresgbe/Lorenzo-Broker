@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { formatDate } from '../../../entities/membership';
-import { MAIN_PLAN, PLANS, findPlan } from '../../../entities/plan';
+import { MAIN_PLAN, PLANS, findPlan, priceTimes } from '../../../entities/plan';
 import { useAuth } from '../../../entities/session';
 import { STUDENT_STATUS_TONE, expireAccess, grantAccess, recordPayment, revokeAccess, updateStudent, type Student } from '../../../entities/student';
 import { PAYMENT_METHODS } from '../../../shared/config/payment-methods';
@@ -260,7 +260,7 @@ function PaymentForm({ student, onDone }: Pick<StudentActionModalProps, 'student
                 onChange={(event) => {
                   const next = Number(event.target.value);
                   setMonths(next);
-                  setAmountUsd(String(plan.price * next));
+                  setAmountUsd(String(priceTimes(plan.price, next)));
                 }}
                 className={inputClasses}
               >

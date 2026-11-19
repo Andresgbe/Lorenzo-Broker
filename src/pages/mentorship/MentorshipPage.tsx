@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { useAuth } from '../../entities/session';
+import { useEditMode } from '../../features/edit-mode';
 import { useSiteContentDraft } from '../../entities/site-content';
 import { Container } from '../../shared/ui/Container';
 import { SectionHeading } from '../../shared/ui/SectionHeading';
@@ -50,7 +50,7 @@ const LEAD_CLASSES = 'text-ink text-xl md:text-[22px] font-semibold leading-rela
 const PARAGRAPH_CLASSES = 'text-muted text-[17px] md:text-lg leading-relaxed';
 
 export function MentorshipPage() {
-  const { isAdmin } = useAuth();
+  const { isEditing } = useEditMode();
   const { draft, update, commit, replace } = useSiteContentDraft('mentorship.page', DEFAULT_MENTORSHIP);
 
   return (
@@ -62,7 +62,7 @@ export function MentorshipPage() {
         className="grid gap-12 lg:grid-cols-[minmax(260px,1fr)_minmax(0,1.9fr)] lg:gap-16 xl:gap-24"
       >
         <div className="lg:sticky lg:top-28 lg:self-start">
-          {isAdmin ? (
+          {isEditing ? (
             <SectionHeading
               align="left"
               eyebrow={
@@ -96,7 +96,7 @@ export function MentorshipPage() {
         </div>
 
         <div>
-          {isAdmin && (
+          {isEditing && (
             <p className="text-[12.5px] text-muted mb-6">
               Modo edición: cada cambio se guarda al salir del campo. Escribe <span className="text-ink">**así**</span> para
               resaltar una palabra.
@@ -104,7 +104,7 @@ export function MentorshipPage() {
           )}
 
           <div className="mb-7">
-            {isAdmin ? (
+            {isEditing ? (
               <EditableText
                 multiline
                 label="Frase principal"
@@ -120,7 +120,7 @@ export function MentorshipPage() {
 
           <EditableParagraphs
             paragraphs={draft.paragraphs}
-            editable={isAdmin}
+            editable={isEditing}
             paragraphClassName={PARAGRAPH_CLASSES}
             onUpdate={(paragraphs) => update({ paragraphs })}
             onCommit={commit}
@@ -129,7 +129,7 @@ export function MentorshipPage() {
 
           <div className="mt-12 pt-10 border-t border-line text-center lg:text-left">
             <div className="mb-7">
-              {isAdmin ? (
+              {isEditing ? (
                 <EditableText
                   multiline
                   label="Texto de cierre"
@@ -145,7 +145,7 @@ export function MentorshipPage() {
               )}
             </div>
 
-            {isAdmin ? (
+            {isEditing ? (
               <div className="max-w-xs mx-auto lg:mx-0">
                 <EditableText
                   label="Texto del botón"
@@ -162,7 +162,7 @@ export function MentorshipPage() {
             )}
 
             <div className="mt-4">
-              {isAdmin ? (
+              {isEditing ? (
                 <EditableText
                   label="Nota bajo el botón"
                   value={draft.ctaNote}

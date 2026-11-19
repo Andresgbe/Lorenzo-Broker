@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { useAuth } from '../../entities/session';
+import { useEditMode } from '../../features/edit-mode';
 import { useSiteContentDraft } from '../../entities/site-content';
 import { Container } from '../../shared/ui/Container';
 import { SectionHeading } from '../../shared/ui/SectionHeading';
@@ -49,7 +49,7 @@ const LEAD_CLASSES = 'text-ink text-xl md:text-[22px] font-semibold leading-rela
 const PARAGRAPH_CLASSES = 'text-muted text-[17px] md:text-lg leading-relaxed';
 
 export function AboutPage() {
-  const { isAdmin } = useAuth();
+  const { isEditing } = useEditMode();
   const { draft, update, commit, replace } = useSiteContentDraft('about.page', DEFAULT_ABOUT);
 
   return (
@@ -61,7 +61,7 @@ export function AboutPage() {
         className="grid gap-12 lg:grid-cols-[minmax(300px,1.35fr)_minmax(0,1.65fr)] lg:gap-16 xl:gap-20"
       >
         <div className="flex flex-col gap-9">
-          {isAdmin ? (
+          {isEditing ? (
             <SectionHeading
               align="left"
               eyebrow={
@@ -108,7 +108,7 @@ export function AboutPage() {
               />
             </div>
             <figcaption className="text-muted text-xs leading-relaxed">
-              {isAdmin ? (
+              {isEditing ? (
                 <EditableText
                   multiline
                   label="Pie de foto"
@@ -124,7 +124,7 @@ export function AboutPage() {
         </div>
 
         <div>
-          {isAdmin && (
+          {isEditing && (
             <p className="text-[12.5px] text-muted mb-6">
               Modo edición: cada cambio se guarda al salir del campo. Escribe <span className="text-ink">**así**</span> para
               resaltar una palabra.
@@ -132,7 +132,7 @@ export function AboutPage() {
           )}
 
           <div className="mb-7">
-            {isAdmin ? (
+            {isEditing ? (
               <EditableText
                 multiline
                 label="Frase principal"
@@ -148,8 +148,8 @@ export function AboutPage() {
 
           <EditableParagraphs
             paragraphs={draft.paragraphs}
-            editable={isAdmin}
-            paragraphClassName={isAdmin ? PARAGRAPH_CLASSES : `${PARAGRAPH_CLASSES} text-justify hyphens-auto`}
+            editable={isEditing}
+            paragraphClassName={isEditing ? PARAGRAPH_CLASSES : `${PARAGRAPH_CLASSES} text-justify hyphens-auto`}
             onUpdate={(paragraphs) => update({ paragraphs })}
             onCommit={commit}
             onReplace={(paragraphs) => replace({ ...draft, paragraphs })}

@@ -1,7 +1,6 @@
-import LiteYouTubeEmbed from 'react-lite-youtube-embed';
-import 'react-lite-youtube-embed/dist/LiteYouTubeEmbed.css';
 import type { VideoSource } from '../model/useVideoSource';
 import { BunnyFrame } from './BunnyFrame';
+import { bunnyEmbedUrl } from '../../../shared/config/bunny';
 import { cn } from '../../../shared/lib/cn';
 import { MediaPlaceholder } from '../../../shared/ui/MediaPlaceholder';
 
@@ -23,10 +22,13 @@ export function VideoPlayer({ source, title, className }: VideoPlayerProps) {
           controls
           className="h-full w-full object-cover bg-black"
         />
-      ) : source.type === 'youtube' ? (
-        <LiteYouTubeEmbed
-          id={source.videoId}
+      ) : source.type === 'bunny-public' ? (
+        <iframe
+          src={bunnyEmbedUrl(source.libraryId, source.videoId)}
           title={title}
+          allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; fullscreen"
+          allowFullScreen
+          className="absolute inset-0 h-full w-full border-0 bg-black"
         />
       ) : source.type === 'bunny' ? (
         <BunnyFrame libraryId={source.libraryId} videoId={source.videoId} access={source.access} title={title} />

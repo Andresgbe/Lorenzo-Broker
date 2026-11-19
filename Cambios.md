@@ -2,6 +2,22 @@
 
 Registro de los cambios pedidos sobre la plataforma, del más reciente al más antiguo.
 
+## 19/11/2026 — Precios correctos y en un solo archivo
+
+- **Precios:** mensual USD 27.77 y anual USD 277.77 (antes 29 y 297 en el checkout). El ahorro del anual queda en 55.47.
+- **`src/shared/config/pricing.ts`:** nuevo, con solo los precios (en céntimos). La portada, las tarjetas de precios, el checkout, la renovación (1, 2, 3, 6 meses y año), el resumen, el ahorro y el monto sugerido al registrar un pago manual los leen de ahí. Cambiar un número allí lo cambia en todo el programa.
+- **Precios con céntimos:** `formatPrice` muestra `$27.77` y los totales por meses (`priceTimes`) se redondean a céntimos para evitar errores como 83.31000000000001.
+- **Tarjetas de la portada:** el precio ya no se edita en la página ni se guarda en `site_content`; así el valor viejo guardado (29) deja de ganarle al archivo. Siguen editables el nombre del plan, la nota y los beneficios.
+- **Migración `0015_update_prices.sql`:** actualiza `plans.price_usd_cents` (2777 y 27777). **Hay que ejecutarla en el SQL Editor de LBP.** Los pagos ya registrados no cambian.
+- Si el precio cambia otra vez: editar `pricing.ts`, una migración nueva y `PRICE_MENSUAL` / `PRICE_ANUAL` del bot.
+
+## 19/11/2026 — Se quita el video de YouTube de la portada
+
+- **Hero:** ya no muestra el video de YouTube. En su lugar hay una tarjeta con el logo (fondo con los degradados de la marca). Falta la foto de Lorenzo.
+- **Botón "Editar" (solo admin):** nuevo botón flotante abajo a la derecha en las páginas públicas (`features/edit-mode`). Los textos editables de la web (precios, FAQ, "¿Qué incluye?", Sobre mí, Mentoría y la portada) ya no se editan siempre que el admin entra: solo al pulsar "Editar", y "Listo" lo apaga. Empieza apagado. En "Vista de alumno" el botón desaparece.
+- **Portada editable:** título (con `**palabra**` en verde), descripción y las tres cifras se editan en sitio (`site_content` clave `hero.content`). En modo edición aparece "Video de bienvenida (enlace de Bunny Stream)" con "Guardar video": al pegar el enlace Embed, el video reemplaza a la tarjeta del logo. Vacío = vuelve la tarjeta.
+- **`VideoPlayer`:** se eliminó el tipo `youtube` y la dependencia `react-lite-youtube-embed`. Se agregó `bunny-public` (video público de la portada, sin comprobar acceso: la librería debe tener Token Authentication apagada). Quedan `local`, `bunny`, `bunny-public` y el aviso "Video próximamente".
+
 ## 17/11/2026 — La web pasa al dominio lorenzobroker.com
 
 - Dominio raíz `lorenzobroker.com` configurado en AWS Route 53 (registros A hacia GitHub Pages y CNAME `www`) y en GitHub Pages.

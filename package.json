@@ -16,7 +16,6 @@
     "framer-motion": "^12.42.2",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
-    "react-lite-youtube-embed": "^3.6.0",
     "react-router-dom": "^7.18.1",
     "tailwind-merge": "^3.6.0"
   },

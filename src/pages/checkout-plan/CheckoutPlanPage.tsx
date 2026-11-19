@@ -1,6 +1,6 @@
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { caracasDay, formatDate } from '../../entities/membership';
-import { ANNUAL_PLAN, MAIN_PLAN, PLANS, PlanCard, annualSavings, formatPrice, useSelectedPlan } from '../../entities/plan';
+import { ANNUAL_PLAN, MAIN_PLAN, PLANS, PlanCard, annualSavings, formatPrice, priceTimes, useSelectedPlan } from '../../entities/plan';
 import { MonthsPicker, useCheckoutOrder } from '../../features/renew-membership';
 import { ROUTES } from '../../shared/config/routes';
 import { PAYMENT_METHODS } from '../../shared/config/payment-methods';
@@ -51,7 +51,7 @@ export function CheckoutPlanPage() {
                 setParams(months > 1 ? { plan: MAIN_PLAN.id, meses: String(months) } : { plan: MAIN_PLAN.id }, { replace: true })
               }
               onChooseAnnual={() => setParams({ plan: ANNUAL_PLAN.id }, { replace: true })}
-              priceFor={(months) => formatPrice(MAIN_PLAN.price * months)}
+              priceFor={(months) => formatPrice(priceTimes(MAIN_PLAN.price, months))}
               annualPrice={formatPrice(ANNUAL_PLAN.price)}
               annualNote={`Ahorras ${formatPrice(annualSavings(ANNUAL_PLAN))}`}
             />

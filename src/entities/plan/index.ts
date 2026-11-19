@@ -7,6 +7,7 @@ export {
   DEFAULT_PLAN_ID,
   annualSavings,
   formatPrice,
+  priceTimes,
   findPlan,
 } from './model/plans';
 export { useSelectedPlan } from './model/useSelectedPlan';

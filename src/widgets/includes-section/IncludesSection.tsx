@@ -4,7 +4,7 @@ import { HOME_SECTIONS } from '../../shared/config/routes';
 import { Container } from '../../shared/ui/Container';
 import { SectionHeading } from '../../shared/ui/SectionHeading';
 import { BenefitCard, type Benefit } from '../../entities/benefit';
-import { useAuth } from '../../entities/session';
+import { useEditMode } from '../../features/edit-mode';
 import { useSiteContentField } from '../../entities/site-content';
 import { cn } from '../../shared/lib/cn';
 
@@ -57,7 +57,7 @@ function PlusIcon({ className }: { className?: string }) {
 }
 
 export function IncludesSection() {
-  const { isAdmin } = useAuth();
+  const { isEditing } = useEditMode();
   const { value: stored, setValue: persistItems, isLoading } = useSiteContentField(
     'includes.items',
     DEFAULT_INCLUDES_DATA
@@ -157,7 +157,7 @@ export function IncludesSection() {
           {items.map((item, index) => (
             <div
               key={item.id}
-              draggable={isAdmin}
+              draggable={isEditing}
               onMouseDown={handleMouseDown}
               onDragStart={(e) => handleDragStart(e, item.id)}
               onDragOver={(e) => handleDragOver(e, item.id)}
@@ -174,7 +174,7 @@ export function IncludesSection() {
                 <BenefitCard
                   benefit={item}
                   index={index + 1}
-                  editable={isAdmin}
+                  editable={isEditing}
                   onChange={(patch) => updateItem(item.id, patch)}
                   onBlurSave={saveItems}
                   onToggleBonus={() => toggleBonus(item.id)}
@@ -184,7 +184,7 @@ export function IncludesSection() {
             </div>
           ))}
 
-          {isAdmin && (
+          {isEditing && (
             <button
               type="button"
               onClick={addItem}

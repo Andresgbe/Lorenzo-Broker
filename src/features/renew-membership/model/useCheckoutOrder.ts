@@ -1,6 +1,6 @@
 import { useSearchParams } from 'react-router-dom';
 import { renewalExpiresOn, useMembership } from '../../../entities/membership';
-import { MAIN_PLAN, findPlan, type Plan } from '../../../entities/plan';
+import { MAIN_PLAN, findPlan, priceTimes, type Plan } from '../../../entities/plan';
 import { useAuth } from '../../../entities/session';
 
 // Sin 12: pagar un año entero siempre sale mejor con el plan anual.
@@ -34,7 +34,7 @@ export function useCheckoutOrder(selectedPlan: Plan | null) {
     plan,
     months,
     periodLabel: plan.period === 'year' ? '1 año' : monthsLabel(months),
-    total: plan.price * months,
+    total: priceTimes(plan.price, months),
     newExpiresOn: membership ? renewalExpiresOn(membership, months * plan.durationDays) : null,
     /** Para enlaces a otros pasos: "&meses=3", vacío si es un solo mes. */
     monthsQuery: months > 1 ? `&meses=${months}` : '',

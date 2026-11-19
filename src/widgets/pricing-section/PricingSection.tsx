@@ -1,10 +1,11 @@
 import { useState, type ChangeEvent } from 'react';
 import { motion } from 'framer-motion';
 import { HOME_SECTIONS } from '../../shared/config/routes';
+import { ANNUAL_PRICE_USD, MONTHLY_PRICE_USD } from '../../shared/config/pricing';
 import { Container } from '../../shared/ui/Container';
 import { SectionHeading } from '../../shared/ui/SectionHeading';
 import { SubscribeButton } from '../../features/subscribe-cta';
-import { useAuth } from '../../entities/session';
+import { useEditMode } from '../../features/edit-mode';
 import { useSiteContentField } from '../../entities/site-content';
 import { cn } from '../../shared/lib/cn';
 
@@ -14,26 +15,24 @@ interface PriceItem {
   bonus?: boolean;
 }
 
+// Los precios NO se guardan aquí: salen de shared/config/pricing.ts (las filas viejas de
+// site_content con `price` / `annualPrice` se ignoran).
 interface PricingContent {
   planName: string;
-  price: string;
-  /** Opcional: lo guardado antes del plan anual no lo trae. */
-  annualPrice?: string;
   billingNote: string;
   items: PriceItem[];
 }
 
-const DEFAULT_ANNUAL_PRICE = '297';
-
-/** 36.24, 24.75 o 297: con punto decimal, como el bot muestra los montos en USDT. */
+/** 55.47, 23.14 o 297: con punto decimal, como el bot muestra los montos en USDT. */
 function formatUsdt(amount: number) {
   return Number.isInteger(amount) ? String(amount) : amount.toFixed(2);
 }
 
+const MONTHLY_PRICE = formatUsdt(MONTHLY_PRICE_USD);
+const ANNUAL_PRICE = formatUsdt(ANNUAL_PRICE_USD);
+
 const DEFAULT_PRICING: PricingContent = {
   planName: 'Comunidad Lorenzo Broker',
-  price: '27.77',
-  annualPrice: DEFAULT_ANNUAL_PRICE,
   billingNote: 'Sin permanencia. Cancela cuando quieras.',
   items: [
     { id: '1', label: 'Trading en vivo 2 días a la semana (grabado)' },
@@ -71,7 +70,7 @@ function PlusIcon({ className }: { className?: string }) {
 }
 
 export function PricingSection() {
-  const { isAdmin } = useAuth();
+  const { isEditing } = useEditMode();
   const { value: stored, setValue: persistContent, isLoading } = useSiteContentField(
     'pricing.plan',
     DEFAULT_PRICING
@@ -86,10 +85,9 @@ export function PricingSection() {
     setContent(stored);
   }
 
-  const annualPrice = content.annualPrice ?? DEFAULT_ANNUAL_PRICE;
   // Redondeado a centavos: 12 × 27.77 en coma flotante no da 333.24 exacto.
-  const annualSavings = Math.round((Number(content.price) * 12 - Number(annualPrice)) * 100) / 100;
-  const annualPerMonth = formatUsdt(Number(annualPrice) / 12);
+  const annualSavings = Math.round((MONTHLY_PRICE_USD * 12 - ANNUAL_PRICE_USD) * 100) / 100;
+  const annualPerMonth = formatUsdt(Math.round((ANNUAL_PRICE_USD / 12) * 100) / 100);
 
   function saveContent(next: PricingContent = content) {
     persistContent(next);
@@ -143,7 +141,7 @@ export function PricingSection() {
             transition={{ duration: 0.5 }}
             className="w-full bg-panel border border-line rounded-[22px] px-6 sm:px-10 py-11 text-center"
           >
-            {isAdmin ? (
+            {isEditing ? (
               <input
                 value={content.planName}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => updateField({ planName: e.target.value })}
@@ -155,21 +153,11 @@ export function PricingSection() {
             )}
 
             <div className="font-display font-bold text-[56px] mt-4 mb-1 text-ink flex items-baseline justify-center gap-0.5">
-              {isAdmin ? (
-                <input
-                  aria-label="Precio mensual"
-                  value={content.price}
-                  onChange={(e: ChangeEvent<HTMLInputElement>) => updateField({ price: e.target.value })}
-                  onBlur={() => saveContent()}
-                  className="w-36 text-center bg-transparent outline-none border-b border-dashed border-line focus:border-accent"
-                />
-              ) : (
-                content.price
-              )}
+              {MONTHLY_PRICE}
               <small className="text-lg text-muted font-body font-medium">USDT/mes</small>
             </div>
 
-            {isAdmin ? (
+            {isEditing ? (
               <input
                 value={content.billingNote}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => updateField({ billingNote: e.target.value })}
@@ -185,7 +173,7 @@ export function PricingSection() {
               {content.items.map((item) => (
                 <div key={item.id} className="flex gap-3 items-start text-[14.5px] text-ink-soft">
                   <CheckIcon bonus={item.bonus} />
-                  {isAdmin ? (
+                  {isEditing ? (
                     <div className="flex-1 flex items-center gap-2 min-w-0">
                       <input
                         value={item.label}
@@ -218,7 +206,7 @@ export function PricingSection() {
                 </div>
               ))}
 
-              {isAdmin && (
+              {isEditing && (
                 <button
                   type="button"
                   onClick={addItem}
@@ -248,17 +236,7 @@ export function PricingSection() {
             <div className="text-xs font-bold tracking-[3px] uppercase text-accent">Membresía anual</div>
 
             <div className="font-display font-bold text-[56px] mt-4 mb-1 text-ink flex items-baseline justify-center gap-0.5">
-              {isAdmin ? (
-                <input
-                  aria-label="Precio anual"
-                  value={annualPrice}
-                  onChange={(e: ChangeEvent<HTMLInputElement>) => updateField({ annualPrice: e.target.value })}
-                  onBlur={() => saveContent()}
-                  className="w-28 text-center bg-transparent outline-none border-b border-dashed border-line focus:border-accent"
-                />
-              ) : (
-                annualPrice
-              )}
+              {ANNUAL_PRICE}
               <small className="text-lg text-muted font-body font-medium">USDT/año</small>
             </div>
 
