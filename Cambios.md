@@ -2,6 +2,13 @@
 
 Registro de los cambios pedidos sobre la plataforma, del más reciente al más antiguo.
 
+## 19/11/2026 — "Así funciona cada parte": editable y con las fotos en mosaico
+
+- **Editable con el botón "Editar":** en cada parte (Educación continua, Ideas de inversión, Copytrading) se editan el título, la introducción, los puntos (editar, agregar con "Agregar punto" y quitar con la X) y el texto debajo de cada foto. Se guarda en `site_content`, clave `includes.details`. Las fotos siguen en el código.
+- **Fotos:** ya no es una galería con puntos para pasar de una a otra. Todas las fotos de cada parte se ven juntas, más pequeñas, apiladas en columnas a todo el ancho (2 en el teléfono, 3 en tableta, 4 en computadora), cada una con su texto debajo.
+- **Diseño:** arriba de las fotos va el título con la introducción a la izquierda y los puntos a la derecha (en el teléfono, uno debajo del otro). Ya no se alternan texto e imagen de lado.
+- Código: `widgets/includes-detail/IncludesDetail.tsx`.
+
 ## 19/11/2026 — Precios correctos y en un solo archivo
 
 - **Precios:** mensual USD 27.77 y anual USD 277.77 (antes 29 y 297 en el checkout). El ahorro del anual queda en 55.47.

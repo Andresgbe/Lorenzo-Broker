@@ -1,10 +1,12 @@
-import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { HOME_SECTIONS } from '../../shared/config/routes';
 import { cn } from '../../shared/lib/cn';
 import { Container } from '../../shared/ui/Container';
+import { EditableText } from '../../shared/ui/EditableText';
 import { MediaPlaceholder } from '../../shared/ui/MediaPlaceholder';
 import { SectionHeading } from '../../shared/ui/SectionHeading';
+import { useEditMode } from '../../features/edit-mode';
+import { useSiteContentDraft } from '../../entities/site-content';
 import educacionCursos from '../../shared/assets/images/includes/educacion-cursos.webp';
 import educacionClaseGrabada from '../../shared/assets/images/includes/educacion-clase-grabada.webp';
 import educacionClasePresencial from '../../shared/assets/images/includes/educacion-clase-presencial.webp';
@@ -103,6 +105,41 @@ const DEFAULT_INCLUDE_DETAILS: IncludeDetail[] = [
   },
 ];
 
+/** Lo que el admin edita de cada parte. Las imágenes siguen en el código. */
+interface DetailText {
+  title: string;
+  intro: string;
+  points: string[];
+  /** Un texto por captura, en el mismo orden que `shots`. */
+  captions: string[];
+}
+
+type DetailTexts = Record<string, DetailText>;
+
+// Valores por defecto: en cuanto el admin guarda, manda lo que está en site_content ('includes.details').
+const DEFAULT_DETAIL_TEXTS: DetailTexts = Object.fromEntries(
+  DEFAULT_INCLUDE_DETAILS.map((detail) => [
+    detail.id,
+    { title: detail.title, intro: detail.intro, points: detail.points, captions: detail.shots.map((shot) => shot.caption) },
+  ])
+);
+
+function XIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" className={className}>
+      <path d="M6 6l12 12M18 6L6 18" />
+    </svg>
+  );
+}
+
+function PlusIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" className={className}>
+      <path d="M12 5v14M5 12h14" />
+    </svg>
+  );
+}
+
 function CheckIcon({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 20 20" aria-hidden="true" fill="none" className={className}>
@@ -122,81 +159,87 @@ function ImageIcon({ className }: { className?: string }) {
   );
 }
 
+interface ShotGridProps {
+  shots: Shot[];
+  /** Si llega, el texto bajo cada captura se edita en sitio. */
+  captionEditor?: {
+    onChange: (index: number, caption: string) => void;
+    onCommit: () => void;
+  };
+}
+
 /**
- * Marco de la captura: ventana con su barra. Con varias capturas, los puntos de abajo
- * cambian cuál se ve. Cada imagen se muestra entera (las hay verticales y apaisadas).
+ * Todas las capturas a la vez, en mosaico a todo el ancho: columnas donde cada imagen se
+ * apila debajo de la anterior con su altura natural (las hay verticales y apaisadas).
  */
-function ScreenshotFrame({ shots, bonus }: { shots: Shot[]; bonus?: boolean }) {
-  const [active, setActive] = useState(0);
-  const shot = shots[active];
+function ShotGrid({ shots, captionEditor }: ShotGridProps) {
+  if (shots.length === 0) {
+    return (
+      <MediaPlaceholder
+        icon={<ImageIcon className="w-7 h-7 text-ink-inverse" />}
+        label="Captura de pantalla"
+        className="aspect-[16/10] rounded-[14px]"
+      />
+    );
+  }
 
   return (
-    <figure className="w-full">
-      <div className="rounded-[20px] border border-line bg-panel p-2.5 shadow-[0_30px_80px_rgba(0,0,0,0.5)]">
-        <div className="flex items-center gap-1.5 px-2.5 pb-2.5 pt-1" aria-hidden="true">
-          <span className="w-2.5 h-2.5 rounded-full bg-line-strong" />
-          <span className="w-2.5 h-2.5 rounded-full bg-line-strong" />
-          <span className="w-2.5 h-2.5 rounded-full bg-line-strong" />
-        </div>
-        {shot ? (
-          <div className="aspect-[16/10] rounded-[14px] bg-bg overflow-hidden flex items-center justify-center">
+    <div className="columns-2 md:columns-3 lg:columns-4 gap-3 sm:gap-4">
+      {shots.map((shot, i) => (
+        <figure key={shot.src} className="mb-3 sm:mb-4 break-inside-avoid">
+          <div className="rounded-[14px] border border-line bg-panel p-1.5 shadow-[0_16px_40px_rgba(0,0,0,0.4)]">
             <img
-              key={shot.src}
               src={shot.src}
               alt={shot.alt}
               loading="lazy"
               decoding="async"
-              className="max-w-full max-h-full object-contain"
+              className="block w-full h-auto rounded-[10px]"
             />
           </div>
-        ) : (
-          <MediaPlaceholder
-            icon={<ImageIcon className="w-7 h-7 text-ink-inverse" />}
-            label="Captura de pantalla"
-            className="aspect-[16/10] rounded-[14px]"
-          />
-        )}
-      </div>
-      {shot && <figcaption className="text-[12.5px] text-muted text-center mt-3">{shot.caption}</figcaption>}
-      {shots.length > 1 && (
-        <div className="flex justify-center gap-2 mt-3">
-          {shots.map((item, i) => (
-            <button
-              key={item.src}
-              type="button"
-              onClick={() => setActive(i)}
-              aria-label={`Ver captura ${i + 1} de ${shots.length}`}
-              aria-current={i === active}
-              className="p-1.5 rounded-full focus-visible:outline-2 focus-visible:outline-accent"
-            >
-              <span
-                className={cn(
-                  'block h-2 rounded-full transition-all',
-                  i === active ? cn('w-6', bonus ? 'bg-highlight' : 'bg-accent') : 'w-2 bg-line-strong hover:bg-faint'
-                )}
+          {captionEditor ? (
+            <div className="mt-2">
+              <EditableText
+                label={`Texto de la captura ${i + 1}`}
+                value={shot.caption}
+                onChange={(caption) => captionEditor.onChange(i, caption)}
+                onCommit={captionEditor.onCommit}
+                multiline
+                className="text-[12px] text-muted text-center"
               />
-            </button>
-          ))}
-        </div>
-      )}
-    </figure>
+            </div>
+          ) : (
+            <figcaption className="text-[12px] leading-snug text-muted text-center mt-2">{shot.caption}</figcaption>
+          )}
+        </figure>
+      ))}
+    </div>
   );
 }
 
 /**
  * Debajo del plan ("Un solo plan. Todo incluido."): cada parte de la membresía explicada
- * en detalle, con su captura.
- * En computadora texto y captura se alternan de lado; en el teléfono van uno debajo del otro.
+ * en detalle: arriba el título y los puntos (en dos columnas en computadora) y debajo todas
+ * sus capturas juntas, en mosaico.
  */
 export function IncludesDetail() {
+  const { isEditing } = useEditMode();
+  const { draft, update, commit, replace } = useSiteContentDraft<DetailTexts>('includes.details', DEFAULT_DETAIL_TEXTS);
+
+  // Lo guardado manda, campo por campo, sobre los valores por defecto.
+  const textFor = (id: string): DetailText => ({ ...DEFAULT_DETAIL_TEXTS[id], ...draft[id] });
+  const patchText = (id: string, patch: Partial<DetailText>) => update({ [id]: { ...textFor(id), ...patch } });
+  const replaceText = (id: string, patch: Partial<DetailText>) => replace({ ...draft, [id]: { ...textFor(id), ...patch } });
+
   return (
     <section id={HOME_SECTIONS.includesDetail} className="py-24">
       <Container>
         <SectionHeading eyebrow="En detalle" title={<>Así funciona <span className="text-accent">cada parte</span></>} />
 
         <div className="mt-16 flex flex-col gap-20 lg:gap-28">
-          {DEFAULT_INCLUDE_DETAILS.map((detail, position) => {
-            const imageFirst = position % 2 === 1;
+          {DEFAULT_INCLUDE_DETAILS.map((detail) => {
+            const text = textFor(detail.id);
+            const shots = detail.shots.map((shot, i) => ({ ...shot, caption: text.captions[i] ?? shot.caption }));
+            const checkClasses = cn('w-[18px] h-[18px] shrink-0 mt-0.5', detail.bonus ? 'text-highlight' : 'text-accent');
             return (
               <motion.article
                 key={detail.id}
@@ -205,9 +248,10 @@ export function IncludesDetail() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-80px' }}
                 transition={{ duration: 0.6 }}
-                className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16 scroll-mt-28"
+                className="flex flex-col gap-10 scroll-mt-28"
               >
-                <div className={cn(imageFirst && 'lg:order-2')}>
+                <div className="grid gap-6 lg:grid-cols-2 lg:gap-16 items-start">
+                  <div>
                   <span
                     className={cn(
                       'inline-flex items-center justify-center w-[34px] h-[34px] rounded-[10px] font-bold text-base',
@@ -224,22 +268,90 @@ export function IncludesDetail() {
                       detail.bonus ? 'text-highlight' : 'text-ink'
                     )}
                   >
-                    {detail.title}
+                    {isEditing ? (
+                      <EditableText
+                        label={`Título de la parte ${detail.index}`}
+                        value={text.title}
+                        onChange={(title) => patchText(detail.id, { title })}
+                        onCommit={commit}
+                        multiline
+                      />
+                    ) : (
+                      text.title
+                    )}
                   </h3>
-                  <p className="text-muted text-[16px] leading-relaxed mt-4 text-pretty">{detail.intro}</p>
-                  <ul className="flex flex-col gap-3 mt-6">
-                    {detail.points.map((point) => (
-                      <li key={point} className="flex gap-3 items-start text-[14.5px] text-ink-soft">
-                        <CheckIcon className={cn('w-[18px] h-[18px] shrink-0 mt-0.5', detail.bonus ? 'text-highlight' : 'text-accent')} />
-                        {point}
+                  {isEditing ? (
+                    <div className="mt-4">
+                      <EditableText
+                        label={`Introducción de la parte ${detail.index}`}
+                        value={text.intro}
+                        onChange={(intro) => patchText(detail.id, { intro })}
+                        onCommit={commit}
+                        multiline
+                        className="text-muted text-[16px] leading-relaxed"
+                      />
+                    </div>
+                  ) : (
+                    <p className="text-muted text-[16px] leading-relaxed mt-4 text-pretty">{text.intro}</p>
+                  )}
+                  </div>
+                  <ul className="flex flex-col gap-3 lg:pt-14">
+                    {text.points.map((point, i) => (
+                      <li key={isEditing ? i : point} className="flex gap-3 items-start text-[14.5px] text-ink-soft">
+                        <CheckIcon className={checkClasses} />
+                        {isEditing ? (
+                          <div className="flex-1 flex items-start gap-2 min-w-0">
+                            <EditableText
+                              label={`Punto ${i + 1} de la parte ${detail.index}`}
+                              value={point}
+                              onChange={(value) =>
+                                patchText(detail.id, { points: text.points.map((p, j) => (j === i ? value : p)) })
+                              }
+                              onCommit={commit}
+                              multiline
+                            />
+                            <button
+                              type="button"
+                              onClick={() => replaceText(detail.id, { points: text.points.filter((_, j) => j !== i) })}
+                              aria-label={`Eliminar el punto ${i + 1}`}
+                              className="shrink-0 mt-1 text-muted hover:text-red-400 transition-colors cursor-pointer"
+                            >
+                              <XIcon className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        ) : (
+                          point
+                        )}
                       </li>
                     ))}
+                    {isEditing && (
+                      <li>
+                        <button
+                          type="button"
+                          onClick={() => replaceText(detail.id, { points: [...text.points, 'Nuevo punto'] })}
+                          className="flex items-center gap-2 text-[13px] text-muted hover:text-accent transition-colors cursor-pointer"
+                        >
+                          <PlusIcon className="w-4 h-4" /> Agregar punto
+                        </button>
+                      </li>
+                    )}
                   </ul>
                 </div>
 
-                <div className={cn(imageFirst && 'lg:order-1')}>
-                  <ScreenshotFrame shots={detail.shots} bonus={detail.bonus} />
-                </div>
+                <ShotGrid
+                  shots={shots}
+                  captionEditor={
+                    isEditing
+                      ? {
+                          onChange: (index, caption) =>
+                            patchText(detail.id, {
+                              captions: shots.map((shot, j) => (j === index ? caption : shot.caption)),
+                            }),
+                          onCommit: commit,
+                        }
+                      : undefined
+                  }
+                />
               </motion.article>
             );
           })}
