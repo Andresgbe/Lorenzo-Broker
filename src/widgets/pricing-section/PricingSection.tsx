@@ -152,7 +152,7 @@ export function PricingSection() {
               <div className="text-xs font-bold tracking-[3px] uppercase text-accent">{content.planName}</div>
             )}
 
-            <div className="font-display font-bold text-[56px] mt-4 mb-1 text-ink flex items-baseline justify-center gap-0.5">
+            <div className="font-display font-bold text-[clamp(42px,11vw,56px)] mt-4 mb-1 text-ink flex flex-wrap items-baseline justify-center gap-0.5">
               {MONTHLY_PRICE}
               <small className="text-lg text-muted font-body font-medium">USDT/mes</small>
             </div>
@@ -235,7 +235,7 @@ export function PricingSection() {
             )}
             <div className="text-xs font-bold tracking-[3px] uppercase text-accent">Membresía anual</div>
 
-            <div className="font-display font-bold text-[56px] mt-4 mb-1 text-ink flex items-baseline justify-center gap-0.5">
+            <div className="font-display font-bold text-[clamp(42px,11vw,56px)] mt-4 mb-1 text-ink flex flex-wrap items-baseline justify-center gap-0.5">
               {ANNUAL_PRICE}
               <small className="text-lg text-muted font-body font-medium">USDT/año</small>
             </div>

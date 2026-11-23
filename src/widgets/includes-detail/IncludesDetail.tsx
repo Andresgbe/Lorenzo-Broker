@@ -184,10 +184,10 @@ function BentoTile({ shot, shotIndex, spanClassName, topCrop, captionEditor, onO
         decoding="async"
         className={cn(
           'absolute inset-0 w-full h-full',
-          topCrop ? 'object-cover object-top p-0' : 'object-contain p-2 pb-9'
+          topCrop ? 'object-cover object-top p-0' : 'object-contain p-2 pb-11 sm:pb-9'
         )}
       />
-      <div className="absolute inset-x-0 bottom-0 pt-6 pb-2.5 px-3 bg-[linear-gradient(transparent,rgba(18,19,20,0.95)_50%)]">
+      <div className="absolute inset-x-0 bottom-0 pt-5 pb-2 px-2.5 sm:pt-6 sm:pb-2.5 sm:px-3 bg-[linear-gradient(transparent,rgba(18,19,20,0.95)_45%)]">
         {captionEditor ? (
           <EditableText
             label={`Texto de la captura ${shotIndex + 1}`}
@@ -195,10 +195,10 @@ function BentoTile({ shot, shotIndex, spanClassName, topCrop, captionEditor, onO
             onChange={(caption) => captionEditor.onChange(shotIndex, caption)}
             onCommit={captionEditor.onCommit}
             multiline
-            className="text-[12px] leading-snug text-ink-soft"
+            className="text-[11.5px] sm:text-[12px] leading-snug text-ink-soft"
           />
         ) : (
-          <span className="block text-[12px] leading-snug text-ink-soft">{shot.caption}</span>
+          <span className="block text-[11.5px] sm:text-[12px] leading-snug text-ink-soft line-clamp-2">{shot.caption}</span>
         )}
       </div>
       {!captionEditor && (
@@ -241,28 +241,28 @@ function ZcashComparisonTile({
 
   const inner = (
     <>
-      <div className="absolute inset-x-2 top-2 bottom-9 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] gap-2 items-center">
+      <div className="absolute inset-x-2 top-2 bottom-11 sm:bottom-9 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] gap-1.5 sm:gap-2 items-center">
         <figure className="relative h-full m-0">
           <img src={before.src} alt={before.alt} loading="lazy" decoding="async" className="w-full h-full object-contain" />
-          <span className="absolute top-1 left-1 text-[11px] font-semibold bg-black/75 text-ink px-1.5 py-0.5 rounded-[6px]">
+          <span className="absolute top-1 left-1 text-[10px] sm:text-[11px] font-semibold bg-black/75 text-ink px-1.5 py-0.5 rounded-[6px]">
             3 oct 2025 · $147
           </span>
         </figure>
-        <span className="flex flex-col items-center gap-0.5 text-accent font-bold text-lg">
+        <span className="flex flex-col items-center gap-0.5 text-accent font-bold text-base sm:text-lg">
           →
-          <b className="text-[11.5px] bg-accent/15 px-1.5 py-0.5 rounded-[6px]">+249%</b>
+          <b className="text-[10.5px] sm:text-[11.5px] bg-accent/15 px-1.5 py-0.5 rounded-[6px]">+249%</b>
         </span>
         <figure className="relative h-full m-0">
           <img src={after.src} alt={after.alt} loading="lazy" decoding="async" className="w-full h-full object-contain" />
-          <span className="absolute top-1 left-1 text-[11px] font-semibold bg-black/75 text-ink px-1.5 py-0.5 rounded-[6px]">
+          <span className="absolute top-1 left-1 text-[10px] sm:text-[11px] font-semibold bg-black/75 text-ink px-1.5 py-0.5 rounded-[6px]">
             27 dic 2025 · $513
           </span>
         </figure>
       </div>
 
-      <div className="absolute inset-x-0 bottom-0 pt-6 pb-2.5 px-3 bg-[linear-gradient(transparent,rgba(18,19,20,0.95)_50%)]">
+      <div className="absolute inset-x-0 bottom-0 pt-5 pb-2 px-2.5 sm:pt-6 sm:pb-2.5 sm:px-3 bg-[linear-gradient(transparent,rgba(18,19,20,0.95)_45%)]">
         {captionEditor ? (
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 sm:gap-2">
             <EditableText
               label={`Texto de la captura ${beforeIndex + 1}`}
               value={before.caption}
@@ -281,7 +281,7 @@ function ZcashComparisonTile({
             />
           </div>
         ) : (
-          <span className="block text-[12px] leading-snug text-ink-soft">{combinedCaption}</span>
+          <span className="block text-[11.5px] sm:text-[12px] leading-snug text-ink-soft line-clamp-2">{combinedCaption}</span>
         )}
       </div>
 
@@ -317,7 +317,7 @@ interface BentoSectionGridProps {
 }
 
 function BentoSectionGrid({ detailId, shots, captionEditor, onOpen }: BentoSectionGridProps) {
-  const baseGrid = 'mt-6 lg:mt-8 grid grid-cols-2 auto-rows-[155px] sm:auto-rows-[175px] lg:auto-rows-[190px] gap-2.5 lg:gap-3.5 grid-flow-dense';
+  const baseGrid = 'mt-6 lg:mt-8 grid grid-cols-2 auto-rows-[175px] sm:auto-rows-[185px] lg:auto-rows-[190px] gap-2.5 lg:gap-3.5 grid-flow-dense';
 
   if (detailId === 'educacion') {
     return (
@@ -394,9 +394,9 @@ function BentoSectionGrid({ detailId, shots, captionEditor, onOpen }: BentoSecti
           captionEditor={captionEditor}
           onOpen={onOpen}
         />
-        <div className="col-span-1 rounded-[16px] border border-accent/40 bg-[radial-gradient(260px_180px_at_100%_0%,rgba(0,176,154,0.32),transparent_70%)] bg-panel-2 p-4 flex flex-col justify-end gap-1.5 text-left">
-          <span className="text-[11px] font-bold uppercase tracking-[1.6px] text-accent">Chat privado</span>
-          <p className="text-[13.5px] sm:text-[14px] leading-snug text-ink font-semibold">
+        <div className="col-span-1 rounded-[16px] border border-accent/40 bg-[radial-gradient(260px_180px_at_100%_0%,rgba(0,176,154,0.32),transparent_70%)] bg-panel-2 p-3 sm:p-4 flex flex-col justify-end gap-1 sm:gap-1.5 text-left">
+          <span className="text-[10.5px] sm:text-[11px] font-bold uppercase tracking-[1.6px] text-accent">Chat privado</span>
+          <p className="text-[12.5px] sm:text-[14px] leading-snug text-ink font-semibold">
             Avisos en tiempo real de compras y ventas: acciones, ETFs y cripto.
           </p>
         </div>
@@ -632,17 +632,17 @@ export function IncludesDetail() {
               )
             }
             aria-label="Captura anterior"
-            className="absolute left-3 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-panel border border-line-strong text-ink hover:border-accent hover:text-accent grid place-items-center text-2xl transition-colors cursor-pointer"
+            className="absolute bottom-5 left-1/2 -translate-x-13 sm:bottom-auto sm:left-4 sm:top-1/2 sm:translate-x-0 sm:-translate-y-1/2 w-11 h-11 rounded-full bg-panel border border-line-strong text-ink hover:border-accent hover:text-accent grid place-items-center text-2xl transition-colors cursor-pointer"
           >
             ‹
           </button>
-          <figure className="m-0 max-w-[min(1100px,100%)] flex flex-col items-center">
+          <figure className="m-0 max-w-[min(1100px,100%)] pb-14 sm:pb-0 flex flex-col items-center">
             <img
               src={lightbox.shots[lightbox.index].src}
               alt={lightbox.shots[lightbox.index].alt}
-              className="max-w-full max-h-[80vh] rounded-[12px] shadow-[0_30px_80px_rgba(0,0,0,0.6)]"
+              className="max-w-full max-h-[72vh] sm:max-h-[80vh] rounded-[12px] shadow-[0_30px_80px_rgba(0,0,0,0.6)]"
             />
-            <figcaption className="mt-3 text-[14px] text-ink-soft text-center">
+            <figcaption className="mt-3 text-[13.5px] sm:text-[14px] text-ink-soft text-center">
               {lightbox.shots[lightbox.index].caption} · {lightbox.index + 1} / {lightbox.shots.length}
             </figcaption>
           </figure>
@@ -652,7 +652,7 @@ export function IncludesDetail() {
               setLightbox((prev) => (prev ? { ...prev, index: (prev.index + 1) % prev.shots.length } : null))
             }
             aria-label="Siguiente captura"
-            className="absolute right-3 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-panel border border-line-strong text-ink hover:border-accent hover:text-accent grid place-items-center text-2xl transition-colors cursor-pointer"
+            className="absolute bottom-5 left-1/2 translate-x-2 sm:bottom-auto sm:left-auto sm:right-4 sm:top-1/2 sm:translate-x-0 sm:-translate-y-1/2 w-11 h-11 rounded-full bg-panel border border-line-strong text-ink hover:border-accent hover:text-accent grid place-items-center text-2xl transition-colors cursor-pointer"
           >
             ›
           </button>

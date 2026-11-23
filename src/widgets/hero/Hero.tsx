@@ -112,7 +112,7 @@ export function Hero() {
               Ver qué incluye
             </Button>
           </div>
-          <div className="mt-12 grid grid-cols-3 gap-4 sm:flex sm:flex-wrap sm:justify-center sm:gap-10">
+          <div className={isEditing ? 'mt-12 grid grid-cols-1 gap-4 sm:flex sm:flex-wrap sm:justify-center sm:gap-10' : 'mt-12 grid grid-cols-3 gap-4 sm:flex sm:flex-wrap sm:justify-center sm:gap-10'}>
             {draft.stats.map((stat, index) => (
               <div key={index}>
                 {isEditing ? (
