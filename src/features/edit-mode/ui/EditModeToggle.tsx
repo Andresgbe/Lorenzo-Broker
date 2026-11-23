@@ -28,7 +28,7 @@ export function EditModeToggle() {
       onClick={() => setEditing(!isEditing)}
       aria-pressed={isEditing}
       className={
-        'fixed bottom-5 right-5 z-40 inline-flex h-12 items-center gap-2 rounded-full px-5 text-[14px] font-semibold ' +
+        'fixed bottom-5 left-5 z-40 inline-flex h-12 items-center gap-2 rounded-full px-5 text-[14px] font-semibold cursor-pointer ' +
         'shadow-[0_10px_30px_rgba(0,0,0,0.5)] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ' +
         (isEditing
           ? 'bg-accent text-ink-inverse hover:brightness-110'
