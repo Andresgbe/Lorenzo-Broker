@@ -1,9 +1,9 @@
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { HOME_SECTIONS } from '../../shared/config/routes';
 import { cn } from '../../shared/lib/cn';
 import { Container } from '../../shared/ui/Container';
 import { EditableText } from '../../shared/ui/EditableText';
-import { MediaPlaceholder } from '../../shared/ui/MediaPlaceholder';
 import { SectionHeading } from '../../shared/ui/SectionHeading';
 import { useEditMode } from '../../features/edit-mode';
 import { useSiteContentDraft } from '../../entities/site-content';
@@ -29,20 +29,17 @@ interface Shot {
 }
 
 interface IncludeDetail {
-  id: string;
-  /** Número de la tarjeta de "¿Qué incluye?" a la que amplía. */
+  id: 'educacion' | 'ideas' | 'copytrading';
+  /** Número de la parte en "¿Qué incluye?". */
   index: number;
   title: string;
   intro: string;
   points: string[];
-  /** Capturas de esa parte; con más de una, se pasan con los puntos de abajo. */
+  /** Capturas de esa parte. */
   shots: Shot[];
   bonus?: boolean;
 }
 
-// Los textos siguen siendo de ejemplo: Lorenzo los va a reescribir. Las capturas son las que
-// mandó el 12 y el 13/11/2026 (originales en `resources/`).
-// Siguen el orden de las tarjetas de "¿Qué incluye?" (IncludesSection).
 const DEFAULT_INCLUDE_DETAILS: IncludeDetail[] = [
   {
     id: 'educacion',
@@ -149,93 +146,336 @@ function CheckIcon({ className }: { className?: string }) {
   );
 }
 
-function ImageIcon({ className }: { className?: string }) {
+function ExpandIcon({ className }: { className?: string }) {
   return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className={className}>
-      <rect x="3" y="4" width="18" height="16" rx="2.5" />
-      <circle cx="9" cy="10" r="1.8" />
-      <path d="m21 16-5-5-9 9" />
+    <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className={className}>
+      <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
     </svg>
   );
 }
 
-interface ShotGridProps {
-  shots: Shot[];
-  /** Si llega, el texto bajo cada captura se edita en sitio. */
-  captionEditor?: {
-    onChange: (index: number, caption: string) => void;
-    onCommit: () => void;
-  };
+interface CaptionEditor {
+  onChange: (index: number, caption: string) => void;
+  onCommit: () => void;
 }
 
-/**
- * Todas las capturas a la vez, en mosaico a todo el ancho: columnas donde cada imagen se
- * apila debajo de la anterior con su altura natural (las hay verticales y apaisadas).
- */
-function ShotGrid({ shots, captionEditor }: ShotGridProps) {
-  if (shots.length === 0) {
-    return (
-      <MediaPlaceholder
-        icon={<ImageIcon className="w-7 h-7 text-ink-inverse" />}
-        label="Captura de pantalla"
-        className="aspect-[16/10] rounded-[14px]"
+interface BentoTileProps {
+  shot: Shot;
+  shotIndex: number;
+  spanClassName: string;
+  topCrop?: boolean;
+  captionEditor?: CaptionEditor;
+  onOpen: (index: number) => void;
+}
+
+function BentoTile({ shot, shotIndex, spanClassName, topCrop, captionEditor, onOpen }: BentoTileProps) {
+  const tileClasses = cn(
+    'group relative overflow-hidden rounded-[16px] bg-bg-2 border border-line text-left transition-[border-color,transform] duration-200',
+    !captionEditor && 'hover:border-accent hover:-translate-y-0.5 cursor-zoom-in',
+    spanClassName
+  );
+
+  const content = (
+    <>
+      <img
+        src={shot.src}
+        alt={shot.alt}
+        loading="lazy"
+        decoding="async"
+        className={cn(
+          'absolute inset-0 w-full h-full',
+          topCrop ? 'object-cover object-top p-0' : 'object-contain p-2 pb-9'
+        )}
       />
+      <div className="absolute inset-x-0 bottom-0 pt-6 pb-2.5 px-3 bg-[linear-gradient(transparent,rgba(18,19,20,0.95)_50%)]">
+        {captionEditor ? (
+          <EditableText
+            label={`Texto de la captura ${shotIndex + 1}`}
+            value={shot.caption}
+            onChange={(caption) => captionEditor.onChange(shotIndex, caption)}
+            onCommit={captionEditor.onCommit}
+            multiline
+            className="text-[12px] leading-snug text-ink-soft"
+          />
+        ) : (
+          <span className="block text-[12px] leading-snug text-ink-soft">{shot.caption}</span>
+        )}
+      </div>
+      {!captionEditor && (
+        <span className="absolute top-2 right-2 w-7 h-7 rounded-[8px] bg-black/55 text-ink grid place-items-center opacity-0 group-hover:opacity-100 transition-opacity">
+          <ExpandIcon className="w-3.5 h-3.5" />
+        </span>
+      )}
+    </>
+  );
+
+  if (captionEditor) {
+    return <div className={tileClasses}>{content}</div>;
+  }
+
+  return (
+    <button type="button" onClick={() => onOpen(shotIndex)} className={tileClasses}>
+      {content}
+    </button>
+  );
+}
+
+interface ZcashComparisonTileProps {
+  before: Shot;
+  after: Shot;
+  beforeIndex: number;
+  afterIndex: number;
+  captionEditor?: CaptionEditor;
+  onOpen: (index: number) => void;
+}
+
+function ZcashComparisonTile({
+  before,
+  after,
+  beforeIndex,
+  afterIndex,
+  captionEditor,
+  onOpen,
+}: ZcashComparisonTileProps) {
+  const combinedCaption = `${before.caption} → ${after.caption}`;
+
+  const inner = (
+    <>
+      <div className="absolute inset-x-2 top-2 bottom-9 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] gap-2 items-center">
+        <figure className="relative h-full m-0">
+          <img src={before.src} alt={before.alt} loading="lazy" decoding="async" className="w-full h-full object-contain" />
+          <span className="absolute top-1 left-1 text-[11px] font-semibold bg-black/75 text-ink px-1.5 py-0.5 rounded-[6px]">
+            3 oct 2025 · $147
+          </span>
+        </figure>
+        <span className="flex flex-col items-center gap-0.5 text-accent font-bold text-lg">
+          →
+          <b className="text-[11.5px] bg-accent/15 px-1.5 py-0.5 rounded-[6px]">+249%</b>
+        </span>
+        <figure className="relative h-full m-0">
+          <img src={after.src} alt={after.alt} loading="lazy" decoding="async" className="w-full h-full object-contain" />
+          <span className="absolute top-1 left-1 text-[11px] font-semibold bg-black/75 text-ink px-1.5 py-0.5 rounded-[6px]">
+            27 dic 2025 · $513
+          </span>
+        </figure>
+      </div>
+
+      <div className="absolute inset-x-0 bottom-0 pt-6 pb-2.5 px-3 bg-[linear-gradient(transparent,rgba(18,19,20,0.95)_50%)]">
+        {captionEditor ? (
+          <div className="grid grid-cols-2 gap-2">
+            <EditableText
+              label={`Texto de la captura ${beforeIndex + 1}`}
+              value={before.caption}
+              onChange={(caption) => captionEditor.onChange(beforeIndex, caption)}
+              onCommit={captionEditor.onCommit}
+              multiline
+              className="text-[11.5px] leading-snug text-ink-soft"
+            />
+            <EditableText
+              label={`Texto de la captura ${afterIndex + 1}`}
+              value={after.caption}
+              onChange={(caption) => captionEditor.onChange(afterIndex, caption)}
+              onCommit={captionEditor.onCommit}
+              multiline
+              className="text-[11.5px] leading-snug text-ink-soft"
+            />
+          </div>
+        ) : (
+          <span className="block text-[12px] leading-snug text-ink-soft">{combinedCaption}</span>
+        )}
+      </div>
+
+      {!captionEditor && (
+        <span className="absolute top-2 right-2 w-7 h-7 rounded-[8px] bg-black/55 text-ink grid place-items-center opacity-0 group-hover:opacity-100 transition-opacity">
+          <ExpandIcon className="w-3.5 h-3.5" />
+        </span>
+      )}
+    </>
+  );
+
+  const classes = cn(
+    'group relative overflow-hidden rounded-[16px] bg-bg-2 border border-line text-left col-span-2 transition-[border-color,transform] duration-200',
+    !captionEditor && 'hover:border-accent hover:-translate-y-0.5 cursor-zoom-in'
+  );
+
+  if (captionEditor) {
+    return <div className={classes}>{inner}</div>;
+  }
+
+  return (
+    <button type="button" onClick={() => onOpen(beforeIndex)} className={classes}>
+      {inner}
+    </button>
+  );
+}
+
+interface BentoSectionGridProps {
+  detailId: IncludeDetail['id'];
+  shots: Shot[];
+  captionEditor?: CaptionEditor;
+  onOpen: (index: number) => void;
+}
+
+function BentoSectionGrid({ detailId, shots, captionEditor, onOpen }: BentoSectionGridProps) {
+  const baseGrid = 'mt-6 lg:mt-8 grid grid-cols-2 auto-rows-[155px] sm:auto-rows-[175px] lg:auto-rows-[190px] gap-2.5 lg:gap-3.5 grid-flow-dense';
+
+  if (detailId === 'educacion') {
+    return (
+      <div className={cn(baseGrid, 'lg:grid-cols-[2fr_1fr_1fr]')}>
+        <BentoTile
+          shot={shots[0]}
+          shotIndex={0}
+          spanClassName="col-span-2 lg:col-span-1 lg:row-span-2"
+          captionEditor={captionEditor}
+          onOpen={onOpen}
+        />
+        <BentoTile
+          shot={shots[1]}
+          shotIndex={1}
+          spanClassName="col-span-1"
+          captionEditor={captionEditor}
+          onOpen={onOpen}
+        />
+        <BentoTile
+          shot={shots[2]}
+          shotIndex={2}
+          spanClassName="col-span-1"
+          captionEditor={captionEditor}
+          onOpen={onOpen}
+        />
+        <BentoTile
+          shot={shots[3]}
+          shotIndex={3}
+          spanClassName="col-span-2 lg:col-span-2"
+          captionEditor={captionEditor}
+          onOpen={onOpen}
+        />
+      </div>
+    );
+  }
+
+  if (detailId === 'ideas') {
+    return (
+      <div className={cn(baseGrid, 'lg:grid-cols-4')}>
+        <BentoTile
+          shot={shots[2]}
+          shotIndex={2}
+          spanClassName="col-span-1 row-span-2"
+          topCrop
+          captionEditor={captionEditor}
+          onOpen={onOpen}
+        />
+        <BentoTile
+          shot={shots[0]}
+          shotIndex={0}
+          spanClassName="col-span-1"
+          captionEditor={captionEditor}
+          onOpen={onOpen}
+        />
+        <ZcashComparisonTile
+          before={shots[3]}
+          after={shots[4]}
+          beforeIndex={3}
+          afterIndex={4}
+          captionEditor={captionEditor}
+          onOpen={onOpen}
+        />
+        <BentoTile
+          shot={shots[1]}
+          shotIndex={1}
+          spanClassName="col-span-1"
+          captionEditor={captionEditor}
+          onOpen={onOpen}
+        />
+        <BentoTile
+          shot={shots[5]}
+          shotIndex={5}
+          spanClassName="col-span-1"
+          captionEditor={captionEditor}
+          onOpen={onOpen}
+        />
+        <div className="col-span-1 rounded-[16px] border border-accent/40 bg-[radial-gradient(260px_180px_at_100%_0%,rgba(0,176,154,0.32),transparent_70%)] bg-panel-2 p-4 flex flex-col justify-end gap-1.5 text-left">
+          <span className="text-[11px] font-bold uppercase tracking-[1.6px] text-accent">Chat privado</span>
+          <p className="text-[13.5px] sm:text-[14px] leading-snug text-ink font-semibold">
+            Avisos en tiempo real de compras y ventas: acciones, ETFs y cripto.
+          </p>
+        </div>
+      </div>
     );
   }
 
   return (
-    <div className="columns-2 md:columns-3 lg:columns-4 gap-3 sm:gap-4">
-      {shots.map((shot, i) => (
-        <figure key={shot.src} className="mb-3 sm:mb-4 break-inside-avoid">
-          <div className="rounded-[14px] border border-line bg-panel p-1.5 shadow-[0_16px_40px_rgba(0,0,0,0.4)]">
-            <img
-              src={shot.src}
-              alt={shot.alt}
-              loading="lazy"
-              decoding="async"
-              className="block w-full h-auto rounded-[10px]"
-            />
-          </div>
-          {captionEditor ? (
-            <div className="mt-2">
-              <EditableText
-                label={`Texto de la captura ${i + 1}`}
-                value={shot.caption}
-                onChange={(caption) => captionEditor.onChange(i, caption)}
-                onCommit={captionEditor.onCommit}
-                multiline
-                className="text-[12px] text-muted text-center"
-              />
-            </div>
-          ) : (
-            <figcaption className="text-[12px] leading-snug text-muted text-center mt-2">{shot.caption}</figcaption>
-          )}
-        </figure>
-      ))}
+    <div className={cn(baseGrid, 'lg:grid-cols-[1fr_1fr_1.5fr]')}>
+      <BentoTile
+        shot={shots[0]}
+        shotIndex={0}
+        spanClassName="col-span-1 row-span-2"
+        captionEditor={captionEditor}
+        onOpen={onOpen}
+      />
+      <BentoTile
+        shot={shots[1]}
+        shotIndex={1}
+        spanClassName="col-span-1 row-span-2"
+        captionEditor={captionEditor}
+        onOpen={onOpen}
+      />
+      <BentoTile
+        shot={shots[2]}
+        shotIndex={2}
+        spanClassName="col-span-2 lg:col-span-1 lg:row-span-2"
+        captionEditor={captionEditor}
+        onOpen={onOpen}
+      />
     </div>
   );
 }
 
+interface LightboxState {
+  shots: Shot[];
+  index: number;
+}
+
 /**
- * Debajo del plan ("Un solo plan. Todo incluido."): cada parte de la membresía explicada
- * en detalle: arriba el título y los puntos (en dos columnas en computadora) y debajo todas
- * sus capturas juntas, en mosaico.
+ * Sección "¿Qué incluye?" debajo del hero: cada parte de la membresía dentro de su tarjeta
+ * con mosaico Bento de celdas fijas (sin huecos ni alturas desparejas) y visor al tocar.
  */
 export function IncludesDetail() {
   const { isEditing } = useEditMode();
   const { draft, update, commit, replace } = useSiteContentDraft<DetailTexts>('includes.details', DEFAULT_DETAIL_TEXTS);
+  const [lightbox, setLightbox] = useState<LightboxState | null>(null);
 
   // Lo guardado manda, campo por campo, sobre los valores por defecto.
   const textFor = (id: string): DetailText => ({ ...DEFAULT_DETAIL_TEXTS[id], ...draft[id] });
   const patchText = (id: string, patch: Partial<DetailText>) => update({ [id]: { ...textFor(id), ...patch } });
   const replaceText = (id: string, patch: Partial<DetailText>) => replace({ ...draft, [id]: { ...textFor(id), ...patch } });
 
-  return (
-    <section id={HOME_SECTIONS.includesDetail} className="py-24">
-      <Container>
-        <SectionHeading eyebrow="En detalle" title={<>Así funciona <span className="text-accent">cada parte</span></>} />
+  useEffect(() => {
+    if (!lightbox) return;
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        setLightbox(null);
+      } else if (event.key === 'ArrowRight') {
+        setLightbox((prev) => (prev ? { ...prev, index: (prev.index + 1) % prev.shots.length } : null));
+      } else if (event.key === 'ArrowLeft') {
+        setLightbox((prev) => (prev ? { ...prev, index: (prev.index - 1 + prev.shots.length) % prev.shots.length } : null));
+      }
+    }
+    document.addEventListener('keydown', handleKeyDown);
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [lightbox]);
 
-        <div className="mt-16 flex flex-col gap-20 lg:gap-28">
+  return (
+    <section id={HOME_SECTIONS.includes} className="py-24">
+      <Container>
+        <SectionHeading title={<>¿Qué <span className="text-accent">incluye</span>?</>} />
+
+        <div className="mt-12 lg:mt-16 flex flex-col gap-6 lg:gap-7">
           {DEFAULT_INCLUDE_DETAILS.map((detail) => {
             const text = textFor(detail.id);
             const shots = detail.shots.map((shot, i) => ({ ...shot, caption: text.captions[i] ?? shot.caption }));
@@ -243,59 +483,65 @@ export function IncludesDetail() {
             return (
               <motion.article
                 key={detail.id}
-                id={`${HOME_SECTIONS.includesDetail}-${detail.index}`}
+                id={`${HOME_SECTIONS.includes}-${detail.index}`}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-80px' }}
                 transition={{ duration: 0.6 }}
-                className="flex flex-col gap-10 scroll-mt-28"
+                className={cn(
+                  'rounded-[24px] border bg-panel p-5 sm:p-7 lg:p-9 scroll-mt-28',
+                  detail.bonus
+                    ? 'border-brand-petrol/70 bg-[linear-gradient(180deg,rgba(0,110,150,0.12),transparent_45%)]'
+                    : 'border-line'
+                )}
               >
-                <div className="grid gap-6 lg:grid-cols-2 lg:gap-16 items-start">
+                <div className="grid gap-5 lg:grid-cols-[1.05fr_1fr] lg:gap-14 items-start">
                   <div>
-                  <span
-                    className={cn(
-                      'inline-flex items-center justify-center w-[34px] h-[34px] rounded-[10px] font-bold text-base',
-                      detail.bonus
-                        ? 'bg-brand-petrol text-white shadow-[0_0_18px_rgba(0,110,150,0.6)]'
-                        : 'bg-accent text-ink-inverse shadow-[0_0_18px_rgba(0,176,154,0.5)]'
-                    )}
-                  >
-                    {detail.index}
-                  </span>
-                  <h3
-                    className={cn(
-                      'font-display font-bold text-[clamp(24px,3vw,32px)] leading-tight mt-5 text-balance',
-                      detail.bonus ? 'text-highlight' : 'text-ink'
-                    )}
-                  >
+                    <span
+                      className={cn(
+                        'inline-flex items-center justify-center w-[34px] h-[34px] rounded-[10px] font-bold text-base',
+                        detail.bonus
+                          ? 'bg-brand-petrol text-white shadow-[0_0_18px_rgba(0,110,150,0.6)]'
+                          : 'bg-accent text-ink-inverse shadow-[0_0_18px_rgba(0,176,154,0.5)]'
+                      )}
+                    >
+                      {detail.index}
+                    </span>
+                    <h3
+                      className={cn(
+                        'font-display font-bold text-[clamp(22px,2.6vw,30px)] leading-tight mt-4 text-balance',
+                        detail.bonus ? 'text-highlight' : 'text-ink'
+                      )}
+                    >
+                      {isEditing ? (
+                        <EditableText
+                          label={`Título de la parte ${detail.index}`}
+                          value={text.title}
+                          onChange={(title) => patchText(detail.id, { title })}
+                          onCommit={commit}
+                          multiline
+                        />
+                      ) : (
+                        text.title
+                      )}
+                    </h3>
                     {isEditing ? (
-                      <EditableText
-                        label={`Título de la parte ${detail.index}`}
-                        value={text.title}
-                        onChange={(title) => patchText(detail.id, { title })}
-                        onCommit={commit}
-                        multiline
-                      />
+                      <div className="mt-3">
+                        <EditableText
+                          label={`Introducción de la parte ${detail.index}`}
+                          value={text.intro}
+                          onChange={(intro) => patchText(detail.id, { intro })}
+                          onCommit={commit}
+                          multiline
+                          className="text-muted text-[15.5px] leading-relaxed"
+                        />
+                      </div>
                     ) : (
-                      text.title
+                      <p className="text-muted text-[15.5px] leading-relaxed mt-3 text-pretty">{text.intro}</p>
                     )}
-                  </h3>
-                  {isEditing ? (
-                    <div className="mt-4">
-                      <EditableText
-                        label={`Introducción de la parte ${detail.index}`}
-                        value={text.intro}
-                        onChange={(intro) => patchText(detail.id, { intro })}
-                        onCommit={commit}
-                        multiline
-                        className="text-muted text-[16px] leading-relaxed"
-                      />
-                    </div>
-                  ) : (
-                    <p className="text-muted text-[16px] leading-relaxed mt-4 text-pretty">{text.intro}</p>
-                  )}
                   </div>
-                  <ul className="flex flex-col gap-3 lg:pt-14">
+
+                  <ul className="flex flex-col gap-3 lg:pt-13">
                     {text.points.map((point, i) => (
                       <li key={isEditing ? i : point} className="flex gap-3 items-start text-[14.5px] text-ink-soft">
                         <CheckIcon className={checkClasses} />
@@ -338,7 +584,8 @@ export function IncludesDetail() {
                   </ul>
                 </div>
 
-                <ShotGrid
+                <BentoSectionGrid
+                  detailId={detail.id}
                   shots={shots}
                   captionEditor={
                     isEditing
@@ -351,12 +598,66 @@ export function IncludesDetail() {
                         }
                       : undefined
                   }
+                  onOpen={(index) => setLightbox({ shots, index })}
                 />
               </motion.article>
             );
           })}
         </div>
       </Container>
+
+      {lightbox && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Vista ampliada de la captura"
+          className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-[2px] flex items-center justify-center p-4 sm:px-16"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) setLightbox(null);
+          }}
+        >
+          <button
+            type="button"
+            onClick={() => setLightbox(null)}
+            aria-label="Cerrar"
+            className="absolute top-4 right-4 w-11 h-11 rounded-full bg-panel border border-line-strong text-ink hover:border-accent hover:text-accent grid place-items-center text-2xl transition-colors cursor-pointer"
+          >
+            ×
+          </button>
+          <button
+            type="button"
+            onClick={() =>
+              setLightbox((prev) =>
+                prev ? { ...prev, index: (prev.index - 1 + prev.shots.length) % prev.shots.length } : null
+              )
+            }
+            aria-label="Captura anterior"
+            className="absolute left-3 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-panel border border-line-strong text-ink hover:border-accent hover:text-accent grid place-items-center text-2xl transition-colors cursor-pointer"
+          >
+            ‹
+          </button>
+          <figure className="m-0 max-w-[min(1100px,100%)] flex flex-col items-center">
+            <img
+              src={lightbox.shots[lightbox.index].src}
+              alt={lightbox.shots[lightbox.index].alt}
+              className="max-w-full max-h-[80vh] rounded-[12px] shadow-[0_30px_80px_rgba(0,0,0,0.6)]"
+            />
+            <figcaption className="mt-3 text-[14px] text-ink-soft text-center">
+              {lightbox.shots[lightbox.index].caption} · {lightbox.index + 1} / {lightbox.shots.length}
+            </figcaption>
+          </figure>
+          <button
+            type="button"
+            onClick={() =>
+              setLightbox((prev) => (prev ? { ...prev, index: (prev.index + 1) % prev.shots.length } : null))
+            }
+            aria-label="Siguiente captura"
+            className="absolute right-3 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-panel border border-line-strong text-ink hover:border-accent hover:text-accent grid place-items-center text-2xl transition-colors cursor-pointer"
+          >
+            ›
+          </button>
+        </div>
+      )}
     </section>
   );
 }

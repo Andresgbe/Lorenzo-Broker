@@ -1,5 +1,4 @@
 import { Hero } from '../../widgets/hero';
-import { IncludesSection } from '../../widgets/includes-section';
 import { IncludesDetail } from '../../widgets/includes-detail';
 import { PricingSection } from '../../widgets/pricing-section';
 import { FaqSection } from '../../widgets/faq-section';
@@ -9,9 +8,8 @@ export function HomePage() {
   return (
     <>
       <Hero />
-      <IncludesSection />
-      <PricingSection />
       <IncludesDetail />
+      <PricingSection />
       <FaqSection variant="home" />
       <ClosingCta />
     </>

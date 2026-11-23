@@ -78,7 +78,7 @@ export function Hero() {
           transition={{ duration: 0.6, ease: 'easeOut', delay: 0.2 }}
           className="w-full mt-12"
         >
-          <h1 className="font-display font-bold text-[clamp(34px,5.4vw,62px)] leading-[1.12] text-ink text-balance max-w-5xl mx-auto">
+          <h1 className="font-display font-bold text-[clamp(32px,4.8vw,56px)] leading-[1.12] text-ink text-pretty w-full">
             {isEditing ? (
               <EditableText
                 label="Título (usa **palabra** para resaltarla en verde)"
@@ -92,7 +92,7 @@ export function Hero() {
               <RichText text={draft.title} strongClassName="text-accent font-bold" />
             )}
           </h1>
-          <div className="text-muted text-[17px] sm:text-lg mt-6 mb-9 max-w-3xl mx-auto">
+          <div className="text-muted text-[17px] sm:text-lg mt-6 mb-9 max-w-5xl mx-auto">
             {isEditing ? (
               <EditableText
                 label="Descripción"
